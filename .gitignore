@@ -1,3 +1,4 @@
 salgemmaserverside.sublime-project
 salgemmaserverside.sublime-workspace
-serverSide/node_modules/
+serverside/node_modules
+.*~
