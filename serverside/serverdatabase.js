@@ -1,0 +1,300 @@
+'use strict'
+
+var express = require('express');
+var http = require('http');
+var mysql = require('mysql');
+var server = express();
+
+server.configure(function () {
+	server.set('port', 8585);
+	server.use(express.bodyParser());
+});
+
+http.createServer(server).listen(server.get('port'), function(){
+	console.log('Server avviato e in ascolto alla porta:' + server.get('port'));
+});
+
+var pool = mysql.createPool({
+	host:'192.168.10.7',
+	database:'matteos',
+	user:'matteos',
+	password:'matteos'
+	/* Decommentare le righe seguenti per attivare il limite di connessione e 
+	togliere l'attesa in caso di limite raggiunto e lanciare errore; 
+	connectionLimit:1, //default 10
+	waitForConnection:false //default=true
+	*/
+});
+
+//  <--------------------------> RICHIESTE GET <-------------------------->
+
+/* 
+	La get seguente richiede come parametri dell' URL username e password e ritorna l'id e il nome della risorsa.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	*/
+	server.get('/:login/:pw', function (req, res) {
+		pool.getConnection( function (err, connection){
+			if (err) {
+				res.send(500, err);
+			} else{
+				connection.query('SELECT id, nome FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
+					function (err, results) {
+						if (err) {
+							res.send(500, err);
+						} else{
+							if (results.length===0) {
+								res.send(401, "Autenticazione fallita: username e/o password errati");
+							} else{
+								res.send(200, results);
+							};
+						};
+						connection.end();
+					});
+			};
+		});
+	});
+
+/*
+	La get seguente richiede come parametri dell'URL l'id dell'utente e l'anno su cui effettuare la richiesta.
+	Se ha successo ritorna id e descrizione di tutti gli ordini associati alla risorsa con quel particolare id nell'anno specificato.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	*/
+	server.get('/ordini/:userId/:year', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(500, err);
+			} else{
+				connection.query('SELECT DISTINCT o.id, o.descrizione ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+					'WHERE p.idrisorsa=? AND DATE_FORMAT(o.datacreazione, "%Y")=?', [req.params.userId, req.params.year],
+					function (err, results) {
+						if (err) {
+							res.send(500, err);
+						} else{
+							res.send(200, results);
+						};
+					});
+			};
+			connection.end();
+		});
+	});
+
+/*
+	La get seguente richiede come parametri dell'URL l'id dell'utente e quello dell'ordine.
+	Se ha successo ritorna id e descrizione di tutte le attività collegate a quel particolare orine per quel particolare utente.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	*/
+	server.get('/attivita/:userId/:idordine', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(500, err);
+			} else{
+				connection.query('SELECT r.id, r.descrizione ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+					'WHERE p.idrisorsa=? AND r.idtabella=?', [req.params.userId, req.params.idordine],
+					function (err, results) {
+						if (err) {
+							res.send(500, err);
+						} else{
+							res.send(200, results);
+						};
+					});
+			};
+			connection.end();
+		});
+	});
+
+/*
+	La get seguente richiede come parametri dell'URL l'id dell'utente e dell'attività.
+	Se ha successo ritorna id della pianificazione collegata a quella particolare attività di quell'ordine per quel particolare utente.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	*/
+	server.get('/pianificazione/:userId/:idattivita/:idordine', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(500, err);
+			} else{
+				connection.query('SELECT p.id ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as or ON  or.id=r.idtabella' +
+					'WHERE p.idrisorsa=? AND r.id=? AND or.id=?', [req.params.userId, req.params.idattivita, req.params.idordine],
+					function (err, results) {
+						if (err) {
+							res.send(500, err);
+						} else{
+							res.send(200, results);
+						};
+					});
+			};
+			connection.end();
+		});
+	});
+
+/*
+	La get seguente richiede come parametri dell'URL l'id dell'utente e il mese e l'anno su cui effettuare la query.
+	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	*/
+	server.get('/storico/:userId/:monthOfYear', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(500, err);
+			} else{
+				connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, r.id AS idr, r.descrizione AS attivita, '+
+					'o.id AS ido, o.descrizione AS ordine '+
+					'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
+					'JOIN ordine AS o ON r.idtabella=o.id '+
+					'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%m-%Y")=?', [req.params.userId, req.params.monthOfYear],
+					function (err, results) {
+						if (err) {
+							res.send(500, err);
+						} else{
+							res.send(200, results);
+						};
+					});
+			};
+			connection.end();
+		});
+	});
+
+//  <--------------------------> RICHIESTE POST <-------------------------->
+
+/*
+La post seguente permette di inserire una nuova tupla nella tabella storico. Nel body della richiesta sono necessari:
+idpianificazione, idrisorsa, giorno, secondi, note. Il calcolo di costi e ricavi invece è automatico e demandato alla funzione
+calcolaCostiRicavi.
+Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+*/
+server.post('/insertstorico', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(500, err);
+		} else{
+			calcolaCostiRicavi(req.body.idpianificazione, req.body.secondi, function(tupla){
+				tupla.idrisorsa = req.body.idrisorsa,
+				tupla.idpianificazione = req.body.idpianificazione,
+				tupla.quantita= 0;
+				tupla.giorno= req.body.giorno;
+				tupla.secondi= req.body.secondi;
+				tupla.note= req.body.note;
+				connection.query('INSERT INTO storico SET ?',
+					tupla, function (err, results) {
+						if (err) {
+							res.send(500, err);
+						} else{
+							res.send(200, 'Inserimento correttamente eseguito.');
+						};
+					});
+			});
+		};
+		connection.end();
+	});
+});
+
+//  <--------------------------> RICHIESTE PUT <-------------------------->
+
+server.put('/modificastorico', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(500,err);
+		} else{
+			connection.query();
+		};
+	})
+});
+
+//  <--------------------------> RICHIESTE DELETE <-------------------------->
+
+server.delete('/deletestorico', function (req,res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(500, err);
+		} else{
+			connection.query('DELETE FROM storico WHERE id=?',[req.body.id],
+				function (err, results) {
+					if (err) {
+						res.send(500, err);
+					} else{
+						res.send(200, "Cancellazione effettuata.")
+					};
+				})
+		};
+		connection.end();
+	});
+});
+
+//  <--------------------------> FUNZIONI AGGIUNTIVE <-------------------------->
+
+/*
+La funzione richiede come parametri l'idPianificazone, i secondi lavorati e il callback per capire cosa fare del valore ritornato.
+Calcola i costi e i ricavi, affidandosi alle funzioni calcolaCosto e caloclaRicavo e ritorna l'oggetto contenente
+i parametri costo e ricavo utilizzabile attraverso callback.
+*/
+function calcolaCostiRicavi (pianificazione, secondi, callback) {
+	calcolaCosto(pianificazione, secondi, function(costi){
+		calcolaRicavo(pianificazione, secondi, function(ricavi){
+			var tupla = new Object();
+			tupla.costo = costi;
+			tupla.ricavo = ricavi;
+			callback(tupla);
+		});
+	});
+};
+
+/*
+La funzione richiede l'id della pianificazione, i secondi lavorati e la funzione di callback,
+per sapere cosa fare del valore di costo che calcola.
+Per utilizzi successivi il calcolo del costo dovrà essere integrato con l'unita di misura con cui viene pagato l'articolo
+(reperibile attraverso la colonna unimisura della tabella articololistino).
+*/
+function calcolaCosto (pianificazione, secondi, callback) {
+	var costo = 0;
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			throw err;
+		} else{
+			connection.query('SELECT al.prezzo AS costo '+
+				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) '+
+				'JOIN articololistino AS al ON p.idlistinorisorsa=al.idlistino AND r.idarticolo=al.idarticolo '+
+				'WHERE p.id=?', [pianificazione],
+				function (err, results) {
+					if (err) {
+						throw err;
+					} else{
+						costo = results[0].costo*(secondi/3600);
+						callback(costo);
+					};
+				});
+		};
+		connection.end();
+	});
+};
+
+/*
+La funzione richiede l'id della pianificazione, i secondi lavorati e la funzione di callback,
+per sapere cosa fare del valore di ricavo che calcola.
+Per utilizzi successivi il calcolo del ricavo dovrà essere integrato con l'unita di misura con cui viene pagato l'articolo
+(reperibile attraverso la colonna unimisura della tabella articololistino).
+*/
+function calcolaRicavo (pianificazione, secondi, callback) {
+	var ricavo=0;
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			throw err;
+		} else{
+			connection.query('SELECT al.prezzo AS ricavo '+
+				'FROM (((pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS ord ON ord.id=r.idtabella) '+
+					'JOIN offerta AS offe ON offe.id=ord.idofferta) ' +
+			'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo '+
+			'WHERE p.id=?', [pianificazione],
+			function (err, results) {
+				if (err) {
+					throw err;
+				} else{
+					ricavo = results[0].ricavo*(secondi/3600);
+					callback(ricavo);
+				};
+			});
+		};
+		connection.end();
+	});
+};
