@@ -105,31 +105,6 @@ var pool = mysql.createPool({
 	});
 
 /*
-	La get seguente richiede come parametri dell'URL l'id dell'utente e dell'attività.
-	Se ha successo ritorna id della pianificazione collegata a quella particolare attività di quell'ordine per quel particolare utente.
-	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
-	*/
-	server.get('/pianificazione/:userId/:idattivita/:idordine', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(500, err);
-			} else{
-				connection.query('SELECT p.id ' +
-					'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as or ON  or.id=r.idtabella' +
-					'WHERE p.idrisorsa=? AND r.id=? AND or.id=?', [req.params.userId, req.params.idattivita, req.params.idordine],
-					function (err, results) {
-						if (err) {
-							res.send(500, err);
-						} else{
-							res.send(200, results);
-						};
-					});
-			};
-			connection.end();
-		});
-	});
-
-/*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e il mese e l'anno su cui effettuare la query.
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
@@ -169,22 +144,24 @@ server.post('/insertstorico', function (req, res) {
 		if (err) {
 			res.send(500, err);
 		} else{
-			calcolaCostiRicavi(req.body.idpianificazione, req.body.secondi, function(tupla){
-				tupla.idrisorsa = req.body.idrisorsa,
-				tupla.idpianificazione = req.body.idpianificazione,
-				tupla.quantita= 0;
-				tupla.giorno= req.body.giorno;
-				tupla.secondi= req.body.secondi;
-				tupla.note= req.body.note;
-				connection.query('INSERT INTO storico SET ?',
-					tupla, function (err, results) {
-						if (err) {
-							res.send(500, err);
-						} else{
-							res.send(200, 'Inserimento correttamente eseguito.');
-						};
+			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(idPianificazione){
+					calcolaCostiRicavi(idPianificazione, req.body.secondi, function(tupla){
+						tupla.idrisorsa = req.body.idrisorsa,
+						tupla.idpianificazione = idPianificazione,
+						tupla.quantita= 0;
+						tupla.giorno= req.body.giorno;
+						tupla.secondi= req.body.secondi;
+						tupla.note= req.body.note;
+						connection.query('INSERT INTO storico SET ?',
+							tupla, function (err, results) {
+								if (err) {
+									res.send(500, err);
+								} else{
+									res.send(200, 'Inserimento correttamente eseguito.');
+								};
+							});
 					});
-			});
+				});
 		};
 		connection.end();
 	});
@@ -225,7 +202,7 @@ server.delete('/deletestorico', function (req,res) {
 //  <--------------------------> FUNZIONI AGGIUNTIVE <-------------------------->
 
 /*
-La funzione richiede come parametri l'idPianificazone, i secondi lavorati e il callback per capire cosa fare del valore ritornato.
+La funzione richiede come parametri l'idPianificazione, i secondi lavorati e il callback per capire cosa fare del valore ritornato.
 Calcola i costi e i ricavi, affidandosi alle funzioni calcolaCosto e caloclaRicavo e ritorna l'oggetto contenente
 i parametri costo e ricavo utilizzabile attraverso callback.
 */
@@ -294,6 +271,32 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 					callback(ricavo);
 				};
 			});
+		};
+		connection.end();
+	});
+};
+
+/*
+La funzione seguente riceve come parametri lo userId, l'id dell'ordine e quello dell'attività.
+Trova l'id della pianificazione associata a questi parametri e applica la funzione di callback passatagli come ultimo
+parametro all'id della pianificazione appena trovato.
+*/
+function trovaPianificazione (userId, idOrdine, idAttivita, callback) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			throw err;
+		} else{
+			connection.query('SELECT p.id ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
+				'WHERE p.idrisorsa=? AND ord.id=? AND r.id=?', [userId, idOrdine, idAttivita],
+				function (err, results) {
+					if (err) {
+						throw err;
+					} else{
+						var idPianificazione = results[0].id;
+						callback(idPianificazione);
+					};
+				});
 		};
 		connection.end();
 	});
