@@ -149,7 +149,7 @@ server.post('/insertstorico', function (req, res) {
 					tupla.idrisorsa = req.body.idrisorsa,
 					tupla.idpianificazione = idPianificazione,
 					tupla.quantita= 0;
-					tupla.giorno= req.body.giorno;
+					tupla.giorno= new Date(req.body.giorno);
 					tupla.secondi= req.body.secondi;
 					tupla.note= req.body.note;
 					connection.query('INSERT INTO storico SET ?',
