@@ -145,23 +145,23 @@ server.post('/insertstorico', function (req, res) {
 			res.send(500, err);
 		} else{
 			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(idPianificazione){
-					calcolaCostiRicavi(idPianificazione, req.body.secondi, function(tupla){
-						tupla.idrisorsa = req.body.idrisorsa,
-						tupla.idpianificazione = idPianificazione,
-						tupla.quantita= 0;
-						tupla.giorno= req.body.giorno;
-						tupla.secondi= req.body.secondi;
-						tupla.note= req.body.note;
-						connection.query('INSERT INTO storico SET ?',
-							tupla, function (err, results) {
-								if (err) {
-									res.send(500, err);
-								} else{
-									res.send(200, 'Inserimento correttamente eseguito.');
-								};
-							});
-					});
+				calcolaCostiRicavi(idPianificazione, req.body.secondi, function(tupla){
+					tupla.idrisorsa = req.body.idrisorsa,
+					tupla.idpianificazione = idPianificazione,
+					tupla.quantita= 0;
+					tupla.giorno= req.body.giorno;
+					tupla.secondi= req.body.secondi;
+					tupla.note= req.body.note;
+					connection.query('INSERT INTO storico SET ?',
+						tupla, function (err, results) {
+							if (err) {
+								res.send(500, err);
+							} else{
+								res.send(200, 'Inserimento correttamente eseguito.');
+							};
+						});
 				});
+			});
 		};
 		connection.end();
 	});
@@ -169,14 +169,45 @@ server.post('/insertstorico', function (req, res) {
 
 //  <--------------------------> RICHIESTE PUT <-------------------------->
 
-server.put('/modificastorico', function (req, res) {
+server.put('/editstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			res.send(500,err);
 		} else{
-			connection.query();
-		};
-	})
+			connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results){
+				if (err) {
+					res.send(500, err);
+				} else{
+					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(idPianificazione){
+						calcolaCostiRicavi(idPianificazione, req.body.secondi, function(nuovaTupla){
+							nuovaTupla.id = req.body.id;
+							nuovaTupla.idrisorsa = req.body.idrisorsa;
+							nuovaTupla.idpianificazione = idPianificazione;
+							nuovaTupla.quantita = 0;
+							nuovaTupla.giorno = new Date(req.body.giorno);
+							nuovaTupla.secondi = req.body.secondi;
+							nuovaTupla.note = req.body.note;
+							if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
+								nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
+								nuovaTupla.secondi == results[0].secondi &&
+								nuovaTupla.note == results[0].note){
+								res.send(400, 'Nessuna modifica apportata, riga identica.');
+						} else{
+							connection.query('UPDATE storico SET ? WHERE id=?', [nuovaTupla, req.body.id], function (err, results){
+								if (err) {
+									res.send(500, err);
+								} else{
+									res.send(200, 'Modifica effettuata con successo');
+								}
+							});
+						}
+					});
+					});
+}
+});
+}
+connection.end();
+});
 });
 
 //  <--------------------------> RICHIESTE DELETE <-------------------------->
