@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="it" ng-app>
+<head>
+	<meta charset="utf-8">
+	<title>Salgemma Interface</title>
+	<link href="img/anteaLogo.png" rel="icon">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<script src="lib/angular/angular.js"></script>
+	<script src="lib/angular/angular-bootstrap.min.js"></script>
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script src="lib/bootstrap/bootstrap.min.js"></script>
+	<script src="js/autenticazione.js"></script>
+</head>
+<body>
+	<h1>Salgemma Interface</h1>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span4"></div>
+			<div class="span4 hero-unit">
+				<h2>Autenticazione:</h2>
+				<p>
+					<form class="form-horizontal" ng-submit="submitLogin(login, pw)">
+						<div class="control-group">
+							<label class="control-label" for="login">UserName</label>
+							<div class="controls">
+								<input type="text" id="login" ng-model="login" placeholder="UserName">
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="password">Password</label>
+							<div class="controls">
+								<input type="password" id="password" ng-model="pw" placeholder="Password">
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="controls">
+								<button type="submit" class="btn"><i class="icon-ok"></i>OK</button>
+							</div>
+						</div>
+					</form>
+				</p>
+				<ul class="unstyled">
+					<li ng-repeat="resouce in resources">
+						<p>Salve {{resource.name}}</p>
+					</li>
+				</ul>
+			</div>
+			<div class="span4"></div>
+		</div>
+	</div>
+</body>
+</html>
