@@ -57,7 +57,7 @@ var pool = mysql.createPool({
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e l'anno su cui effettuare la richiesta.
 	Se ha successo ritorna id e descrizione di tutti gli ordini associati alla risorsa con quel particolare id nell'anno specificato.
-	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
 	server.get('/ordini/:userId/:year', function (req, res) {
 		pool.getConnection(function (err, connection) {
@@ -82,7 +82,7 @@ var pool = mysql.createPool({
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e quello dell'ordine.
 	Se ha successo ritorna id e descrizione di tutte le attività collegate a quel particolare orine per quel particolare utente.
-	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
 	server.get('/attivita/:userId/:idordine', function (req, res) {
 		pool.getConnection(function (err, connection) {
@@ -107,7 +107,7 @@ var pool = mysql.createPool({
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e il mese e l'anno su cui effettuare la query.
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
-	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
 	server.get('/storico/:userId/:monthOfYear', function (req, res) {
 		pool.getConnection(function (err, connection) {
@@ -135,9 +135,9 @@ var pool = mysql.createPool({
 
 /*
 La post seguente permette di inserire una nuova tupla nella tabella storico. Nel body della richiesta sono necessari:
-idpianificazione, idrisorsa, giorno, secondi, note. Il calcolo di costi e ricavi invece è automatico e demandato alla funzione
-calcolaCostiRicavi.
-Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
+idordine, id attivita, idrisorsa, giorno, secondi, note. Il calcolo di costi e ricavi invece è automatico e demandato
+alla funzione calcolaCostiRicavi.
+Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 */
 server.post('/insertstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
@@ -175,6 +175,12 @@ server.post('/insertstorico', function (req, res) {
 
 //  <--------------------------> RICHIESTE PUT <-------------------------->
 
+/*
+La put seguente permette di modificare una tupla nella tabella storico. Nel body della richiesta sono necessari:
+id dell'ordine e dell'attività, idrisorsa, giorno, secondi, note. Il calcolo di costi e ricavi invece è automatico 
+e demandato alla funzione calcolaCostiRicavi.
+Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
+*/
 server.put('/editstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
@@ -227,6 +233,11 @@ connection.end();
 
 //  <--------------------------> RICHIESTE DELETE <-------------------------->
 
+/*
+La delete seguente permette di cancellare una tupla dalla tabella storico. Nel body della richiesta è necessario l'id della
+tupla da cancellare.
+Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
+*/
 server.delete('/deletestorico', function (req,res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
