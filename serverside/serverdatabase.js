@@ -144,24 +144,30 @@ server.post('/insertstorico', function (req, res) {
 		if (err) {
 			res.send(500, err);
 		} else{
-			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(idPianificazione){
-				calcolaCostiRicavi(idPianificazione, req.body.secondi, function(tupla){
-					tupla.idrisorsa = req.body.idrisorsa,
-					tupla.idpianificazione = idPianificazione,
-					tupla.quantita= 0;
-					tupla.giorno= new Date(req.body.giorno);
-					tupla.secondi= req.body.secondi;
-					tupla.note= req.body.note;
-					connection.query('INSERT INTO storico SET ?',
-						tupla, function (err, results) {
-							if (err) {
-								res.send(500, err);
-							} else{
-								res.send(200, 'Inserimento correttamente eseguito.');
-							};
-						});
+			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idPianificazione){
+				if(err){
+					res.send(500, err);
+				}else {
+					calcolaCostiRicavi(idPianificazione, req.body.secondi, function(err, tupla){
+						if (err) {
+							res.send(500, err);
+						} else{
+							tupla.idrisorsa = req.body.idrisorsa,
+							tupla.idpianificazione = idPianificazione,
+							tupla.quantita= 0;
+							tupla.giorno= new Date(req.body.giorno);
+							tupla.secondi= req.body.secondi;
+							tupla.note= req.body.note;
+							connection.query('INSERT INTO storico SET ?',
+								tupla, function (err, results) {
+									if (err) {
+										res.send(500, err);
+									} else{
+										res.send(200, 'Inserimento correttamente eseguito.');
+									};
+								});}
+						});}
 				});
-			});
 		};
 		connection.end();
 	});
@@ -178,31 +184,40 @@ server.put('/editstorico', function (req, res) {
 				if (err) {
 					res.send(500, err);
 				} else{
-					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(idPianificazione){
-						calcolaCostiRicavi(idPianificazione, req.body.secondi, function(nuovaTupla){
-							nuovaTupla.id = req.body.id;
-							nuovaTupla.idrisorsa = req.body.idrisorsa;
-							nuovaTupla.idpianificazione = idPianificazione;
-							nuovaTupla.quantita = 0;
-							nuovaTupla.giorno = new Date(req.body.giorno);
-							nuovaTupla.secondi = req.body.secondi;
-							nuovaTupla.note = req.body.note;
-							if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
-								nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
-								nuovaTupla.secondi == results[0].secondi &&
-								nuovaTupla.note == results[0].note){
-								res.send(400, 'Nessuna modifica apportata, riga identica.');
+					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idPianificazione){
+						if (err) {
+							res.send(500, err);
 						} else{
-							connection.query('UPDATE storico SET ? WHERE id=?', [nuovaTupla, req.body.id], function (err, results){
+							calcolaCostiRicavi(idPianificazione, req.body.secondi, function(err, nuovaTupla){
 								if (err) {
 									res.send(500, err);
 								} else{
-									res.send(200, 'Modifica effettuata con successo');
+									nuovaTupla.id = req.body.id;
+									nuovaTupla.idrisorsa = req.body.idrisorsa;
+									nuovaTupla.idpianificazione = idPianificazione;
+									nuovaTupla.quantita = 0;
+									nuovaTupla.giorno = new Date(req.body.giorno);
+									nuovaTupla.secondi = req.body.secondi;
+									nuovaTupla.note = req.body.note;
+									if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
+										nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
+										nuovaTupla.secondi == results[0].secondi &&
+										nuovaTupla.note == results[0].note){
+										res.send(400, 'Nessuna modifica apportata, riga identica.');
+								} else{
+									connection.query('UPDATE storico SET ? WHERE id=?',
+										[nuovaTupla, req.body.id], function (err, results){
+										if (err) {
+											res.send(500, err);
+										} else{
+											res.send(200, 'Modifica effettuata con successo');
+										}
+									});
 								}
-							});
-						}
-					});
-					});
+							}
+						});
+}
+});
 }
 });
 }
@@ -238,14 +253,21 @@ Calcola i costi e i ricavi, affidandosi alle funzioni calcolaCosto e caloclaRica
 i parametri costo e ricavo utilizzabile attraverso callback.
 */
 function calcolaCostiRicavi (pianificazione, secondi, callback) {
-	calcolaCosto(pianificazione, secondi, function(costi){
-		calcolaRicavo(pianificazione, secondi, function(ricavi){
-			var tupla = new Object();
-			tupla.costo = costi;
-			tupla.ricavo = ricavi;
-			callback(tupla);
+	calcolaCosto(pianificazione, secondi, function(err, costi){
+		if(err){
+			callback(err, tupla)
+		} else {calcolaRicavo(pianificazione, secondi, function(err, ricavi){
+			if (err) {
+				callback(err, tupla);
+			} else{
+				var tupla = new Object();
+				tupla.costo = costi;
+				tupla.ricavo = ricavi;
+				callback(err, tupla);
+			}
 		});
-	});
+	}
+});
 };
 
 /*
@@ -258,7 +280,7 @@ function calcolaCosto (pianificazione, secondi, callback) {
 	var costo = 0;
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			throw err;
+			callback(err, costo);
 		} else{
 			connection.query('SELECT al.prezzo AS costo '+
 				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) '+
@@ -266,10 +288,10 @@ function calcolaCosto (pianificazione, secondi, callback) {
 				'WHERE p.id=?', [pianificazione],
 				function (err, results) {
 					if (err) {
-						throw err;
+						callback(err, costo);
 					} else{
 						costo = results[0].costo*(secondi/3600);
-						callback(costo);
+						callback(err, costo);
 					};
 				});
 		};
@@ -287,7 +309,7 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 	var ricavo=0;
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			throw err;
+			callback(err, ricavo);
 		} else{
 			connection.query('SELECT al.prezzo AS ricavo '+
 				'FROM (((pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS ord ON ord.id=r.idtabella) '+
@@ -296,10 +318,10 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 			'WHERE p.id=?', [pianificazione],
 			function (err, results) {
 				if (err) {
-					throw err;
+					callback(err, ricavo);
 				} else{
 					ricavo = results[0].ricavo*(secondi/3600);
-					callback(ricavo);
+					callback(err, ricavo);
 				};
 			});
 		};
@@ -315,17 +337,17 @@ parametro all'id della pianificazione appena trovato.
 function trovaPianificazione (userId, idOrdine, idAttivita, callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			throw err;
+			callback(err, idPianificazione);
 		} else{
 			connection.query('SELECT p.id ' +
 				'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
 				'WHERE p.idrisorsa=? AND ord.id=? AND r.id=?', [userId, idOrdine, idAttivita],
 				function (err, results) {
 					if (err) {
-						throw err;
+						callback(err, idPianificazione);
 					} else{
 						var idPianificazione = results[0].id;
-						callback(idPianificazione);
+						callback(err, idPianificazione);
 					};
 				});
 		};
