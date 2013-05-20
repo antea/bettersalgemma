@@ -1,11 +1,20 @@
-function autenticazioneCtrl ($scope) {
-	$scope.resources=[];
-	
-	$scope.submitLogin = function (userName, pw){
-		$http.get('http://locahost:8585/'+userName+'/'+pw).success(function (code, results){
-			if (code===200) {
-				$scope.resources.push(results[0]);
-			}
-		});
-	};
+function AutenticazioneCtrl ($scope, $http) {
+	$scope.users=[];
+	$scope.errors=[];
+	$scope.submitLogin = function (){
+			$http.get('http://localhost:8585/login/'+$scope.userName+'/'+$scope.pw).
+			success(function (data, status, headers, config) {
+				$scope.errors = [];
+				$scope.users = data;
+			}).
+			error(function (data, status, headers, config) {
+				console.log(status);
+				console.log(data);
+				if (status===401) {
+					$scope.errors=[{subject:"Errore di autenticazione:", description:"Username e/o password errati"}];
+				} else{
+					$scope.errors=[{subject:"Errore del server:", description:"Riprovare, se l'errore persiste contattare l'amministratore."}];
+				};
+			});
+		};
 };

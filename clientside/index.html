@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/bootstrap.css">
 	<script src="lib/angular/angular.js"></script>
+	<script src="lib/angular/angular-resource.min.js"></script>
 	<script src="lib/angular/angular-bootstrap.min.js"></script>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="lib/bootstrap/bootstrap.min.js"></script>
@@ -17,34 +18,34 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span4"></div>
-			<div class="span4 hero-unit">
+			<div class="span4 hero-unit" ng-controller="AutenticazioneCtrl">
 				<h2>Autenticazione:</h2>
 				<p>
-					<form class="form-horizontal" ng-submit="submitLogin(login, pw)">
+					<form class="form-horizontal">
 						<div class="control-group">
-							<label class="control-label" for="login">UserName</label>
+							<label class="control-label" for="login">UserName:</label>
 							<div class="controls">
-								<input type="text" id="login" ng-model="login" placeholder="UserName">
+								<input type="text" id="login" ng-model="userName" placeholder="UserName">
 							</div>
 						</div>
 						<div class="control-group">
-							<label class="control-label" for="password">Password</label>
+							<label class="control-label" for="password">Password:</label>
 							<div class="controls">
 								<input type="password" id="password" ng-model="pw" placeholder="Password">
 							</div>
 						</div>
 						<div class="control-group">
 							<div class="controls">
-								<button type="submit" class="btn"><i class="icon-ok"></i>OK</button>
+								<button class="btn" ng-click="submitLogin()"><i class="icon-ok"></i>OK</button>
 							</div>
 						</div>
 					</form>
 				</p>
-				<ul class="unstyled">
-					<li ng-repeat="resouce in resources">
-						<p>Salve {{resource.name}}</p>
-					</li>
-				</ul>
+				<h4 ng-repeat="user in users">Salve {{user.nome}}</h4>
+				<div class="alert alert-error" ng-repeat="error in errors">
+					<h4>{{error.subject}}</h4>
+					<p>{{error.description}}</p>
+				</div>
 			</div>
 			<div class="span4"></div>
 		</div>

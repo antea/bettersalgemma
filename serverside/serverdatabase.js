@@ -4,13 +4,15 @@ var express = require('express');
 var http = require('http');
 var mysql = require('mysql');
 var server = express();
+var path = require('path');
 
 server.configure(function () {
 	server.set('port', 8585);
 	server.use(express.bodyParser());
+	server.use(express.static(path.join(__dirname,"../clientside")));
 });
 
-http.createServer(server).listen(server.get('port'), function(){
+server.listen(server.get('port'), function(){
 	console.log('Server avviato e in ascolto alla porta:' + server.get('port'));
 });
 
@@ -32,7 +34,7 @@ var pool = mysql.createPool({
 	La get seguente richiede come parametri dell' URL username e password e ritorna l'id e il nome della risorsa.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
 	*/
-	server.get('/:login/:pw', function (req, res) {
+	server.get('/login/:login/:pw', function (req, res) {
 		pool.getConnection( function (err, connection){
 			if (err) {
 				res.send(500, err);
@@ -43,8 +45,10 @@ var pool = mysql.createPool({
 							res.send(500, err);
 						} else{
 							if (results.length===0) {
+								//res.header("Access-Control-Allow-Origin", "*");
 								res.send(401, "Autenticazione fallita: username e/o password errati");
 							} else{
+								//res.header("Access-Control-Allow-Origin", "*");
 								res.send(200, results);
 							};
 						};
@@ -213,12 +217,12 @@ server.put('/editstorico', function (req, res) {
 								} else{
 									connection.query('UPDATE storico SET ? WHERE id=?',
 										[nuovaTupla, req.body.id], function (err, results){
-										if (err) {
-											res.send(500, err);
-										} else{
-											res.send(200, 'Modifica effettuata con successo');
-										}
-									});
+											if (err) {
+												res.send(500, err);
+											} else{
+												res.send(200, 'Modifica effettuata con successo');
+											}
+										});
 								}
 							}
 						});
