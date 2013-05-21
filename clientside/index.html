@@ -4,47 +4,52 @@
 	<meta charset="utf-8">
 	<title>Salgemma Interface</title>
 	<link href="img/anteaLogo.png" rel="icon">
-	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/bootstrap-responsive.css" type="text/css" media="screen">
 	<script src="lib/angular/angular.js"></script>
 	<script src="lib/angular/angular-resource.min.js"></script>
 	<script src="lib/angular/angular-bootstrap.min.js"></script>
+	<script src="lib/md5.js"></script>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="lib/bootstrap/bootstrap.min.js"></script>
 	<script src="js/autenticazione.js"></script>
 </head>
 <body>
-	<h1>Salgemma Interface</h1>
+	<div class="page-header">
+		<h1><img id="logoAntea" src="img/Antea_logo_colore_def.png">Salgemma Interface</h1>
+	</div>
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span4"></div>
-			<div class="span4 hero-unit" ng-controller="AutenticazioneCtrl">
-				<h2>Autenticazione:</h2>
-				<p>
-					<form class="form-horizontal">
-						<div class="control-group">
-							<label class="control-label" for="login">UserName:</label>
-							<div class="controls">
-								<input type="text" id="login" ng-model="userName" placeholder="UserName">
+			<div class="span4" ng-controller="AutenticazioneCtrl">
+				<div class="hero-unit"><h2>Autenticazione:</h2>
+					<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="login">UserName:</label>
+								<div class="controls">
+									<input type="text" id="login" ng-model="userName" placeholder="UserName">
+								</div>
 							</div>
-						</div>
-						<div class="control-group">
-							<label class="control-label" for="password">Password:</label>
-							<div class="controls">
-								<input type="password" id="password" ng-model="pw" placeholder="Password">
+							<div class="control-group">
+								<label class="control-label" for="password">Password:</label>
+								<div class="controls">
+									<input type="password" id="password" ng-model="pw" placeholder="Password">
+								</div>
 							</div>
-						</div>
-						<div class="control-group">
-							<div class="controls">
-								<button class="btn" ng-click="submitLogin()"><i class="icon-ok"></i>OK</button>
+							<div class="control-group">
+								<div class="controls">
+									<button class="btn" ng-click="submitLogin()"><i class="icon-ok"></i> OK</button>
+								</div>
 							</div>
-						</div>
-					</form>
-				</p>
-				<h4 ng-repeat="user in users">Salve {{user.nome}}</h4>
-				<div class="alert alert-error" ng-repeat="error in errors">
-					<h4>{{error.subject}}</h4>
-					<p>{{error.description}}</p>
+						</form>
+					</p>
+					<h4 ng-repeat="user in users">Salve {{user.nome}}</h4>
+					<div class="alert alert-error" ng-repeat="error in errors">
+						<h4>{{error.subject}}</h4>
+						<p>{{error.description}}</p>
+					</div>
 				</div>
 			</div>
 			<div class="span4"></div>

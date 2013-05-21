@@ -1,0 +1,11 @@
+#logoAntea {
+	width: 20%;
+}
+body {
+	background-image:url('../img/haliteGrande.JPG');
+	background-repeat: repeat-y;
+	background-size: 100%;
+}
+.page-header{
+	background-color: white;
+}
