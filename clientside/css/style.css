@@ -1,6 +1,3 @@
-#logoAntea {
-	width: 20%;
-}
 body {
 	background-image:url('../img/haliteGrande.JPG');
 	background-repeat: repeat-y;
@@ -8,4 +5,10 @@ body {
 }
 .page-header{
 	background-color: white;
+}
+#logoAnteaLogin {
+	width: 20%;
+}
+#logoAnteaCalendar {
+	width: 6%;
 }

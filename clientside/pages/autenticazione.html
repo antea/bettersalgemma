@@ -1,0 +1,38 @@
+<div class="page-header">
+	<h1><img id="logoAnteaLogin" src="img/Antea_logo_colore_def.png">Salgemma Interface</h1>
+</div>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span4"></div>
+		<div class="span4">
+			<div class="hero-unit"><h2>Autenticazione:</h2>
+				<p>
+					<form class="form-horizontal">
+						<div class="control-group">
+							<label class="control-label" for="login">UserName:</label>
+							<div class="controls">
+								<input type="text" id="login" ng-model="userName" placeholder="UserName">
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="password">Password:</label>
+							<div class="controls">
+								<input type="password" id="password" ng-model="pw" placeholder="Password">
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="controls">
+								<button class="btn" ng-click="submitLogin()"><i class="icon-ok"></i> OK</button>
+							</div>
+						</div>
+					</form>
+				</p>
+				<div class="alert alert-error" ng-repeat="error in errors">
+					<h4>{{error.subject}}</h4>
+					<p>{{error.description}}</p>
+				</div>
+			</div>
+		</div>
+		<div class="span4"></div>
+	</div>
+</div>

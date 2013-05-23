@@ -1,29 +1,36 @@
-<!doctype html>
-<html lang="it" ng-app>
-<head>
-	<meta charset="utf-8">
-	<title>Salgemma Interface</title>
-	<link href="img/anteaLogo.png" rel="icon">
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen">
-	<script src="lib/angular/angular.js"></script>
-	<script src="lib/angular/angular-resource.min.js"></script>
-	<script src="lib/angular/angular-bootstrap.min.js"></script>
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
-	<script src="lib/bootstrap/bootstrap.min.js"></script>
-	<script src="js/autenticazione.js"></script>
-</head>
-<body>
-	<div class="page-header">
-		<h1>Salgemma Interface</h1>
-	</div>
-	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class="span2">
-			</div>
-			<div class="span10">
+<div class="page-header">
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container" style="width: auto;">
+				<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" class="brand">
+				<ul class="nav pull-right">
+					<li class="dropdown">
+						<a id="dropuser" href="#" role="button" class="dropdown-toggle brand" data-toggle="dropdown" ng-repeat="user in users">
+							{{user.nome}}
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dropuser">
+							<li role="presentation">
+								<a role="menuitem" tabiondex="-1" href="#/salgemmainterface/logout"><i class="icon-off"></i> Logout</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
-</body>
-</html>
+</div>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span2">
+			<div class="well well-large">
+
+			</div>
+		</div>
+		<div class="span10">
+			<div class="well well-large">
+
+			</div>
+		</div>
+	</div>
+</div>
