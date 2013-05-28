@@ -33,6 +33,9 @@
 	<tr>
 		<td ng-repeat="day in days">{{day}}</td>
 	</tr>
+	<tr ng-repeat="settimana in calendario">
+		<td ng-repeat="gg in settimana.giorni">{{gg.numero}}</td>
+	</tr>
 </table>
 			</div>
 		</div>

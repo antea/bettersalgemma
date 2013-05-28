@@ -27,29 +27,35 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 	var questoAnno = now.getFullYear();
 	var primoMeseCorrente = new Date(questoAnno, questoMese, 1).getDay()-1;
 	var ultimoMeseCorrente = new Date(questoAnno, questoMese+1, 0);
+	var set = -1;
 	for (var i = 0; i < ultimoMeseCorrente.getDate()+primoMeseCorrente; i++) {
+		if (i%7==0) {
+			set++;
+			$scope.calendario[set]={giorni: new Array(7)}	
+		}
 		if (i<primoMeseCorrente) {
-			$scope.calendario[i] = {};
+			$scope.calendario[set].giorni[i%7] = {};
 		} else{
 			var dayi = new Date(questoAnno, questoMese, i+1-primoMeseCorrente);
-			$scope.calendario[i] = {numero: dayi.getDate() , 
+			$scope.calendario[set].giorni[i%7] = {numero: dayi.getDate() , 
 				giorno: $scope.days[dayi.getDay()-1], 
 				date: (dayi.getDate()) + "-" + (questoMese+1) + "-" + questoAnno
 			}
 			if (i+1-primoMeseCorrente==oggi) {
-				$scope.calendario[i].oggi = true;
+				$scope.calendario[set].giorni[i%7].oggi = true;
 			};
 		};
 	};
-	$scope.calendario.forEach(function (arrayElement) {
-		$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+arrayElement.date).
-		success(function (data, status, headers, config) {
-			arrayElement.storico = data;
-		}).
-		error(function (data, status, headers, config) {
-			if (status!==200) {
-				$scope.errors = [{subject: "Errore del server:", description: "Riprovare, se l'errore persiste contattare l'amministratore."}];
-			}
+	$scope.calendario.forEach(function (settimana) {
+		settimana.giorni.forEach(function (gg){$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+gg.date).
+			success(function (data, status, headers, config) {
+				gg.storico = data;
+			}).
+			error(function (data, status, headers, config) {
+				if (status!==200) {
+					$scope.errors = [{subject: "Errore del server:", description: "Riprovare, se l'errore persiste contattare l'amministratore."}];
+				}
+			});
 		});
 	});
 	console.log($scope.calendario);
