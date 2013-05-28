@@ -113,7 +113,7 @@ var pool = mysql.createPool({
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/storico/:userId/:monthOfYear', function (req, res) {
+	server.get('/storico/:userId/:dayOfYear', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(500, err);
@@ -122,7 +122,7 @@ var pool = mysql.createPool({
 					'o.id AS ido, o.descrizione AS ordine '+
 					'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
 					'JOIN ordine AS o ON r.idtabella=o.id '+
-					'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%m-%Y")=?', [req.params.userId, req.params.monthOfYear],
+					'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%e-%c-%Y")=?', [req.params.userId, req.params.dayOfYear],
 					function (err, results) {
 						if (err) {
 							res.send(500, err);
@@ -332,7 +332,7 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 			'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo '+
 			'WHERE p.id=?', [pianificazione],
 			function (err, results) {
-				if (err) {
+				if (err || !results[0]) {  //ATTENZIONE ACCROCCHIO DA CONTROLLARE!!!!!
 					callback(err, ricavo);
 				} else{
 					ricavo = results[0].ricavo*(secondi/3600);
