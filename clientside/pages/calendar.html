@@ -22,21 +22,26 @@
 </div>
 <div class="container-fluid">
 	<div class="row-fluid">
-		<div class="span2">
-			<div class="well well-large">
+		<div class="span12">
+			<div class="well">
+				<table class="table table-bordered">
+					<tr>
+						<th>Ordine</th>
+						<th>Attività</th>
+						<th ng-repeat="day in month"><p>{{day.day}}</p><p>{{day.number}}</p></th>
+					</tr>
+					<tr ng-repeat="ordine in ordini">
+						<td rowspan="{{ordine.attivita.length+1}}" id="ord">{{ordine.descrizione}}</td>
+					</tr>
+					<tr ng-repeat="attivitaSingole in ordini | filtroAttivita">
+						<td>
+							{{attivitaSingole.descrizione}}
+						</td>
+						<td ng-repeat="day in month">
 
-			</div>
-		</div>
-		<div class="span10">
-			<div class="well well-large">
-<table class="table table-bordered">
-	<tr>
-		<td ng-repeat="day in days">{{day}}</td>
-	</tr>
-	<tr ng-repeat="settimana in calendario">
-		<td ng-repeat="gg in settimana.giorni">{{gg.numero}}</td>
-	</tr>
-</table>
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</div>

@@ -19,7 +19,7 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location) {
 }
 
 function CalendarCtrl ($rootScope, $scope, $http) {
-	$scope.days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+	/*$scope.days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 	$scope.calendario = [];
 	var now = new Date();
 	var oggi = now.getDate();
@@ -58,5 +58,35 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 			});
 		});
 	});
-	console.log($scope.calendario);
+console.log($scope.calendario);*/
+$scope.month = [];
+$scope.ordini = [];
+var week = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+var now = new Date();
+var thisMonth = now.getMonth();
+var thisYear = now.getFullYear();
+var lastOfMonth = new Date(thisYear, thisMonth+1, 0).getDate();
+for (var i = 0; i < lastOfMonth; i++) {
+	var dayi = new Date(thisYear, thisMonth, i+1);
+	$scope.month[i] = {number: dayi.getDate(),
+		day: week[dayi.getDay()],
+		date: dayi.getDate()+"-"+thisMonth+1+"-"+thisYear};
+	};
+	$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+thisYear).
+	success(function (data, status, headers, config) {
+		$scope.errors = [];
+		$scope.ordini = data;
+		$scope.ordini.forEach(function (ordine) {
+			$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id).
+			success(function (data, status, headers, config) {
+				ordine.attivita = data;
+			}).
+			error(function (data, status, headers, config) {
+				$scope.errors = [{subject: "Errore del server:", description: "Riprovare, se l'errore persiste contattare l'amministratore."}];
+			});
+		});
+	}).
+	error(function (data, status, headers, config) {
+		$scope.errors = [{subject: "Errore del server:", description: "Riprovare, se l'errore persiste contattare l'amministratore."}];
+	});
 }
