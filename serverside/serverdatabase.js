@@ -113,23 +113,29 @@ var pool = mysql.createPool({
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/storico/:userId/:dayOfYear', function (req, res) {
+	server.get('/storico/:userId/:monthOfYear/:idordine/:idattivita', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(500, err);
 			} else{
-				connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, r.id AS idr, r.descrizione AS attivita, '+
-					'o.id AS ido, o.descrizione AS ordine '+
-					'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
-					'JOIN ordine AS o ON r.idtabella=o.id '+
-					'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%e-%c-%Y")=?', [req.params.userId, req.params.dayOfYear],
-					function (err, results) {
-						if (err) {
-							res.send(500, err);
-						} else{
-							res.send(200, results);
-						};
-					});
+				trovaPianificazione(req.params.userId, req.params.idordine, req.params.idattivita, function (err, idPianificazione) {
+					if (err) {
+						res.send(500, err);
+					} else{
+						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
+							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
+							'JOIN ordine AS o ON r.idtabella=o.id '+
+							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione=?',
+							[req.params.userId, req.params.monthOfYear, idPianificazione],
+							function (err, results) {
+								if (err) {
+									res.send(500, err);
+								} else{
+									res.send(200, results);
+								};
+							});
+					};
+				})
 			};
 			connection.end();
 		});
@@ -242,12 +248,12 @@ La delete seguente permette di cancellare una tupla dalla tabella storico. Nel b
 tupla da cancellare.
 Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 */
-server.delete('/deletestorico', function (req,res) {
+server.delete('/deletestorico/:idstorico', function (req,res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			res.send(500, err);
 		} else{
-			connection.query('DELETE FROM storico WHERE id=?',[req.body.id],
+			connection.query('DELETE FROM storico WHERE id=?',[req.params.idstorico],
 				function (err, results) {
 					if (err) {
 						res.send(500, err);

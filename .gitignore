@@ -2,3 +2,4 @@ salgemmaserverside.sublime-project
 salgemmaserverside.sublime-workspace
 serverside/node_modules
 .*~
+*.log

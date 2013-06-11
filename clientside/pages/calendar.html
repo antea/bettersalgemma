@@ -37,8 +37,31 @@
 						<td>
 							{{attivitaSingole.descrizione}}
 						</td>
-						<td ng-repeat="day in month">
-
+						<td ng-repeat="day in attivitaSingole.mese" ng-dblclick="editable=true">
+							<form class="form-inline" ng-hide="editable">
+								<label popover>{{day.ore}}</label>
+								<label>{{day.unimis}}</label>
+							</form>
+							<form class="form-horizontal" ng-show="editable">
+								<div class="control-group">
+									<label class="control-label" for="ore">Ore:</label>
+									<div class="controls">
+										<input type="text" id="ore" ng-model="editore" placeholder={{day.ore}}>
+									</div>
+								</div>
+								<div class="control-group">
+									<label class="control-label" for="note">Note:</label>
+									<div class="controls">
+										<input type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
+									</div>
+								</div>
+								<div class="control-group">
+									<div class="controls">
+										<button class="btn" ng-click="editable=false; save($index, day, attivitaSingole, editore, editnote)"><i class="icon-ok"></i> OK</button>
+										<button class="btn" ng-click="editable=false; editore=undefined; editnote=undefined"><i class="icon-remove"></i> Annulla</button>
+									</div>
+								</div>
+							</form>
 						</td>
 					</tr>
 				</table>

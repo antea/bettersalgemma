@@ -15,3 +15,11 @@ body {
 #ord {
 	vertical-align: middle;
 }
+.hero-unit {
+	margin-top: 150px;
+	margin-bottom: 150px;
+}
+.well {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
