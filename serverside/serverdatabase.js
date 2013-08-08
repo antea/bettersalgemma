@@ -308,7 +308,7 @@ function calcolaCosto (pianificazione, secondi, callback) {
 				'JOIN articololistino AS al ON p.idlistinorisorsa=al.idlistino AND r.idarticolo=al.idarticolo '+
 				'WHERE p.id=?', [pianificazione],
 				function (err, results) {
-					if (err) {
+					if (err || results.length === 0) {
 						callback(err, costo);
 					} else{
 						costo = results[0].costo*(secondi/3600);
@@ -338,7 +338,7 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 			'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo '+
 			'WHERE p.id=?', [pianificazione],
 			function (err, results) {
-				if (err || !results[0]) {  //ATTENZIONE ACCROCCHIO DA CONTROLLARE!!!!!
+				if (err || results.length === 0) {  //ATTENZIONE ACCROCCHIO DA CONTROLLARE!!!!!
 					callback(err, ricavo);
 				} else{
 					ricavo = results[0].ricavo*(secondi/3600);

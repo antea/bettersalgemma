@@ -161,7 +161,7 @@ for (var i = 0; i < lastOfMonth; i++) {
 			console.log("Edit Successo!!");
 		})
 		.error(function (argument) {
-			console.log("Errore edit!!");
+			console.log("Errore edit!! " + argument);
 		});
 	}
 	$scope.newInsert = function ($index, day, attivitaSingole, editore, editnote) {
@@ -186,7 +186,7 @@ for (var i = 0; i < lastOfMonth; i++) {
 			console.log("inserimento effettuato")
 		})
 		.error(function (argument) {
-			console.log("Errore!!")
+			console.log("Errore!! " + argument);
 		});
 	}
 	$scope.delete = function (day) {
@@ -196,7 +196,7 @@ for (var i = 0; i < lastOfMonth; i++) {
 			console.log("cancellazione effettuata")
 		})
 		.error(function (argument) {
-			console.log("Errore cancellazione!!")
+			console.log("Errore cancellazione!! " + argument);
 		});
 	}
 }

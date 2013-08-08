@@ -26,18 +26,20 @@
 			<div class="well">
 				<table class="table table-bordered">
 					<tr>
-						<th>Ordine</th>
+						<!--th>Ordine</th-->
 						<th>Attività</th>
 						<th ng-repeat="day in month"><p>{{day.day}}</p><p>{{day.number}}</p></th>
 					</tr>
-					<tr ng-repeat="ordine in ordini">
+					<!--tr ng-repeat="ordine in ordini">
 						<td rowspan="{{ordine.attivita.length+1}}" id="ord">{{ordine.descrizione}}</td>
-					</tr>
-					<tr ng-repeat="attivitaSingole in ordini | filtroAttivita">
+						<td ng-hide="setOrdine($index)"></td>
+						<td ng-hide="true" ng-repeat="day in month"></td>
+					</tr-->
+					<tr ng-repeat="attivitaSingola in ordini | filtroAttivita">
 						<td>
-							{{attivitaSingole.descrizione}}
+							{{attivitaSingola.descrizione}}
 						</td>
-						<td ng-repeat="day in attivitaSingole.mese" ng-dblclick="editable=true">
+						<td ng-repeat="day in attivitaSingola.mese" ng-click="editable=true">
 							<form class="form-inline" ng-hide="editable">
 								<label popover>{{day.ore}}</label>
 								<label>{{day.unimis}}</label>
@@ -57,7 +59,7 @@
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<button class="btn" ng-click="editable=false; save($index, day, attivitaSingole, editore, editnote)"><i class="icon-ok"></i> OK</button>
+										<button class="btn" ng-click="editable=false; save($index, day, attivitaSingola, editore, editnote)"><i class="icon-ok"></i> OK</button>
 										<button class="btn" ng-click="editable=false; editore=undefined; editnote=undefined"><i class="icon-remove"></i> Annulla</button>
 									</div>
 								</div>

@@ -5,17 +5,21 @@ angular.module('salgemmainterfaceFilters', []).filter('filtroAttivita', function
 			return ordini;
 		};
 		for (var i = 0; i < ordini.length; i++) {
-			if (!ordini[i].attivita) {
-				return ordini[i].attivita;
-			} else{
+			if (ordini[i].attivita) {
+				ordini[i].attivita.forEach(function (argument) {
+					argument.ordine = ordini[i].id;
+					att.push(argument);
+				});
+			} /*else{
 				att = ordini[i].attivita;
 				att.forEach(function (arrayElement) {
 					arrayElement.ordine  = ordini[i].id;
 				});
 			};
-		};
-		return att;
-	}
+		};*/
+	};
+	return att;
+}
 })
 .directive('popover', function () {
 	return function (scope, element, attributes){
