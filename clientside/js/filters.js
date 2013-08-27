@@ -5,11 +5,12 @@ angular.module('salgemmainterfaceFilters', []).filter('filtroAttivita', function
 			return ordini;
 		};
 		for (var i = 0; i < ordini.length; i++) {
-			if (ordini[i].attivita) {
-				ordini[i].attivita.forEach(function (argument) {
-					argument.ordine = ordini[i].id;
-					att.push(argument);
-				});
+			if (ordini[i].selected) {
+				if (ordini[i].attivita) {
+					ordini[i].attivita.forEach(function (argument) {
+						argument.ordine = ordini[i].id;
+						att.push(argument);
+					});
 			} /*else{
 				att = ordini[i].attivita;
 				att.forEach(function (arrayElement) {
@@ -18,7 +19,8 @@ angular.module('salgemmainterfaceFilters', []).filter('filtroAttivita', function
 			};
 		};*/
 	};
-	return att;
+};
+return att;
 }
 })
 .directive('popover', function () {

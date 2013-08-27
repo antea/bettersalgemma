@@ -22,7 +22,33 @@
 </div>
 <div class="container-fluid">
 	<div class="row-fluid">
-		<div class="span12">
+		<div class="span2">
+			<div class="well">
+				<div>
+					<h5><i class="icon-calendar"></i> Calendario:</h5>
+					<div id="calendarCarousel" class="carousel slide" data-interval="false">
+						<div class="carousel-inner">
+							<div ng-repeat="calendario in calendar" class="{{calendario.active}}item">
+								<h5 id="calendarMonth">{{calendario.monthDescription}} {{calendario.year}}</h5>
+							</div>
+						</div>
+						<a class="carousel-control left" href="#calendarCarousel" data-slide="prev">&lsaquo;</a>
+						<a class="carousel-control right" href="#calendarCarousel" data-slide="next">&rsaquo;</a>
+					</div>
+				</div>
+				<div>
+					<h5><i class="icon-list"></i> Ordini visualizzati:</h5>
+					<p>[<a href="" ng-click="selectAllOrders()">Seleziona tutto</a>] - [<a href="" ng-click="deselectAllOrders()">Deseleziona tutto</a>]</p>
+					<ul class="unstyled">
+						<li ng-repeat="ordine in ordini">
+							<input type="checkbox" ng-model="ordine.selected">
+							<span>{{ordine.descrizione}}</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="span10">
 			<div class="well">
 				<table class="table table-bordered">
 					<tr>
