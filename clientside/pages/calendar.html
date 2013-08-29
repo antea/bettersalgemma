@@ -22,7 +22,7 @@
 </div>
 <div class="container-fluid">
 	<div class="row-fluid">
-		<div class="span2">
+		<div class="span2" id="span">
 			<div class="well">
 				<div>
 					<h5><i class="icon-calendar"></i> Calendario:</h5>
@@ -48,24 +48,22 @@
 				</div>
 			</div>
 		</div>
-		<div class="span10">
+		<div class="span10" id="span">
 			<div class="well">
 				<table class="table table-bordered">
 					<tr>
-						<!--th>Ordine</th-->
+						<th>Ordine</th>
 						<th>Attività</th>
 						<th ng-repeat="day in month"><p>{{day.day}}</p><p>{{day.number}}</p></th>
+						<th>Totale</th>
 					</tr>
-					<!--tr ng-repeat="ordine in ordini">
-						<td rowspan="{{ordine.attivita.length+1}}" id="ord">{{ordine.descrizione}}</td>
-						<td ng-hide="setOrdine($index)"></td>
-						<td ng-hide="true" ng-repeat="day in month"></td>
-					</tr-->
-					<tr ng-repeat="attivitaSingola in ordini | filtroAttivita">
+					
+					<tr ng-repeat="task in tasks | taskFilter">
+						<td id="ord"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
 						<td>
-							{{attivitaSingola.descrizione}}
+							{{task.descrizione}}
 						</td>
-						<td ng-repeat="day in attivitaSingola.mese" ng-click="editable=true">
+						<td ng-repeat="day in task.mese" ng-click="editable=true">
 							<form class="form-inline" ng-hide="editable">
 								<label popover>{{day.ore}}</label>
 								<label>{{day.unimis}}</label>
@@ -85,12 +83,19 @@
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<button class="btn" ng-click="editable=false; save($index, day, attivitaSingola, editore, editnote)"><i class="icon-ok"></i> OK</button>
+										<button class="btn" ng-click="editable=false; save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
 										<button class="btn" ng-click="editable=false; editore=undefined; editnote=undefined"><i class="icon-remove"></i> Annulla</button>
 									</div>
 								</div>
 							</form>
 						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<th>Totale</th>
+						<td>Totale</td>
+						<td ng-repeat="day in month"></td>
+						<td></td>
 					</tr>
 				</table>
 			</div>

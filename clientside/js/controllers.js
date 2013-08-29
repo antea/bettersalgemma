@@ -75,6 +75,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 	*/
 
 	var retrieveInfo = function () {
+		$scope.tasks = new Array;
 		$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+thisYear).
 		success(function (data, status, headers, config) {
 			$scope.errors = [];
@@ -83,14 +84,20 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 				ordine.selected = true;
 				$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id).
 				success(function (data, status, headers, config) {
-					ordine.attivita = data;
-					ordine.attivita.forEach(function (attivita) {
+					data.forEach(function (task, index, array) {
+						if (index === 0) {
+							task.show = true;
+						} else {
+							task.show = false;
+						}
+						task.order = ordine;
+						// task.orderLength = array.length; doveva servire per il rowspan tuttavia sembra impossibile utilizzare il rowspan
 						$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+(thisMonth+1)+
-							'-'+thisYear+'/'+ordine.id+'/'+attivita.id).
+							'-'+thisYear+'/'+ordine.id+'/'+task.id).
 						success(function (data, status, headers, config) {
-							attivita.mese = new Array($scope.month.length);
-							for (var i = 0; i < (attivita.mese).length; i++) {
-								attivita.mese[i] = {
+							task.mese = new Array($scope.month.length);
+							for (var i = 0; i < (task.mese).length; i++) {
+								task.mese[i] = {
 									note : undefined,
 									ore : undefined,
 									unimis : undefined,
@@ -100,8 +107,9 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 							data.forEach(function (storico) {
 								storico.ore = storico.secondi/3600;
 								storico.unimis = " h";
-								attivita.mese[(new Date(storico.giorno).getDate())-1] = storico;
+								task.mese[(new Date(storico.giorno).getDate())-1] = storico;
 							});
+							$scope.tasks.push(task);
 						}).
 						error(function (data, status, headers, config) {
 							$scope.errors = [{
@@ -110,7 +118,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 							}];
 						});
 					});
-				}).
+}).
 error(function (data, status, headers, config) {
 	$scope.errors = [{
 		subject: "Errore del server:",
@@ -129,20 +137,20 @@ error(function (data, status, headers, config) {
 
 retrieveInfo();
 
-$scope.save = function ($index, day, attivitaSingole, editore, editnote) {
+$scope.save = function ($index, day, task, editore, editnote) {
 	if (day.ore) {
 		if (editore !=0) {
-			$scope.edit($index, day, attivitaSingole, editore, editnote);
+			$scope.edit($index, day, task, editore, editnote);
 		} else{
 			$scope.delete(day);
 		};
 	} else{
 		if (editore && editore!=0) {
-			$scope.newInsert($index, day, attivitaSingole, editore, editnote);
+			$scope.newInsert($index, day, task, editore, editnote);
 		};
 	};
 }
-$scope.edit = function ($index, day, attivitaSingole, editore, editnote) {
+$scope.edit = function ($index, day, task, editore, editnote) {
 	if (editnote) {
 		day.note = editnote;
 	}
@@ -152,8 +160,8 @@ $scope.edit = function ($index, day, attivitaSingole, editore, editnote) {
 	};
 	var dati = {
 		id : day.id,
-		idordine : attivitaSingole.ordine,
-		idattivita : attivitaSingole.id,
+		idordine : task.order.id,
+		idattivita : task.id,
 		idrisorsa : $rootScope.users[0].id,
 		giorno : day.giorno,
 		secondi : day.secondi,
@@ -168,7 +176,7 @@ $scope.edit = function ($index, day, attivitaSingole, editore, editnote) {
 		console.log("Errore edit!! " + argument);
 	});
 }
-$scope.newInsert = function ($index, day, attivitaSingole, editore, editnote) {
+$scope.newInsert = function ($index, day, task, editore, editnote) {
 	day.ore = editore;
 	day.secondi = day.ore * 3600;
 	day.unimis = " h";
@@ -177,8 +185,8 @@ $scope.newInsert = function ($index, day, attivitaSingole, editore, editnote) {
 		day.note = editnote;
 	}
 	var dati = {
-		idordine : attivitaSingole.ordine,
-		idattivita : attivitaSingole.id,
+		idordine : task.order.id,
+		idattivita : task.id,
 		idrisorsa : $rootScope.users[0].id,
 		giorno : day.giorno,
 		secondi : day.secondi,
@@ -204,13 +212,13 @@ $scope.delete = function (day) {
 	});
 }
 $scope.selectAllOrders = function() {
-	$scope.ordini.forEach(function (ordine) {
-		ordine.selected = true;
+	$scope.tasks.forEach(function (task) {
+		task.order.selected = true;
 	});
 }
 $scope.deselectAllOrders = function() {
-	$scope.ordini.forEach(function (ordine) {
-		ordine.selected = false;
+	$scope.tasks.forEach(function (task) {
+		task.order.selected = false;
 	});
 }
 }

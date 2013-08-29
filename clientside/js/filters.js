@@ -1,27 +1,16 @@
-angular.module('salgemmainterfaceFilters', []).filter('filtroAttivita', function () {
-	return function (ordini) {
-		var att = [];
-		if (!ordini) {
-			return ordini;
+angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () {
+	return function (tasks) {
+		var tasksFiltered = [];
+		if (!tasks) {
+			return tasks;
 		};
-		for (var i = 0; i < ordini.length; i++) {
-			if (ordini[i].selected) {
-				if (ordini[i].attivita) {
-					ordini[i].attivita.forEach(function (argument) {
-						argument.ordine = ordini[i].id;
-						att.push(argument);
-					});
-			} /*else{
-				att = ordini[i].attivita;
-				att.forEach(function (arrayElement) {
-					arrayElement.ordine  = ordini[i].id;
-				});
-			};
-		};*/
-	};
-};
-return att;
-}
+		tasks.forEach(function (task) {
+			if(task.order.selected){
+				tasksFiltered.push(task);
+			}
+		});
+		return tasksFiltered;
+	}
 })
 .directive('popover', function () {
 	return function (scope, element, attributes){

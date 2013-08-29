@@ -22,6 +22,10 @@ body {
 .well {
 	margin-top: 20px;
 	margin-bottom: 20px;
+	margin-left: 10px;
+}
+#span {
+	margin-left: 0px;
 }
 #calendarMonth {
 	text-align: center;
