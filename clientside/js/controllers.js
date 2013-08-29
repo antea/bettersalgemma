@@ -19,33 +19,26 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location) {
 }
 
 function CalendarCtrl ($rootScope, $scope, $http) {
-
-	$scope.month = [];
 	$scope.ordini = [];
 	var week = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 	var now = new Date();
 	var thisMonth = now.getMonth();
 	var thisYear = now.getFullYear();
-	var lastOfMonth = new Date(thisYear, thisMonth+1, 0).getDate();
-	for (var i = 0; i < lastOfMonth; i++) {
-		var dayi = new Date(thisYear, thisMonth, i+1);
-		$scope.month[i] = {number: dayi.getDate(),
-			day: week[dayi.getDay()],
-			date: dayi.getDate()+"-"+(thisMonth+1)+"-"+thisYear};
-		};
+	$scope.selectedMonth = thisMonth;
+	$scope.selectedYear = thisYear;
 
-		$scope.mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-		$scope.anni = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
-		$scope.calendar = [];
-		$scope.anni.forEach(function (anno) {
-			$scope.mesi.forEach(function (mese, index) {
-				var active = "";
-				if (anno === thisYear && index === thisMonth) {
-					active = "active "
-				};
-				$scope.calendar.push({year: anno, monthDescription: mese, monthNumber: index, active: active});
-			});
+	$scope.mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+	$scope.anni = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
+	$scope.calendar = [];
+	$scope.anni.forEach(function (anno) {
+		$scope.mesi.forEach(function (mese, index) {
+			var active = "";
+			if (anno === thisYear && index === thisMonth) {
+				active = "active "
+			};
+			$scope.calendar.push({year: anno, monthDescription: mese, monthNumber: index, active: active});
 		});
+	});
 	/*
 	var now = new Date();
 	var oggi = now.getDate();
@@ -75,25 +68,33 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 	*/
 
 	var retrieveInfo = function () {
-		$scope.tasks = new Array;
-		$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+thisYear).
-		success(function (data, status, headers, config) {
-			$scope.errors = [];
-			$scope.ordini = data;
-			$scope.ordini.forEach(function (ordine) {
-				ordine.selected = true;
-				$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id).
-				success(function (data, status, headers, config) {
-					data.forEach(function (task, index, array) {
-						if (index === 0) {
-							task.show = true;
-						} else {
-							task.show = false;
-						}
-						task.order = ordine;
+		$scope.month = [];
+		var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
+		for (var i = 0; i < lastOfMonth; i++) {
+			var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
+			$scope.month[i] = {number: dayi.getDate(),
+				day: week[dayi.getDay()],
+				date: dayi.getDate()+"-"+($scope.selectedMonth+1)+"-"+$scope.selectedYear};
+			};
+			$scope.tasks = new Array;
+			$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear).
+			success(function (data, status, headers, config) {
+				$scope.errors = [];
+				$scope.ordini = data;
+				$scope.ordini.forEach(function (ordine) {
+					ordine.selected = true;
+					$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id).
+					success(function (data, status, headers, config) {
+						data.forEach(function (task, index, array) {
+							if (index === 0) {
+								task.show = true;
+							} else {
+								task.show = false;
+							}
+							task.order = ordine;
 						// task.orderLength = array.length; doveva servire per il rowspan tuttavia sembra impossibile utilizzare il rowspan
-						$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+(thisMonth+1)+
-							'-'+thisYear+'/'+ordine.id+'/'+task.id).
+						$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
+							'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
 						success(function (data, status, headers, config) {
 							task.mese = new Array($scope.month.length);
 							for (var i = 0; i < (task.mese).length; i++) {
@@ -180,7 +181,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 	day.ore = editore;
 	day.secondi = day.ore * 3600;
 	day.unimis = " h";
-	day.giorno = thisYear +"-"+(thisMonth+1)+"-"+($index+1);
+	day.giorno = $scope.selectedYear +"-"+($scope.selectedMonth+1)+"-"+($index+1);
 	if (editnote) {
 		day.note = editnote;
 	}
@@ -220,5 +221,41 @@ $scope.deselectAllOrders = function() {
 	$scope.tasks.forEach(function (task) {
 		task.order.selected = false;
 	});
+}
+$scope.next = function () {
+	console.log($scope.calendar);
+	var loop = true;
+	$scope.calendar.forEach(function (calendario, index) {
+		if(loop){
+			if(calendario.active == "active "){
+				calendario.active = "";
+				var nextCalendar = $scope.calendar[index+1]
+				nextCalendar.active = "active "
+				$scope.selectedMonth = nextCalendar.monthNumber;
+				$scope.selectedYear = nextCalendar.year;
+				retrieveInfo();
+				loop = false;
+			}
+		}
+	});
+	console.log($scope.calendar);
+}
+$scope.prev = function () {
+	console.log($scope.calendar);
+	var loop = true;
+	$scope.calendar.forEach(function (calendario, index) {
+		if(loop){
+			if(calendario.active == "active "){
+				calendario.active = "";
+				var prevCalendar = $scope.calendar[index-1]
+				prevCalendar.active = "active "
+				$scope.selectedMonth = prevCalendar.monthNumber;
+				$scope.selectedYear = prevCalendar.year;
+				retrieveInfo();
+				loop = false;
+			}
+		}
+	});
+	console.log($scope.calendar);
 }
 }

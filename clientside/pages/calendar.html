@@ -29,11 +29,11 @@
 					<div id="calendarCarousel" class="carousel slide" data-interval="false">
 						<div class="carousel-inner">
 							<div ng-repeat="calendario in calendar" class="{{calendario.active}}item">
-								<h5 id="calendarMonth">{{calendario.monthDescription}} {{calendario.year}}</h5>
+								<h5 id="calendarMonth" ng-model="selectedMonth">{{calendario.monthDescription}}</h5><h5 id="calendarMonth" ng-model="selectedYear">{{calendario.year}}</h5>
 							</div>
 						</div>
-						<a class="carousel-control left" href="#calendarCarousel" data-slide="prev">&lsaquo;</a>
-						<a class="carousel-control right" href="#calendarCarousel" data-slide="next">&rsaquo;</a>
+						<a class="carousel-control left" ng-click="prev()">&lsaquo;</a>
+						<a class="carousel-control right" ng-click="next()">&rsaquo;</a>
 					</div>
 				</div>
 				<div>

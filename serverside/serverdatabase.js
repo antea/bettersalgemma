@@ -18,9 +18,9 @@ server.listen(server.get('port'), function(){
 
 var pool = mysql.createPool({
 	host:'192.168.10.7',
-	database:'matteos',
-	user:'matteos',
-	password:'matteos'
+	database:'commesse',
+	user:'root',
+	password:'root'
 	/* Decommentare le righe seguenti per attivare il limite di connessione e 
 	togliere l'attesa in caso di limite raggiunto e lanciare errore; 
 	connectionLimit:1, //default 10
