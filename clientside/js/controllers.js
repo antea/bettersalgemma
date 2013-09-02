@@ -83,7 +83,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 				$scope.ordini = data;
 				$scope.ordini.forEach(function (ordine) {
 					ordine.selected = true;
-					$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id).
+					$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 					success(function (data, status, headers, config) {
 						data.forEach(function (task, index, array) {
 							if (index === 0) {

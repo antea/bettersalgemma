@@ -97,14 +97,23 @@ var pool = mysql.createPool({
 	Se ha successo ritorna id e descrizione di tutte le attività collegate a quel particolare orine per quel particolare utente.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/attivita/:userId/:idordine', function (req, res) {
+	server.get('/attivita/:userId/:idordine/:year/:month', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(500, err);
 			} else{
+				var start = new Date(req.params.year,req.params.month,1);
+				start.setHours(2,start.getTimezoneOffset(),0,0);
+				start = start.toISOString();
+				var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
+				end.setHours(2,end.getTimezoneOffset(),0,0);
+				end= end.toISOString();
 				connection.query('SELECT r.id, r.descrizione ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND r.idtabella=?', [req.params.userId, req.params.idordine],
+					'WHERE p.idrisorsa='+connection.escape(req.params.userId) + ' AND r.idtabella='+connection.escape(req.params.idordine) +' ' +
+					'AND ((p.datafineprev>='+connection.escape(start) + ' AND p.datafineprev<='+connection.escape(end) + ')'+
+						'OR (p.datainizioprev>='+connection.escape(start) + ' AND p.datainizioprev<='+connection.escape(end) + ')'+
+						'OR (p.datainizioprev<='+connection.escape(start) + ' AND p.datafineprev>='+connection.escape(end) + '))',
 					function (err, results) {
 						if (err) {
 							res.send(500, err);
