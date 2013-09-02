@@ -1,7 +1,7 @@
 body {
 	background-image:url('../img/haliteGrande.JPG');
 	background-repeat: repeat-y;
-	background-size: 100%;
+	background-size: 115%;
 }
 .page-header{
 	background-color: white;
@@ -23,6 +23,21 @@ body {
 	margin-top: 20px;
 	margin-bottom: 20px;
 	margin-left: 10px;
+}
+.table-bordered {
+	padding-left: 30px;
+	padding-right: 30px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: 10px;
+	margin-right: 10px;
+	background-color: #f5f5f5;
+	border: 1px solid black;
+}
+td,th{
+	border: 1px solid black;
 }
 #span {
 	margin-left: 0px;
