@@ -18,9 +18,9 @@ server.listen(server.get('port'), function(){
 
 var pool = mysql.createPool({
 	host:'192.168.10.7',
-	database:'commesse',
-	user:'root',
-	password:'root'
+	database:'matteos',
+	user:'matteos',
+	password:'matteos'
 	/* Decommentare le righe seguenti per attivare il limite di connessione e 
 	togliere l'attesa in caso di limite raggiunto e lanciare errore; 
 	connectionLimit:1, //default 10
@@ -108,7 +108,7 @@ var pool = mysql.createPool({
 				var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
 				end.setHours(2,end.getTimezoneOffset(),0,0);
 				end= end.toISOString();
-				connection.query('SELECT r.id, r.descrizione ' +
+				connection.query('SELECT r.id, r.descrizione, p.datainizioprev, p.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
 					'WHERE p.idrisorsa='+connection.escape(req.params.userId) + ' AND r.idtabella='+connection.escape(req.params.idordine) +' ' +
 					'AND ((p.datafineprev>='+connection.escape(start) + ' AND p.datafineprev<='+connection.escape(end) + ')'+

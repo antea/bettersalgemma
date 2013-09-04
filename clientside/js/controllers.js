@@ -86,13 +86,16 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 					$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 					success(function (data, status, headers, config) {
 						data.forEach(function (task, index, array) {
+						var taskStart = new Date(task.datainizioprev);
+						var taskEnd = new Date(task.datafineprev);
+						taskStart = new Date(taskStart.getFullYear(),taskStart.getMonth(), taskStart.getDate());
+						taskEnd = new Date(taskEnd.getFullYear(), taskEnd.getMonth(), taskEnd.getDate());
 							if (index === 0) {
 								task.show = true;
 							} else {
 								task.show = false;
 							}
 							task.order = ordine;
-						// task.orderLength = array.length; doveva servire per il rowspan tuttavia sembra impossibile utilizzare il rowspan
 						$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
 							'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
 						success(function (data, status, headers, config) {
@@ -102,12 +105,14 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 									note : undefined,
 									ore : undefined,
 									unimis : undefined,
-									secondi : undefined
+									secondi : undefined,
+									editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) ? false : true
 								}
 							}
 							data.forEach(function (storico) {
 								storico.ore = storico.secondi/3600;
 								storico.unimis = " h";
+								storico.editable = true;
 								task.mese[(new Date(storico.giorno).getDate())-1] = storico;
 							});
 							$scope.tasks.push(task);
@@ -138,7 +143,14 @@ error(function (data, status, headers, config) {
 
 retrieveInfo();
 
+$scope.discard = function (day) {
+	day.editore = undefined;
+	day.editnote = undefined;
+	day.editmode = false;
+}
+
 $scope.save = function ($index, day, task, editore, editnote) {
+	console.log(day);
 	if (day.ore) {
 		if (editore !=0) {
 			$scope.edit($index, day, task, editore, editnote);
@@ -150,6 +162,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 			$scope.newInsert($index, day, task, editore, editnote);
 		};
 	};
+	console.log(day);
 }
 $scope.edit = function ($index, day, task, editore, editnote) {
 	if (editnote) {
@@ -223,7 +236,6 @@ $scope.deselectAllOrders = function() {
 	});
 }
 $scope.next = function () {
-	console.log($scope.calendar);
 	var loop = true;
 	$scope.calendar.forEach(function (calendario, index) {
 		if(loop){
@@ -238,10 +250,8 @@ $scope.next = function () {
 			}
 		}
 	});
-	console.log($scope.calendar);
 }
 $scope.prev = function () {
-	console.log($scope.calendar);
 	var loop = true;
 	$scope.calendar.forEach(function (calendario, index) {
 		if(loop){
@@ -256,6 +266,5 @@ $scope.prev = function () {
 			}
 		}
 	});
-	console.log($scope.calendar);
 }
 }
