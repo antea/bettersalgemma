@@ -38,6 +38,8 @@ body {
 }
 td,th{
 	border: 1px solid black;
+	border-top: 1px solid black;
+	border-left: 1px solid black;
 }
 #span {
 	margin-left: 0px;
@@ -47,10 +49,4 @@ td,th{
 }
 .editable-false {
 	background-color: Grey;
-}
-input[type=checkbox] {
-    background: #f5f5f5;
-    min-width: inherit;
-    min-height: inherit;
-    border: none;
 }

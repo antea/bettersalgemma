@@ -267,4 +267,8 @@ $scope.prev = function () {
 		}
 	});
 }
+$scope.focusOn = function (event) {
+	console.log(event);
+	event.srcElement.focus();
+}
 }
