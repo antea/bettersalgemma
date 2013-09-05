@@ -191,7 +191,7 @@ server.post('/insertstorico', function (req, res) {
 									if (err) {
 										res.send(500, err);
 									} else{
-										res.send(200, 'Inserimento correttamente eseguito.');
+										res.send(200, results);
 									};
 								});}
 						});}
@@ -244,7 +244,7 @@ server.put('/editstorico', function (req, res) {
 											if (err) {
 												res.send(500, err);
 											} else{
-												res.send(200, 'Modifica effettuata con successo');
+												res.send(200, results);
 											}
 										});
 								}
@@ -276,7 +276,7 @@ server.delete('/deletestorico/:idstorico', function (req,res) {
 					if (err) {
 						res.send(500, err);
 					} else{
-						res.send(200, "Cancellazione effettuata.")
+						res.send(200, results)
 					};
 				})
 		};

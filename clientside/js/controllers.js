@@ -86,44 +86,44 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 					$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 					success(function (data, status, headers, config) {
 						data.forEach(function (task, index, array) {
-						var taskStart = new Date(task.datainizioprev);
-						var taskEnd = new Date(task.datafineprev);
-						taskStart = new Date(taskStart.getFullYear(),taskStart.getMonth(), taskStart.getDate());
-						taskEnd = new Date(taskEnd.getFullYear(), taskEnd.getMonth(), taskEnd.getDate());
+							var taskStart = new Date(task.datainizioprev);
+							var taskEnd = new Date(task.datafineprev);
+							taskStart = new Date(taskStart.getFullYear(),taskStart.getMonth(), taskStart.getDate());
+							taskEnd = new Date(taskEnd.getFullYear(), taskEnd.getMonth(), taskEnd.getDate());
 							if (index === 0) {
 								task.show = true;
 							} else {
 								task.show = false;
 							}
 							task.order = ordine;
-						$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
-							'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
-						success(function (data, status, headers, config) {
-							task.mese = new Array($scope.month.length);
-							for (var i = 0; i < (task.mese).length; i++) {
-								task.mese[i] = {
-									note : undefined,
-									ore : undefined,
-									unimis : undefined,
-									secondi : undefined,
-									editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) ? false : true
+							$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
+								'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
+							success(function (data, status, headers, config) {
+								task.mese = new Array($scope.month.length);
+								for (var i = 0; i < (task.mese).length; i++) {
+									task.mese[i] = {
+										note : undefined,
+										ore : undefined,
+										unimis : undefined,
+										secondi : undefined,
+										editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) ? false : true
+									}
 								}
-							}
-							data.forEach(function (storico) {
-								storico.ore = storico.secondi/3600;
-								storico.unimis = " h";
-								storico.editable = true;
-								task.mese[(new Date(storico.giorno).getDate())-1] = storico;
+								data.forEach(function (storico) {
+									storico.ore = storico.secondi/3600;
+									storico.unimis = " h";
+									storico.editable = true;
+									task.mese[(new Date(storico.giorno).getDate())-1] = storico;
+								});
+								$scope.tasks.push(task);
+							}).
+							error(function (data, status, headers, config) {
+								$scope.errors = [{
+									subject: "Errore del server:",
+									description: "Riprovare, se l'errore persiste contattare l'amministratore."
+								}];
 							});
-							$scope.tasks.push(task);
-						}).
-						error(function (data, status, headers, config) {
-							$scope.errors = [{
-								subject: "Errore del server:",
-								description: "Riprovare, se l'errore persiste contattare l'amministratore."
-							}];
 						});
-					});
 }).
 error(function (data, status, headers, config) {
 	$scope.errors = [{
@@ -176,7 +176,7 @@ $scope.edit = function ($index, day, task, editore, editnote) {
 	};
 	$http.put('http://localhost:8585/editstorico', dati)
 	.success(function (argument) {
-		retrieveInfo();
+		//retrieveInfo();
 		console.log("Edit Successo!!");
 	})
 	.error(function (argument) {
@@ -201,8 +201,9 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 	};
 	$http.post('http://localhost:8585/insertstorico', dati)
 	.success(function (argument) {
-		retrieveInfo();
-		console.log("inserimento effettuato")
+		//retrieveInfo();
+		day.id = argument.insertId;
+		console.log("Inserimento effettuato con successo.\n");
 	})
 	.error(function (argument) {
 		console.log("Errore!! " + argument);
@@ -211,7 +212,10 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 $scope.delete = function (day) {
 	$http.delete('http://localhost:8585/deletestorico/'+day.id)
 	.success(function (argument) {
-		retrieveInfo();
+		//retrieveInfo();
+		day.ore = undefined;
+		day.note = undefined;
+		day.unimis = undefined;
 		console.log("cancellazione effettuata")
 	})
 	.error(function (argument) {

@@ -73,7 +73,7 @@
 								<div class="control-group">
 									<label class="control-label" for="ore">Ore:</label>
 									<div class="controls">
-										<input type="text" id="ore" ng-model="editore" placeholder={{day.ore}}>
+										<input type="number" id="ore" ng-model="editore" placeholder={{day.ore}} max="24" min="0">
 									</div>
 								</div>
 								<div class="control-group">
@@ -81,6 +81,9 @@
 									<div class="controls">
 										<input type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
 									</div>
+								</div>
+								<div>
+									
 								</div>
 								<div class="control-group">
 									<div class="controls">

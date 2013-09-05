@@ -28,6 +28,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 		restrict: 'A',
 		link: function (scope, element, attributes) {
 			element.bind('keydown', function (e) {
+				if (e.srcElement.offsetParent) {
 				//up
 				if (e.keyCode == 38) { 
 					var cellNumber = scope.$index + 2;
@@ -69,7 +70,8 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 						previousParentElement.children[0].click();
 					};
 				}
-			});
+			};
+		});
 }
 }
 });
