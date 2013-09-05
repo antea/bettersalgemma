@@ -143,14 +143,7 @@ error(function (data, status, headers, config) {
 
 retrieveInfo();
 
-$scope.discard = function (day) {
-	day.editore = undefined;
-	day.editnote = undefined;
-	day.editmode = false;
-}
-
 $scope.save = function ($index, day, task, editore, editnote) {
-	console.log(day);
 	if (day.ore) {
 		if (editore !=0) {
 			$scope.edit($index, day, task, editore, editnote);
@@ -162,7 +155,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 			$scope.newInsert($index, day, task, editore, editnote);
 		};
 	};
-	console.log(day);
+	document.getElementById("check-"+task.id+"-"+$index).focus();
 }
 $scope.edit = function ($index, day, task, editore, editnote) {
 	if (editnote) {
@@ -268,7 +261,6 @@ $scope.prev = function () {
 	});
 }
 $scope.focusOn = function (event) {
-	console.log(event);
 	event.srcElement.focus();
 }
 }

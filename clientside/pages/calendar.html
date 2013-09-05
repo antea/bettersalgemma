@@ -64,9 +64,9 @@
 							{{task.descrizione}}
 						</td>
 						<td ng-repeat="day in task.mese" class="editable-{{day.editable}}" key-focus>
-							<input type="checkbox" ng-model="editmode" ng-click="focusOn($event)">
-							<form class="form-inline" ng-hide="editmode && day.editable">
-								<label popover>{{day.ore}}</label>
+							<input type="checkbox" ng-model="editmode" ng-click="focusOn($event)" id="check-{{task.id}}-{{$index}}">
+							<form popover class="form-inline" ng-hide="editmode && day.editable">
+								<label>{{day.ore}}</label>
 								<label>{{day.unimis}}</label>
 							</form>
 							<form class="form-horizontal" ng-show="editmode && day.editable">

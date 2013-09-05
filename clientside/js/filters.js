@@ -31,38 +31,51 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 				//up
 				if (e.keyCode == 38) { 
 					var cellNumber = scope.$index + 2;
-					var previousRow = e.srcElement.offsetParent.parentElement.previousElementSibling;
+					var thisCell = e.srcElement.offsetParent;
+					var previousRow = thisCell.parentElement.previousElementSibling;
 					var cellInPreviousRow = previousRow.children[cellNumber];
 					if(cellInPreviousRow.children.length !=0){
+						clickSimulation(thisCell);
 						cellInPreviousRow.children[0].focus();
+						cellInPreviousRow.children[0].click();
 					}
 				} //down
 				else if (e.keyCode == 40) { 
 					var cellNumber = scope.$index + 2;
-					var nextRow = e.srcElement.offsetParent.parentElement.nextElementSibling;
+					var thisCell = e.srcElement.offsetParent;
+					var nextRow = thisCell.parentElement.nextElementSibling;
 					var cellInNextRow = nextRow.children[cellNumber];
 					if(cellInNextRow.children.length !=0){
+						clickSimulation(thisCell);
 						cellInNextRow.children[0].focus();
+						cellInNextRow.children[0].click();
 					}
 				} //right
-				 else if (e.keyCode == 39) {
-					var nextParentElement = e.srcElement.offsetParent.nextElementSibling;
+				else if (e.keyCode == 39) {
+					var thisCell = e.srcElement.offsetParent;
+					var nextParentElement = thisCell.nextElementSibling;
 					if (nextParentElement.children.length!=0) {
+						clickSimulation(thisCell);
 						nextParentElement.children[0].focus();
+						nextParentElement.children[0].click();
 					};
 				} //left
 				else if (e.keyCode == 37){ 
-					var previousParentElement = e.srcElement.offsetParent.previousElementSibling;
+					var thisCell = e.srcElement.offsetParent;
+					var previousParentElement = thisCell.previousElementSibling;
 					if (previousParentElement.children.length!=0) {
+						clickSimulation(thisCell);
 						previousParentElement.children[0].focus();
+						previousParentElement.children[0].click();
 					};
-				} else{
-					console.log(e);
-					console.log(scope);
-					console.log(element);
-					console.log(attributes);
-				};
-			})
+				}
+			});
 }
 }
 });
+
+var clickSimulation = function (thisCell) {
+	if (thisCell.children[0].checked) {
+		thisCell.children[0].click();
+	};
+}
