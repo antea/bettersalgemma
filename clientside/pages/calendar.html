@@ -93,13 +93,15 @@
 								</div>
 							</form>
 						</td>
-						<td></td>
+						<td>
+							{{task.total}}
+						</td>
 					</tr>
 					<tr>
 						<th>Totale</th>
 						<td>Totale</td>
-						<td ng-repeat="day in month"></td>
-						<td></td>
+						<td ng-repeat="taskDay in totalTask">{{taskDay.ore}}</td>
+						<th>{{totalMonth}}</th>
 					</tr>
 				</table>
 			<!--/div-->

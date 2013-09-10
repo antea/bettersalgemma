@@ -115,7 +115,9 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 									storico.editable = true;
 									task.mese[(new Date(storico.giorno).getDate())-1] = storico;
 								});
+								$scope.calculateRowTotal(task);
 								$scope.tasks.push(task);
+								$scope.calculateColTotal();
 							}).
 							error(function (data, status, headers, config) {
 								$scope.errors = [{
@@ -148,7 +150,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 		if (editore !=0) {
 			$scope.edit($index, day, task, editore, editnote);
 		} else{
-			$scope.delete(day);
+			$scope.delete(day, task);
 		};
 	} else{
 		if (editore && editore!=0) {
@@ -176,7 +178,8 @@ $scope.edit = function ($index, day, task, editore, editnote) {
 	};
 	$http.put('http://localhost:8585/editstorico', dati)
 	.success(function (argument) {
-		//retrieveInfo();
+		$scope.calculateRowTotal(task);
+		$scope.calculateColTotal();
 		console.log("Edit Successo!!");
 	})
 	.error(function (argument) {
@@ -201,7 +204,8 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 	};
 	$http.post('http://localhost:8585/insertstorico', dati)
 	.success(function (argument) {
-		//retrieveInfo();
+		$scope.calculateRowTotal(task);
+		$scope.calculateColTotal();
 		day.id = argument.insertId;
 		console.log("Inserimento effettuato con successo.\n");
 	})
@@ -209,14 +213,16 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 		console.log("Errore!! " + argument);
 	});
 }
-$scope.delete = function (day) {
+$scope.delete = function (day, task) {
 	$http.delete('http://localhost:8585/deletestorico/'+day.id)
 	.success(function (argument) {
-		//retrieveInfo();
 		day.ore = undefined;
+		day.secondi = undefined;
 		day.note = undefined;
 		day.unimis = undefined;
-		console.log("cancellazione effettuata")
+		$scope.calculateRowTotal(task);
+		$scope.calculateColTotal();
+		console.log("cancellazione effettuata");
 	})
 	.error(function (argument) {
 		console.log("Errore cancellazione!! " + argument);
@@ -266,5 +272,31 @@ $scope.prev = function () {
 }
 $scope.focusOn = function (event) {
 	event.srcElement.focus();
+}
+$scope.calculateRowTotal = function (task) {
+	task.total = 0;
+	task.mese.forEach(function (day) {
+		if(day.secondi){
+			task.total += day.secondi;
+		}
+	});
+	task.total = task.total/3600;
+}
+$scope.calculateColTotal = function () {
+	$scope.totalTask = new Array($scope.month.length);
+	$scope.tasks.forEach(function (task) {
+		task.mese.forEach(function (day, index) {
+			if (!$scope.totalTask[index]) {
+				$scope.totalTask[index] = {ore : 0};
+			}
+			if (day.secondi) {
+				$scope.totalTask[index].ore += day.secondi/3600;
+			};
+		});
+	});
+	$scope.totalMonth = 0;
+	$scope.totalTask.forEach(function (totalDay) {
+		$scope.totalMonth += totalDay.ore;
+	})
 }
 }
