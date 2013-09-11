@@ -145,6 +145,12 @@ error(function (data, status, headers, config) {
 
 retrieveInfo();
 
+$scope.discard = function ($index, day, task, editore, editnote) {
+	editore = undefined;
+	editnote = undefined;
+	document.getElementById("check-"+task.id+"-"+$index).focus();
+}
+
 $scope.save = function ($index, day, task, editore, editnote) {
 	if (day.ore) {
 		if (editore !=0) {
