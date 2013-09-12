@@ -145,9 +145,10 @@ error(function (data, status, headers, config) {
 
 retrieveInfo();
 
-$scope.discard = function ($index, day, task, editore, editnote) {
+$scope.discard = function ($index, day, task, editore, editnote, editmode) {
 	editore = undefined;
 	editnote = undefined;
+	this.editmode = false;
 	document.getElementById("check-"+task.id+"-"+$index).focus();
 }
 
@@ -164,6 +165,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 		};
 	};
 	document.getElementById("check-"+task.id+"-"+$index).focus();
+	this.editmode = false;
 }
 $scope.edit = function ($index, day, task, editore, editnote) {
 	if (editnote) {
@@ -304,5 +306,11 @@ $scope.calculateColTotal = function () {
 	$scope.totalTask.forEach(function (totalDay) {
 		$scope.totalMonth += totalDay.ore;
 	})
+}
+$scope.tdClick = function ($event, $index, task) {
+	if($event.srcElement.name != "formInput") {
+		this.editmode = true;
+		document.getElementById("check-"+task.id+"-"+$index).focus();
+	}
 }
 }

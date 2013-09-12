@@ -63,32 +63,29 @@
 						<td>
 							{{task.descrizione}}
 						</td>
-						<td ng-repeat="day in task.mese" class="editable-{{day.editable}}" key-focus>
-							<input type="checkbox" ng-model="editmode" ng-click="focusOn($event)" id="check-{{task.id}}-{{$index}}">
+						<td ng-repeat="day in task.mese" class="editable-{{day.editable}}" key-focus id="td-{{task.id}}-{{$index}}" ng-click="tdClick($event, $index, task)">
+							<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event)">
 							<form popover class="form-inline" ng-hide="editmode && day.editable">
 								<label>{{day.ore}}</label>
 								<label>{{day.unimis}}</label>
 							</form>
 							<form class="form-horizontal" ng-show="editmode && day.editable">
 								<div class="control-group">
-									<label class="control-label" for="ore">Ore:</label>
+									<label name="formInput" class="control-label" for="ore">Ore:</label>
 									<div class="controls">
-										<input type="number" id="ore" ng-model="editore" placeholder={{day.ore}} max="24" min="0">
+										<input name="formInput" type="number" id="ore" ng-model="editore" placeholder={{day.ore}} min="0" max="24">
 									</div>
 								</div>
 								<div class="control-group">
-									<label class="control-label" for="note">Note:</label>
+									<label name="formInput" class="control-label" for="note">Note:</label>
 									<div class="controls">
-										<input type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
+										<input name="formInput" type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
 									</div>
-								</div>
-								<div>
-									
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<button class="btn" ng-click="editmode=false; save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
-										<button class="btn" ng-click="editmode=false; discard($index, day, task, editore, editnote)"><i class="icon-remove"></i> Annulla</button>
+										<button class="btn" name="formInput" ng-click="save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
+										<button class="btn" name="formInput" ng-click="discard($index, day, task, editore, editnote)"><i class="icon-remove"></i> Annulla</button>
 									</div>
 								</div>
 							</form>
