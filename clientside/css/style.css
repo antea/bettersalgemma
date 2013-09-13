@@ -49,6 +49,9 @@ td,th{
 .editable-false {
 	background-color: Grey;
 }
+.editable-true {
+	cursor: pointer;
+}
 input[type=checkbox]{
-	opacity: 100;
+	opacity: 0;
 }
