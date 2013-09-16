@@ -39,10 +39,12 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 						clickSimulation(thisCell, scope);
 						cellInPreviousRow.children[0].focus();
 						var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
-						for (var i = 0; i < cellNumber-2; i++) {
-							thisPreviousRow = thisPreviousRow.$$nextSibling;
+						if (thisPreviousRow) {
+							for (var i = 0; i < cellNumber-2; i++) {
+								thisPreviousRow = thisPreviousRow.$$nextSibling;
+							};
+							scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
 						};
-						scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
 						cellInPreviousRow.children[0].click();
 					}
 				} //down
