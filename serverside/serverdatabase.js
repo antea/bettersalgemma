@@ -17,7 +17,7 @@ server.listen(server.get('port'), function(){
 });
 
 var pool = mysql.createPool({
-	host:'192.168.10.7',
+	host:'mysql.antea.bogus',
 	database:'matteos',
 	user:'matteos',
 	password:'matteos'

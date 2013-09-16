@@ -36,8 +36,13 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var previousRow = thisCell.parentElement.previousElementSibling;
 					var cellInPreviousRow = previousRow.children[cellNumber];
 					if(cellInPreviousRow.children.length !=0){
-						clickSimulation(thisCell);
+						clickSimulation(thisCell, scope);
 						cellInPreviousRow.children[0].focus();
+						var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
+						for (var i = 0; i < cellNumber-2; i++) {
+							thisPreviousRow = thisPreviousRow.$$nextSibling;
+						};
+						scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
 						cellInPreviousRow.children[0].click();
 					}
 				} //down
@@ -47,8 +52,13 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var nextRow = thisCell.parentElement.nextElementSibling;
 					var cellInNextRow = nextRow.children[cellNumber];
 					if(cellInNextRow.children.length !=0){
-						clickSimulation(thisCell);
+						clickSimulation(thisCell, scope);
 						cellInNextRow.children[0].focus();
+						var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
+						for (var i = 0; i < cellNumber-2; i++) {
+							thisNextRow = thisNextRow.$$nextSibling;
+						};
+						scope.$parent.$parent.openAndFocusedCell = thisNextRow;
 						cellInNextRow.children[0].click();
 					}
 				} //right
@@ -56,8 +66,9 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var thisCell = e.srcElement.offsetParent;
 					var nextParentElement = thisCell.nextElementSibling;
 					if (nextParentElement.children.length!=0) {
-						clickSimulation(thisCell);
+						clickSimulation(thisCell, scope);
 						nextParentElement.children[0].focus();
+						scope.$parent.$parent.openAndFocusedCell = scope.$$nextSibling;
 						nextParentElement.children[0].click();
 					};
 				} //left
@@ -65,8 +76,9 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var thisCell = e.srcElement.offsetParent;
 					var previousParentElement = thisCell.previousElementSibling;
 					if (previousParentElement.children.length!=0) {
-						clickSimulation(thisCell);
+						clickSimulation(thisCell, scope);
 						previousParentElement.children[0].focus();
+						scope.$parent.$parent.openAndFocusedCell = scope.$$prevSibling;
 						previousParentElement.children[0].click();
 					};
 				}
@@ -76,8 +88,10 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 }
 });
 
-var clickSimulation = function (thisCell) {
+var clickSimulation = function (thisCell, scope) {
 	if (thisCell.children[0].checked) {
 		thisCell.children[0].click();
-	};
+	} else {
+		scope.focused = false;
+	}
 }

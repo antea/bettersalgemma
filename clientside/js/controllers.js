@@ -39,33 +39,6 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 			$scope.calendar.push({year: anno, monthDescription: mese, monthNumber: index, active: active});
 		});
 	});
-	/*
-	var now = new Date();
-	var oggi = now.getDate();
-	var $scope.selectedMonth = now.getMonth();
-	var $scope.selectedYear = now.getFullYear();
-	var firstSelectedMonth = new Date($scope.selectedYear, $scope.selectedMonth, 1).getDay()-1;
-	var lastSelectedMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0);
-	var set = -1;
-	for (var i = 0; i < lastSelectedMonth.getDate()+firstSelectedMonth; i++) {
-		if (i%7==0) {
-			set++;
-			$scope.calendario[set]={giorni: new Array(7)}
-		}
-		if (i<firstSelectedMonth) {
-			$scope.calendario[set].giorni[i%7] = {};
-		} else{
-			var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1-firstSelectedMonth);
-			$scope.calendario[set].giorni[i%7] = {numero: dayi.getDate() , 
-				giorno: week[dayi.getDay()], 
-				date: (dayi.getDate()) + "-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear
-			}
-			if (i+1-firstSelectedMonth==oggi) {
-				$scope.calendario[set].giorni[i%7].oggi = true;
-			};
-		};
-	};
-	*/
 
 	var retrieveInfo = function () {
 		$scope.month = [];
@@ -145,7 +118,7 @@ error(function (data, status, headers, config) {
 
 retrieveInfo();
 
-$scope.discard = function ($index, day, task, editore, editnote, editmode) {
+$scope.discard = function ($index, day, task, editore, editnote) {
 	editore = undefined;
 	editnote = undefined;
 	this.editmode = false;
@@ -278,8 +251,8 @@ $scope.prev = function () {
 		}
 	});
 }
-$scope.focusOn = function (event) {
-	event.srcElement.focus();
+$scope.focusOn = function (event, $index, task) {
+	this.focused = !this.focused;
 }
 $scope.calculateRowTotal = function (task) {
 	task.total = 0;
@@ -307,9 +280,16 @@ $scope.calculateColTotal = function () {
 		$scope.totalMonth += totalDay.ore;
 	})
 }
+$scope.openAndFocusedCell = undefined;
 $scope.tdClick = function ($event, $index, task) {
 	if($event.srcElement.name != "formInput") {
+		if ($scope.openAndFocusedCell) {
+			$scope.openAndFocusedCell.editmode = false;
+			$scope.openAndFocusedCell.focused = false;
+		}
 		this.editmode = true;
+		this.focused = true;
+		$scope.openAndFocusedCell = this;
 		document.getElementById("check-"+task.id+"-"+$index).focus();
 	}
 }
