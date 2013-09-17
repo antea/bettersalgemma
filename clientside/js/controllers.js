@@ -130,7 +130,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 		if (editore !=0) {
 			$scope.edit($index, day, task, editore, editnote);
 		} else{
-			$scope.delete(day, task);
+			$scope.delete(day, task, $index);
 		};
 	} else{
 		if (editore && editore!=0) {
@@ -139,6 +139,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 	};
 	document.getElementById("check-"+task.id+"-"+$index).focus();
 	this.editmode = false;
+	$scope.refreshPopover($index, task, day);
 }
 $scope.edit = function ($index, day, task, editore, editnote) {
 	if (editnote) {
@@ -194,7 +195,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 		console.log("Errore!! " + argument);
 	});
 }
-$scope.delete = function (day, task) {
+$scope.delete = function (day, task, $index) {
 	$http.delete('http://localhost:8585/deletestorico/'+day.id)
 	.success(function (argument) {
 		day.ore = undefined;
@@ -203,6 +204,7 @@ $scope.delete = function (day, task) {
 		day.unimis = undefined;
 		$scope.calculateRowTotal(task);
 		$scope.calculateColTotal();
+		$scope.refreshPopover($index, task, day);
 		console.log("cancellazione effettuata");
 	})
 	.error(function (argument) {
@@ -292,5 +294,9 @@ $scope.tdClick = function ($event, $index, task) {
 		$scope.openAndFocusedCell = this;
 		document.getElementById("check-"+task.id+"-"+$index).focus();
 	}
+}
+$scope.refreshPopover = function ($index, task, day) {
+	var myPopover = $("#form-" + task.id + "-" +$index).data('popover');
+	myPopover.options.content = day.note ? day.note : " ";
 }
 }
