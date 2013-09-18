@@ -17,10 +17,10 @@ server.listen(server.get('port'), function(){
 });
 
 var pool = mysql.createPool({
-	host:'mysql.antea.bogus',
-	database:'matteos',
-	user:'matteos',
-	password:'matteos'
+	host:'localhost',
+	database:'commesse',
+	user:'root',
+	password:'root'
 	/* Decommentare le righe seguenti per attivare il limite di connessione e 
 	togliere l'attesa in caso di limite raggiunto e lanciare errore; 
 	connectionLimit:1, //default 10

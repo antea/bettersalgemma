@@ -27,6 +27,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 	$scope.selectedMonth = thisMonth;
 	$scope.selectedYear = thisYear;
 
+	//Crea il piccolo calendario con 5 anni;
 	$scope.mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
 	$scope.anni = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
 	$scope.calendar = [];
@@ -40,6 +41,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 		});
 	});
 
+	//recupero informazioni dal database;
 	var retrieveInfo = function () {
 		$scope.month = [];
 		var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
@@ -295,17 +297,17 @@ $scope.tdClick = function ($event, $index, task) {
 		document.getElementById("check-"+task.id+"-"+$index).focus();
 	}
 }
-$scope.refreshPopover = function ($index, task, day) {
-	var myPopover = $("#form-" + task.id + "-" +$index).data('popover');
-	myPopover.options.content = day.note ? day.note : " ";
-}
 $scope.removeFocus = function ($event) {
-	var condition = $event.srcElement.id != "repeatedMonth" && $event.srcElement.name != "form" && $event.srcElement.name != "formInput"
+	var condition = $event.srcElement.id != "repeatedMonth" && $event.srcElement.name != "form" && $event.srcElement.name != "formInput";
 	if(condition) {
 		if ($scope.openAndFocusedCell) {
 			$scope.openAndFocusedCell.editmode = false;
 			$scope.openAndFocusedCell.focused = false;
 		};
 	}
+}
+$scope.refreshPopover = function ($index, task, day) {
+	var myPopover = $("#form-" + task.id + "-" +$index).data('popover');
+	myPopover.options.content = day.note ? day.note : " ";
 }
 }
