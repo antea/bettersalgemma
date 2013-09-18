@@ -299,4 +299,13 @@ $scope.refreshPopover = function ($index, task, day) {
 	var myPopover = $("#form-" + task.id + "-" +$index).data('popover');
 	myPopover.options.content = day.note ? day.note : " ";
 }
+$scope.removeFocus = function ($event) {
+	var condition = $event.srcElement.id != "repeatedMonth" && $event.srcElement.name != "form" && $event.srcElement.name != "formInput"
+	if(condition) {
+		if ($scope.openAndFocusedCell) {
+			$scope.openAndFocusedCell.editmode = false;
+			$scope.openAndFocusedCell.focused = false;
+		};
+	}
+}
 }

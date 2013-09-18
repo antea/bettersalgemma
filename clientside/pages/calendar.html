@@ -1,4 +1,4 @@
-<div class="page-header">
+<div class="page-header" ng-click="removeFocus($event)">
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container" style="width: auto;">
@@ -11,7 +11,7 @@
 						</a>
 						<ul class="dropdown-menu" role="menu" aria-labelledby="dropuser">
 							<li role="presentation">
-								<a role="menuitem" tabiondex="-1" href="#/salgemmainterface/logout"><i class="icon-off"></i> Logout</a>
+								<a role="menuitem" tabindex="-1" href="#/salgemmainterface/logout"><i class="icon-off"></i> Logout</a>
 							</li>
 						</ul>
 					</li>
@@ -20,7 +20,7 @@
 		</div>
 	</div>
 </div>
-<div class="container-fluid">
+<div id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid">
 		<div class="span2" id="span">
 			<div class="well">
@@ -63,9 +63,9 @@
 						<td>
 							{{task.descrizione}}
 						</td>
-						<td ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}}" key-focus ng-click="tdClick($event, $index, task)">
-							<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)">
-							<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}">
+						<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}}" key-focus ng-click="tdClick($event, $index, task)">
+							<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1">
+							<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">
 								<label>{{day.ore}}</label>
 								<label>{{day.unimis}}</label>
 							</form>

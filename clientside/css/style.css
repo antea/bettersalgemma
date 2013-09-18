@@ -2,6 +2,17 @@ body {
 	background-image:url('../img/haliteGrande.JPG');
 	background-repeat: repeat;
 	background-size: 115%;
+	min-height: 100%;
+	width: 100%;
+}
+html{
+	height: 100%;
+	width: 100%;
+}
+#bigDiv{
+	min-height: 100%;
+	width: 100%;
+	position: absolute;
 }
 .page-header{
 	background-color: white;
