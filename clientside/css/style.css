@@ -33,7 +33,7 @@ html{
 .well {
 	margin-top: 20px;
 	margin-bottom: 20px;
-	margin-left: 10px;
+	margin-left: 5px;
 }
 .table-bordered {
 	padding-left: 30px;
@@ -74,4 +74,13 @@ td>input[type=checkbox]{
 	outline: 1px solid red;
 	border-bottom: 0px;
 	border-right: 0px;
+}
+.controls[name="formInput"] {
+	margin-left: 50px;
+}
+.control-label[name="formInput"]{
+	float: left;
+	width: 0px;
+	padding-top: 5px;
+	text-align: right;
 }

@@ -72,18 +72,18 @@
 							<form class="form-horizontal" ng-show="editmode && day.editable">
 								<div class="control-group">
 									<label name="formInput" class="control-label" for="ore">Ore:</label>
-									<div class="controls">
+									<div class="controls" name="formInput">
 										<input name="formInput" type="number" id="ore" ng-model="editore" placeholder={{day.ore}} min="0" max="24">
 									</div>
 								</div>
 								<div class="control-group">
 									<label name="formInput" class="control-label" for="note">Note:</label>
-									<div class="controls">
+									<div class="controls" name="formInput">
 										<input name="formInput" type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
 									</div>
 								</div>
 								<div class="control-group">
-									<div class="controls">
+									<div class="controls" name="formInput">
 										<button class="btn" name="formInput" ng-click="save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
 										<button class="btn" name="formInput" ng-click="discard($index, day, task, editore, editnote)"><i class="icon-remove"></i> Annulla</button>
 									</div>
