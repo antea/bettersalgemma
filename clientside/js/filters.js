@@ -35,7 +35,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var thisCell = e.srcElement.offsetParent;
 					var previousRow = thisCell.parentElement.previousElementSibling;
 					var cellInPreviousRow = previousRow.children[cellNumber];
-					if(cellInPreviousRow.children.length !=0){
+					if(cellInPreviousRow.children.length !=0 && cellInPreviousRow.children[0].name === "formInput"){
 						clickSimulation(thisCell, scope);
 						cellInPreviousRow.children[0].focus();
 						var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
@@ -53,7 +53,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var thisCell = e.srcElement.offsetParent;
 					var nextRow = thisCell.parentElement.nextElementSibling;
 					var cellInNextRow = nextRow.children[cellNumber];
-					if(cellInNextRow.children.length !=0){
+					if(cellInNextRow.children.length !=0 && cellInNextRow.children[0].name === "formInput"){
 						clickSimulation(thisCell, scope);
 						cellInNextRow.children[0].focus();
 						var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
@@ -67,7 +67,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 				else if (e.keyCode == 39) {
 					var thisCell = e.srcElement.offsetParent;
 					var nextParentElement = thisCell.nextElementSibling;
-					if (nextParentElement.children.length!=0) {
+					if (nextParentElement.children.length!=0 && nextParentElement.children[0].name === "formInput") {
 						clickSimulation(thisCell, scope);
 						nextParentElement.children[0].focus();
 						scope.$parent.$parent.openAndFocusedCell = scope.$$nextSibling;
@@ -77,7 +77,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 				else if (e.keyCode == 37){ 
 					var thisCell = e.srcElement.offsetParent;
 					var previousParentElement = thisCell.previousElementSibling;
-					if (previousParentElement.children.length!=0) {
+					if (previousParentElement.children.length!=0 && previousParentElement.children[0].name === "formInput") {
 						clickSimulation(thisCell, scope);
 						previousParentElement.children[0].focus();
 						scope.$parent.$parent.openAndFocusedCell = scope.$$prevSibling;
