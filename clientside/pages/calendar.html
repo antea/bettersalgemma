@@ -58,11 +58,9 @@
 						<th>Totale</th>
 					</tr>
 					
-					<tr ng-repeat="task in tasks | taskFilter">
+					<tr ng-repeat="task in tasks | orderBy:order.descrizione | taskFilter">
 						<td id="ord"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
-						<td>
-							{{task.descrizione}}
-						</td>
+						<td>{{task.descrizione}}</td>
 						<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}}" key-focus ng-click="tdClick($event, $index, task)">
 							<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1">
 							<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">

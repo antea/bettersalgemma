@@ -3,8 +3,8 @@ config(['$routeProvider', function ($routeProvider) {
 	$routeProvider.
 	when('/salgemmainterface/login', {templateUrl: 'pages/autenticazione.html', controller: AutenticazioneCtrl}).
 	when('/salgemmainterface', {templateUrl: 'pages/calendar.html', controller: CalendarCtrl}).
-	when('/', {redirectTo:'/salgemmainterface/login'}).
 	when('/salgemmainterface/logout', {redirectTo:'/salgemmainterface/login'}).
+	when('/', {redirectTo:'/salgemmainterface/login'}).
 	otherwise({templateUrl: 'pages/notFound.html'});
 }]).
 run( function ($rootScope, $location) {

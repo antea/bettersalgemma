@@ -1,5 +1,5 @@
 function AutenticazioneCtrl ($rootScope, $scope, $http, $location) {
-	$rootScope.users = [];
+	$rootScope.users = []; //Togliere array
 	$scope.errors = [];
 	$scope.submitLogin = function (){
 		$http.get('http://localhost:8585/login/'+$scope.userName+'/'+CryptoJS.MD5($scope.pw)).
@@ -51,7 +51,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 				day: week[dayi.getDay()],
 				date: dayi.getDate()+"-"+($scope.selectedMonth+1)+"-"+$scope.selectedYear};
 			};
-			$scope.tasks = new Array;
+			$scope.tasks = new Array();
 			$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 			success(function (data, status, headers, config) {
 				$scope.errors = [];

@@ -294,10 +294,10 @@ i parametri costo e ricavo utilizzabile attraverso callback.
 function calcolaCostiRicavi (pianificazione, secondi, callback) {
 	calcolaCosto(pianificazione, secondi, function(err, costi){
 		if(err){
-			callback(err, tupla)
+			callback(err)
 		} else {calcolaRicavo(pianificazione, secondi, function(err, ricavi){
 			if (err) {
-				callback(err, tupla);
+				callback(err);
 			} else{
 				var tupla = new Object();
 				tupla.costo = costi;
@@ -316,10 +316,9 @@ Per utilizzi successivi il calcolo del costo dovrà essere integrato con l'unita
 (reperibile attraverso la colonna unimisura della tabella articololistino).
 */
 function calcolaCosto (pianificazione, secondi, callback) {
-	var costo = 0;
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			callback(err, costo);
+			callback(err);
 		} else{
 			connection.query('SELECT al.prezzo AS costo '+
 				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) '+
@@ -327,9 +326,9 @@ function calcolaCosto (pianificazione, secondi, callback) {
 				'WHERE p.id=?', [pianificazione],
 				function (err, results) {
 					if (err || results.length === 0) {
-						callback(err, costo);
+						callback(err, 0);
 					} else{
-						costo = results[0].costo*(secondi/3600);
+						var costo = results[0].costo*(secondi/3600);
 						callback(err, costo);
 					};
 				});
@@ -345,7 +344,6 @@ Per utilizzi successivi il calcolo del ricavo dovrà essere integrato con l'unit
 (reperibile attraverso la colonna unimisura della tabella articololistino).
 */
 function calcolaRicavo (pianificazione, secondi, callback) {
-	var ricavo=0;
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			callback(err, ricavo);
@@ -356,10 +354,10 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 			'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo '+
 			'WHERE p.id=?', [pianificazione],
 			function (err, results) {
-				if (err || results.length === 0) {  //ATTENZIONE ACCROCCHIO DA CONTROLLARE!!!!!
-					callback(err, ricavo);
+				if (err || results.length === 0) {
+					callback(err, 0);
 				} else{
-					ricavo = results[0].ricavo*(secondi/3600);
+					var ricavo = results[0].ricavo*(secondi/3600);
 					callback(err, ricavo);
 				};
 			});
