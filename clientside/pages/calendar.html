@@ -69,10 +69,10 @@
 								<i class="icon-comment" ng-show="day.note"></i>
 							</form>
 							<form class="form-horizontal" ng-show="editmode && day.editable">
-								<div class="control-group">
+								<div class="control-group {{validator}}">
 									<label name="formInput" class="control-label" for="ore">Ore:</label>
 									<div class="controls" name="formInput">
-										<input name="formInput" type="number" id="ore" ng-model="editore" placeholder={{day.ore}} min="0" max="24">
+										<input name="formInput" type="text" id="ore-{{task.id}}-{{$index}}" ng-model="editore" placeholder={{day.ore}} ng-change="validate(editore)">
 									</div>
 								</div>
 								<div class="control-group">

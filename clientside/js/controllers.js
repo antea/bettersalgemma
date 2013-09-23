@@ -121,27 +121,33 @@ error(function (data, status, headers, config) {
 retrieveInfo();
 
 $scope.discard = function ($index, day, task, editore, editnote) {
-	editore = undefined;
-	editnote = undefined;
+	this.editore = undefined;
+	this.editnote = undefined;
+	$scope.validate(this.editore);
 	this.editmode = false;
 	document.getElementById("check-"+task.id+"-"+$index).focus();
 }
 
 $scope.save = function ($index, day, task, editore, editnote) {
-	if (day.ore) {
-		if (editore !=0) {
-			$scope.edit($index, day, task, editore, editnote);
+	if($scope.validator != "error") {
+		if (day.ore) {
+			if (editore !=0) {
+				$scope.edit($index, day, task, editore, editnote);
+			} else{
+				$scope.delete(day, task, $index);
+			};
 		} else{
-			$scope.delete(day, task, $index);
+			if (editore && editore!=0) {
+				$scope.newInsert($index, day, task, editore, editnote);
+			};
 		};
-	} else{
-		if (editore && editore!=0) {
-			$scope.newInsert($index, day, task, editore, editnote);
-		};
-	};
-	document.getElementById("check-"+task.id+"-"+$index).focus();
-	this.editmode = false;
-	$scope.refreshPopover($index, task, day);
+		document.getElementById("check-"+task.id+"-"+$index).focus();
+		this.editmode = false;
+		$scope.refreshPopover($index, task, day);
+	} else {
+		document.getElementById("ore-"+task.id+"-"+$index).focus();
+		this.editnote = undefined;
+	}
 }
 $scope.edit = function ($index, day, task, editore, editnote) {
 	if (editnote) {
@@ -309,5 +315,21 @@ $scope.removeFocus = function ($event) {
 $scope.refreshPopover = function ($index, task, day) {
 	var myPopover = $("#form-" + task.id + "-" +$index).data('popover');
 	myPopover.options.content = day.note ? day.note : " ";
+}
+$scope.validate = function (editore) {
+	var pattern = /^\d{0,2}(\.\d{1})?$/;
+	if(editore){
+		if(pattern.test(editore)){
+			if(parseFloat(editore) <= 24){
+				$scope.validator = "";
+			} else {
+				$scope.validator = "error";
+			}
+		} else{
+			$scope.validator = "error";
+		}
+	} else {
+		$scope.validator = "";
+	}
 }
 }
