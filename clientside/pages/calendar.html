@@ -66,6 +66,7 @@
 							<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">
 								<label>{{day.ore}}</label>
 								<label>{{day.unimis}}</label>
+								<i class="icon-comment" ng-show="day.note"></i>
 							</form>
 							<form class="form-horizontal" ng-show="editmode && day.editable">
 								<div class="control-group">
