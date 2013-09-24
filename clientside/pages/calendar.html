@@ -38,8 +38,12 @@
 				</div>
 				<div>
 					<h5><i class="icon-list"></i> Ordini visualizzati:</h5>
-					<p>[<a href="" ng-click="selectAllOrders()">Seleziona tutto</a>] - [<a href="" ng-click="deselectAllOrders()">Deseleziona tutto</a>]</p>
 					<ul class="unstyled">
+						<li>
+							<input type="checkbox" ng-click="selectOrDeselectAll()" checked> 
+							<span><strong>Seleziona Tutto</strong></span>
+						</li>
+						<hr>
 						<li ng-repeat="ordine in ordini">
 							<input type="checkbox" ng-model="ordine.selected">
 							<span>{{ordine.descrizione}}</span>
@@ -50,54 +54,54 @@
 		</div>
 		<div class="span10" id="span">
 			<!--div class="well"-->
-				<table class="table table-bordered">
-					<tr>
-						<th id="headers">Ordine</th>
-						<th id="headers">Attività</th>
-						<th ng-repeat="day in month" id="headers"><p class="we-{{day.isWeekend}}">{{day.day}}</p><p class="we-{{day.isWeekend}}">{{day.number}}</p></th>
-						<th id="headers">Totale</th>
-					</tr>
-					
-					<tr ng-repeat="task in tasks | orderBy:order.descrizione | taskFilter">
-						<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
-						<td id="headers"><h5>{{task.descrizione}}</h5></td>
-						<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}}" key-focus ng-click="tdClick($event, $index, task)">
-							<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1">
-							<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">
-								<label>{{day.ore}}</label>
-								<label>{{day.unimis}}</label>
-								<i class="icon-comment" ng-show="day.note"></i>
-							</form>
-							<form class="form-horizontal" ng-show="editmode && day.editable">
-								<div class="control-group {{validator}}">
-									<label name="formInput" class="control-label" for="ore">Ore:</label>
-									<div class="controls" name="formInput">
-										<input name="formInput" type="text" id="ore-{{task.id}}-{{$index}}" ng-model="editore" placeholder={{day.ore}} ng-change="validate(editore)">
-									</div>
+			<table class="table table-bordered">
+				<tr>
+					<th id="headers">Ordine</th>
+					<th id="headers">Attività</th>
+					<th ng-repeat="day in month" id="headers"><p class="we-{{day.isWeekend}}">{{day.day}}</p><p class="we-{{day.isWeekend}}">{{day.number}}</p></th>
+					<th id="headers">Totale</th>
+				</tr>
+
+				<tr ng-repeat="task in tasks | orderBy:order.descrizione | taskFilter">
+					<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
+					<td id="headers"><h5>{{task.descrizione}}</h5></td>
+					<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}}" key-focus ng-click="tdClick($event, $index, task)">
+						<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1">
+						<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">
+							<label>{{day.ore}}</label>
+							<label>{{day.unimis}}</label>
+							<i class="icon-comment" ng-show="day.note"></i>
+						</form>
+						<form class="form-horizontal" ng-show="editmode && day.editable">
+							<div class="control-group {{validator}}">
+								<label name="formInput" class="control-label" for="ore">Ore:</label>
+								<div class="controls" name="formInput">
+									<input name="formInput" type="text" id="ore-{{task.id}}-{{$index}}" ng-model="editore" placeholder={{day.ore}} ng-change="validate(editore)">
 								</div>
-								<div class="control-group">
-									<label name="formInput" class="control-label" for="note">Note:</label>
-									<div class="controls" name="formInput">
-										<input name="formInput" type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
-									</div>
+							</div>
+							<div class="control-group">
+								<label name="formInput" class="control-label" for="note">Note:</label>
+								<div class="controls" name="formInput">
+									<input name="formInput" type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
 								</div>
-								<div class="control-group">
-									<div class="controls" name="formInput">
-										<button class="btn" name="formInput" ng-click="save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
-										<button class="btn" name="formInput" ng-click="discard($index, day, task, editore, editnote)"><i class="icon-remove"></i> Annulla</button>
-									</div>
+							</div>
+							<div class="control-group">
+								<div class="controls" name="formInput">
+									<button class="btn" name="formInput" ng-click="save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
+									<button class="btn" name="formInput" ng-click="discard($index, day, task, editore, editnote)"><i class="icon-remove"></i> Annulla</button>
 								</div>
-							</form>
-						</td>
-						<td id="headers"><h5>{{task.total}}</h5></td>
-					</tr>
-					<tr>
-						<th id="headers">Totale</th>
-						<td id="headers"><h5>Totale</h5></td>
-						<td ng-repeat="taskDay in totalTask" id="headers"><h5>{{taskDay.ore}}</h5></td>
-						<th id="headers">{{totalMonth}}</th>
-					</tr>
-				</table>
+							</div>
+						</form>
+					</td>
+					<td id="headers"><h5>{{task.total}}</h5></td>
+				</tr>
+				<tr>
+					<th id="headers">Totale</th>
+					<td id="headers"><h5>Totale</h5></td>
+					<td ng-repeat="taskDay in totalTask" id="headers"><h5>{{taskDay.ore}}</h5></td>
+					<th id="headers">{{totalMonth}}</th>
+				</tr>
+			</table>
 			<!--/div-->
 		</div>
 	</div>

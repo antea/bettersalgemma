@@ -220,6 +220,15 @@ $scope.delete = function (day, task, $index) {
 		console.log("Errore cancellazione!! " + argument);
 	});
 }
+$scope.selectedAll = true;
+$scope.selectOrDeselectAll = function () {
+	$scope.selectedAll = !$scope.selectedAll
+	if ($scope.selectedAll) {
+		$scope.selectAllOrders();
+	} else {
+		$scope.deselectAllOrders();
+	};
+}
 $scope.selectAllOrders = function() {
 	$scope.tasks.forEach(function (task) {
 		task.order.selected = true;
