@@ -52,15 +52,15 @@
 			<!--div class="well"-->
 				<table class="table table-bordered">
 					<tr>
-						<th>Ordine</th>
-						<th>Attività</th>
-						<th ng-repeat="day in month"><p>{{day.day}}</p><p>{{day.number}}</p></th>
-						<th>Totale</th>
+						<th id="headers">Ordine</th>
+						<th id="headers">Attività</th>
+						<th ng-repeat="day in month" id="headers"><p class="we-{{day.isWeekend}}">{{day.day}}</p><p class="we-{{day.isWeekend}}">{{day.number}}</p></th>
+						<th id="headers">Totale</th>
 					</tr>
 					
 					<tr ng-repeat="task in tasks | orderBy:order.descrizione | taskFilter">
-						<td id="ord"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
-						<td>{{task.descrizione}}</td>
+						<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
+						<td id="headers"><h5>{{task.descrizione}}</h5></td>
 						<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}}" key-focus ng-click="tdClick($event, $index, task)">
 							<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1">
 							<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">
@@ -89,15 +89,13 @@
 								</div>
 							</form>
 						</td>
-						<td>
-							{{task.total}}
-						</td>
+						<td id="headers"><h5>{{task.total}}</h5></td>
 					</tr>
 					<tr>
-						<th>Totale</th>
-						<td>Totale</td>
-						<td ng-repeat="taskDay in totalTask">{{taskDay.ore}}</td>
-						<th>{{totalMonth}}</th>
+						<th id="headers">Totale</th>
+						<td id="headers"><h5>Totale</h5></td>
+						<td ng-repeat="taskDay in totalTask" id="headers"><h5>{{taskDay.ore}}</h5></td>
+						<th id="headers">{{totalMonth}}</th>
 					</tr>
 				</table>
 			<!--/div-->

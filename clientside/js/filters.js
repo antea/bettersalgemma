@@ -17,7 +17,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 		$(element).popover({
 			html:true, 
 			content: scope.day ? scope.day.note : undefined,
-			title: "<strong>Note:</strong>",
+			title: scope.day.note ? "<strong>Note:</strong>" : undefined,
 			trigger: "hover",
 			placement: "bottom"
 		});

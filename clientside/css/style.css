@@ -64,7 +64,7 @@ html{
 	text-align: center;
 }
 .editable-false {
-	background-color: Grey;
+	background-color: #e6e6e6;
 }
 .editable-true {
 	cursor: pointer;
@@ -93,4 +93,10 @@ input[name="formInput"][type="text"]{
 .form-horizontal{
 	margin-bottom: 4px;
 	margin-top: 4px;
+}
+#headers{
+	background-color: #e6e6e6;
+}
+.we-true{
+	color: #0000a6;
 }

@@ -49,7 +49,8 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 			var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
 			$scope.month[i] = {number: dayi.getDate(),
 				day: week[dayi.getDay()],
-				date: dayi.getDate()+"-"+($scope.selectedMonth+1)+"-"+$scope.selectedYear};
+				date: dayi.getDate()+"-"+($scope.selectedMonth+1)+"-"+$scope.selectedYear,
+				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
 			};
 			$scope.tasks = new Array();
 			$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
@@ -81,7 +82,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 										ore : undefined,
 										unimis : undefined,
 										secondi : undefined,
-										editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) ? false : true
+										editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) || $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? false : true
 									}
 								}
 								data.forEach(function (storico) {
@@ -314,7 +315,8 @@ $scope.removeFocus = function ($event) {
 }
 $scope.refreshPopover = function ($index, task, day) {
 	var myPopover = $("#form-" + task.id + "-" +$index).data('popover');
-	myPopover.options.content = day.note ? day.note : " ";
+	myPopover.options.content = day.note ? day.note : undefined;
+	myPopover.options.title = day.note ? "<strong>Note:</strong>" : undefined;
 }
 $scope.validate = function (editore) {
 	var pattern = /^\d{0,2}(\.\d{1})?$/;
