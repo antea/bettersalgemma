@@ -1,26 +1,24 @@
-<div class="page-header" ng-click="removeFocus($event)">
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container" style="width: auto;">
-				<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" class="brand">
-				<ul class="nav pull-right">
-					<li class="dropdown">
-						<a id="dropuser" href="#" role="button" class="dropdown-toggle brand" data-toggle="dropdown" ng-repeat="user in users">
-							{{user.nome}}
-							<b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu" role="menu" aria-labelledby="dropuser">
-							<li role="presentation">
-								<a role="menuitem" tabindex="-1" href="#/salgemmainterface/logout"><i class="icon-off"></i> Logout</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</div>
+<div class="navbar navbar-fixed-top" ng-click="removeFocus($event)">
+	<div class="navbar-inner">
+		<div class="container" style="width: auto;">
+			<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" class="brand">
+			<ul class="nav pull-right">
+				<li class="dropdown">
+					<a id="dropuser" href="#" role="button" class="dropdown-toggle brand" data-toggle="dropdown" ng-repeat="user in users">
+						{{user.nome}}
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dropuser">
+						<li role="presentation">
+							<a role="menuitem" tabindex="-1" href="#/salgemmainterface/logout"><i class="icon-off"></i> Logout</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
 		</div>
 	</div>
 </div>
-<div id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
+<div name="mainDiv" id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid">
 		<div class="span2" id="span">
 			<div class="well">
@@ -52,7 +50,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="span10" id="span">
+		<div class="span10" id="span" name="table">
 			<!--div class="well"-->
 			<table class="table table-bordered">
 				<tr>
