@@ -15,25 +15,26 @@
 
 <div class="container-fluid">
 	<div class="row-fluid">
-		<div class="span4"></div>
-		<div class="span4">
-			<div class="hero-unit"><h2>Autenticazione:</h2>
+		<!--div class="span4"></div-->
+		<div class="span4 offset4">
+			<div id="auth">
+				<h2>Autenticazione:</h2>
 				<p>
-					<form class="form-horizontal">
+					<form class="form-horizontal" id="authForm">
 						<div class="control-group">
-							<label class="control-label" for="login"><i class="icon-user"></i></label>
-							<div class="controls">
-								<input type="text" id="login" ng-model="userName" placeholder="UserName" autofocus="autofocus">
+							<label class="control-label" name="authForm" for="login"><i class="icon-user"></i></label>
+							<div class="controls" name="authForm">
+								<input type="text" id="login" name="inputAuth" ng-model="userName" placeholder="UserName" autofocus="autofocus">
 							</div>
 						</div>
 						<div class="control-group">
-							<label class="control-label" for="password"><i class="icon-lock"></i></label>
-							<div class="controls">
-								<input type="password" id="password" ng-model="pw" placeholder="Password">
+							<label class="control-label" name="authForm" for="password"><i class="icon-lock"></i></label>
+							<div class="controls" name="authForm">
+								<input type="password" id="password" name="inputAuth" ng-model="pw" placeholder="Password">
 							</div>
 						</div>
 						<div class="control-group">
-							<div class="controls">
+							<div class="controls" name="authForm">
 								<button class="btn" ng-click="submitLogin()"><i class="icon-ok"></i> OK</button>
 							</div>
 						</div>
@@ -45,6 +46,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="span4"></div>
+		<!--div class="span4"></div-->
 	</div>
 </div>

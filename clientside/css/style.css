@@ -14,9 +14,6 @@ html{
 	width: 100%;
 	position: absolute;
 }
-.page-header{
-	background-color: white;
-}
 #logoAnteaLogin {
 	width: 20%;
 }
@@ -26,9 +23,26 @@ html{
 #ord {
 	vertical-align: middle;
 }
-.hero-unit {
-	margin-top: 150px;
-	margin-bottom: 150px;
+#auth {
+	margin-top: 50%;
+	margin-bottom: 50%;
+	background-color: #f5f5f5;
+	padding: 10%;
+	border-radius: 25px;
+}
+.control-label[name="authForm"]{
+	float: left;
+	width: 1%;
+	padding-top: 5px;
+	text-align: right;
+	margin-left: 28%;
+}
+.controls[name="authForm"] {
+	margin-left: 35%;
+	margin-right: auto;
+}
+input[name="inputAuth"]{
+	width: 60%;
 }
 .well {
 	margin-top: 20px;
