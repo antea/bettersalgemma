@@ -1,17 +1,19 @@
 body {
 	background-image:url('../img/haliteGrande.JPG');
-	background-repeat: repeat;
 	background-size: 115%;
 	min-height: 100%;
+	max-height: 100%;
 	width: 100%;
 	overflow: hidden;
 }
 html{
-	height: 100%;
+	min-height: 100%;
+	max-height: 100%;
 	width: 100%;
 }
 #bigDiv{
 	min-height: 100%;
+	max-height: 100%;
 	width: 100%;
 	position: absolute;
 }
@@ -57,13 +59,10 @@ input[name="inputAuth"]{
 	padding-right: 30px;
 	padding-top: 30px;
 	padding-bottom: 30px;
-	margin-top: 20px;
 	margin-left: 0px;
 	margin-right: 0px;
 	margin-bottom: 0px;
 	background-color: #f5f5f5;
-	overflow-x: auto;
-	overflow-y: auto;
 }
 .table td, .table th{
 	margin: 4px;
@@ -74,13 +73,26 @@ input[name="inputAuth"]{
 }
 #freccia{
 	cursor: pointer;
+	width: 20px;
+	height: 20px;
+	margin-top: -10px;
+	font-size: 35px;
+	line-height: 15px;
+	color: black;
+	vertical-align: middle;
+	background: white;
+	border: 3px solid black;
 }
 #span {
 	margin-left: 0.5%;
+	height: 92%;
 	overflow-x: auto;
 	overflow-y: auto;
 }
 #calendarMonth {
+	text-align: center;
+}
+.carousel-inner{
 	text-align: center;
 }
 .editable-false {
@@ -131,5 +143,11 @@ hr{
 div[name="mainDiv"]{
 	margin-top: 5%;
 	display: block;
-	position: relative;
+	height: 100%;
+}
+div[name="notMainDiv"]{
+	height: inherit;
+}
+div[name="table"]{
+	margin-top: 20px;
 }
