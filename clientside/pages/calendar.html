@@ -2,12 +2,12 @@
 	<div class="navbar-inner">
 		<div class="container" style="width: auto;">
 			<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" class="brand">
-			<div class="span1.5"><h5><i class="icon-calendar"></i> Calendario:</h5></div>
-			<div class="span3" id="span">
+			<div name="q" class="span1.5"><h4><i class="icon-calendar"></i> Calendario:</h4></div>
+			<div name="q" class="span3" id="span">
 				<div id="calendarCarousel" class="carousel slide" data-interval="false">
 					<div class="carousel-inner">
 						<div ng-repeat="calendario in calendar" class="{{calendario.active}}item">
-							<h5><span id="calendarMonth" ng-model="selectedMonth">{{calendario.monthDescription}}  </span><span id="calendarMonth" ng-model="selectedYear">  {{calendario.year}}</span></h5>
+							<h4><span id="calendarMonth" ng-model="selectedMonth">{{calendario.monthDescription}}  </span><span id="calendarMonth" ng-model="selectedYear">  {{calendario.year}}</span></h4>
 						</div>
 					</div>
 					<a id="freccia" class="carousel-control left" ng-click="prev()">&lsaquo;</a>

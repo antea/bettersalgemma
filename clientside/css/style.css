@@ -96,6 +96,9 @@ input[name="inputAuth"]{
 .carousel-inner{
 	text-align: center;
 }
+.carousel {
+	margin-bottom: 0px;
+}
 .editable-false {
 	background-color: #e6e6e6;
 }
@@ -184,4 +187,7 @@ button[name="filterBtn"]{
 }
 .row-fluid .span2 {
 	margin-left: 0%;
+}
+div[name="q"] {
+	padding-top: 0.5%;
 }
