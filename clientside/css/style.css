@@ -67,6 +67,8 @@ input[name="inputAuth"]{
 .table td, .table th{
 	margin: 4px;
 	padding: 4px;
+	padding-bottom: 1px;
+	padding-top: 1px;
 	border: 1px solid black;
 	text-align: center;
 	vertical-align: middle;
@@ -84,7 +86,6 @@ input[name="inputAuth"]{
 	border: 3px solid black;
 }
 #span {
-	margin-left: 0.5%;
 	height: 92%;
 	overflow-x: auto;
 	overflow-y: auto;
@@ -150,4 +151,37 @@ div[name="notMainDiv"]{
 }
 div[name="table"]{
 	margin-top: 20px;
+}
+h5 {
+	margin: 1px;
+}
+form[name="form"]{
+	margin: 0px;
+}
+button[name="filterBtn"]{
+	margin-top: -40%;
+	width: 200px;
+	-webkit-transform:rotate(90deg);
+	-webkit-transform-origin: left bottom;
+	-moz-transform:rotate(90deg);
+	-moz-transform-origin: left bottom;
+	-o-transform: rotate(90deg);
+	-o-transform-origin: left bottom;
+}
+.row-fluid .span11 {
+	height: 92%;
+	width: 97.5%;
+	margin-left: 1px;
+}
+.row-fluid .span10 {
+	margin-left: 0.5%;
+	width: 84.5%;
+}
+.row-fluid .span1 {
+	margin-left: 0%;
+	width: 2%;
+	height: 96%;
+}
+.row-fluid .span2 {
+	margin-left: 0%;
 }
