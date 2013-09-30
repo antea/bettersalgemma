@@ -345,10 +345,10 @@ $scope.validate = function (editore) {
 }
 $scope.dinamicHide = true;
 $scope.dinamicSpan = 11;
-$scope.dinamicLabelBtn = "Visualizza Filtri"
+$scope.dinamicLabelBtn = "Visualizza Filtri ▲"
 $scope.dinamicMenuFilter = function () {
 	$scope.dinamicSpan = $scope.dinamicSpan===11 ? $scope.dinamicSpan=10 : 11;
-	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri" ? $scope.dinamicLabelBtn="Nascondi Filtri" : "Visualizza Filtri";
+	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 }
 }
