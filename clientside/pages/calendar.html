@@ -32,9 +32,10 @@
 </div>
 <div name="mainDiv" id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid" name="notMainDiv">
-		<div class="span2" id="span">
+		<div class="span2" id="span" ng-hide="dinamicHide">
 			<div class="well">
 				<div>
+					<button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button>
 					<h5><i class="icon-list"></i> Ordini visualizzati:</h5>
 					<ul class="unstyled">
 						<li>
@@ -50,8 +51,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="span10" id="span" name="table">
+		<div class="span{{dinamicSpan}}" id="span" name="table">
 			<!--div class="well"-->
+			<button class="btn btn-info" id="filterBtn" ng-click="dinamicMenuFilter()" ng-show="dinamicHide"><i class="icon-list"></i> {{dinamicLabelBtn}}</button>
 			<table class="table table-bordered">
 				<thead>
 					<tr>
