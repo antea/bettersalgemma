@@ -34,35 +34,39 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var cellNumber = scope.$index + 2;
 					var thisCell = e.srcElement.offsetParent;
 					var previousRow = thisCell.parentElement.previousElementSibling;
-					var cellInPreviousRow = previousRow.children[cellNumber];
-					if(cellInPreviousRow.children.length !=0 && cellInPreviousRow.children[0].name === "formInput"){
-						clickSimulation(thisCell, scope);
-						cellInPreviousRow.children[0].focus();
-						var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
-						if (thisPreviousRow) {
-							for (var i = 0; i < cellNumber-2; i++) {
-								thisPreviousRow = thisPreviousRow.$$nextSibling;
+					if (previousRow) {
+						var cellInPreviousRow = previousRow.children[cellNumber];
+						if(cellInPreviousRow.children.length !=0 && cellInPreviousRow.children[0].name === "formInput"){
+							clickSimulation(thisCell, scope);
+							cellInPreviousRow.children[0].focus();
+							var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
+							if (thisPreviousRow) {
+								for (var i = 0; i < cellNumber-2; i++) {
+									thisPreviousRow = thisPreviousRow.$$nextSibling;
+								};
+								scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
 							};
-							scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
-						};
-						cellInPreviousRow.children[0].click();
-					}
+							cellInPreviousRow.children[0].click();
+						}
+					};
 				} //down
 				else if (e.keyCode == 40) { 
 					var cellNumber = scope.$index + 2;
 					var thisCell = e.srcElement.offsetParent;
 					var nextRow = thisCell.parentElement.nextElementSibling;
-					var cellInNextRow = nextRow.children[cellNumber];
-					if(cellInNextRow.children.length !=0 && cellInNextRow.children[0].name === "formInput"){
-						clickSimulation(thisCell, scope);
-						cellInNextRow.children[0].focus();
-						var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
-						for (var i = 0; i < cellNumber-2; i++) {
-							thisNextRow = thisNextRow.$$nextSibling;
-						};
-						scope.$parent.$parent.openAndFocusedCell = thisNextRow;
-						cellInNextRow.children[0].click();
-					}
+					if (nextRow) {
+						var cellInNextRow = nextRow.children[cellNumber];
+						if(cellInNextRow.children.length !=0 && cellInNextRow.children[0].name === "formInput"){
+							clickSimulation(thisCell, scope);
+							cellInNextRow.children[0].focus();
+							var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
+							for (var i = 0; i < cellNumber-2; i++) {
+								thisNextRow = thisNextRow.$$nextSibling;
+							};
+							scope.$parent.$parent.openAndFocusedCell = thisNextRow;
+							cellInNextRow.children[0].click();
+						}
+					};
 				} //right
 				else if (e.keyCode == 39) {
 					var thisCell = e.srcElement.offsetParent;
