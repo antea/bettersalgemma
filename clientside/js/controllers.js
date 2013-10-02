@@ -2,7 +2,7 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location) {
 	$rootScope.users = []; //Togliere array
 	$scope.errors = [];
 	$scope.submitLogin = function (){
-		$http.get('http://localhost:8585/login/'+$scope.userName+'/'+CryptoJS.MD5($scope.pw)).
+		$http.get('/login/'+$scope.userName+'/'+CryptoJS.MD5($scope.pw)).
 		success(function (data, status, headers, config) {
 			$scope.errors = [];
 			$rootScope.users = data;
@@ -53,13 +53,13 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
 			};
 			$scope.tasks = new Array();
-			$http.get('http://localhost:8585/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
+			$http.get('/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 			success(function (data, status, headers, config) {
 				$scope.errors = [];
 				$scope.ordini = data;
 				$scope.ordini.forEach(function (ordine) {
 					ordine.selected = true;
-					$http.get('http://localhost:8585/attivita/'+$rootScope.users[0].id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
+					$http.get('/attivita/'+$rootScope.users[0].id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 					success(function (data, status, headers, config) {
 						data.forEach(function (task, index, array) {
 							var taskStart = new Date(task.datainizioprev);
@@ -72,7 +72,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 								task.show = false;
 							}
 							task.order = ordine;
-							$http.get('http://localhost:8585/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
+							$http.get('/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
 								'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
 							success(function (data, status, headers, config) {
 								task.mese = new Array($scope.month.length);
@@ -167,7 +167,7 @@ $scope.edit = function ($index, day, task, editore, editnote) {
 		secondi : day.secondi,
 		note : day.note
 	};
-	$http.put('http://localhost:8585/editstorico', dati)
+	$http.put('/editstorico', dati)
 	.success(function (argument) {
 		$scope.calculateRowTotal(task);
 		$scope.calculateColTotal();
@@ -193,7 +193,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 		secondi : day.secondi,
 		note : day.note
 	};
-	$http.post('http://localhost:8585/insertstorico', dati)
+	$http.post('/insertstorico', dati)
 	.success(function (argument) {
 		$scope.calculateRowTotal(task);
 		$scope.calculateColTotal();
@@ -205,7 +205,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 	});
 }
 $scope.delete = function (day, task, $index) {
-	$http.delete('http://localhost:8585/deletestorico/'+day.id)
+	$http.delete('/deletestorico/'+day.id)
 	.success(function (argument) {
 		day.ore = undefined;
 		day.secondi = undefined;
@@ -350,5 +350,9 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicSpan = $scope.dinamicSpan===11 ? $scope.dinamicSpan=10 : 11;
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
+}
+$scope.hideIcon
+$scope.hideLoadingIcon = function () {
+	$scope.hideIcon = true;
 }
 }
