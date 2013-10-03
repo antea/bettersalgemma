@@ -5,3 +5,5 @@ serverside/node_modules
 *.log
 ER02.png
 SchemaLogicoSalgemma.pdf
+serverside/nodemonCheck*
+
