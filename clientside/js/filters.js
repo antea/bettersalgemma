@@ -87,7 +87,12 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 						scope.$parent.$parent.openAndFocusedCell = scope.$$prevSibling;
 						previousParentElement.children[0].click();
 					};
-				}
+				} else if (e.keyCode == 27) {
+					scope.editmode = false;
+					var thisCell = e.srcElement.offsetParent;
+					thisCell.children[0].click();
+					thisCell.children[2][3].click();
+				};
 			};
 		});
 }
