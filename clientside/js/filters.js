@@ -97,6 +97,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 var clickSimulation = function (thisCell, scope) {
 	if (thisCell.children[0].checked) {
 		thisCell.children[0].click();
+		thisCell.children[2][2].click();
 	} else {
 		scope.focused = false;
 	}
