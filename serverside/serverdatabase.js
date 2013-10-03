@@ -237,7 +237,7 @@ server.put('/editstorico', function (req, res) {
 										nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
 										nuovaTupla.secondi == results[0].secondi &&
 										nuovaTupla.note == results[0].note){
-										res.send(400, 'Nessuna modifica apportata, riga identica.');
+										res.send(200, 'Nessuna modifica apportata, riga identica.');
 								} else{
 									connection.query('UPDATE storico SET ? WHERE id=?',
 										[nuovaTupla, req.body.id], function (err, results){
