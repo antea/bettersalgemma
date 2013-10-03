@@ -126,7 +126,7 @@ $scope.discard = function ($index, day, task, editore, editnote) {
 	this.editnote = undefined;
 	$scope.validate(this.editore);
 	this.editmode = false;
-	document.getElementById("check-"+task.id+"-"+$index).focus();
+	this.focused = false;
 }
 
 $scope.save = function ($index, day, task, editore, editnote) {
@@ -142,8 +142,8 @@ $scope.save = function ($index, day, task, editore, editnote) {
 				$scope.newInsert($index, day, task, editore, editnote);
 			};
 		};
-		document.getElementById("check-"+task.id+"-"+$index).focus();
 		this.editmode = false;
+		this.focused = false;
 		$scope.refreshPopover($index, task, day);
 	} else {
 		document.getElementById("ore-"+task.id+"-"+$index).focus();

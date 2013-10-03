@@ -37,16 +37,18 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					if (previousRow) {
 						var cellInPreviousRow = previousRow.children[cellNumber];
 						if(cellInPreviousRow.children.length !=0 && cellInPreviousRow.children[0].name === "formInput"){
-							clickSimulation(thisCell, scope);
-							cellInPreviousRow.children[0].focus();
-							var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
-							if (thisPreviousRow) {
-								for (var i = 0; i < cellNumber-2; i++) {
-									thisPreviousRow = thisPreviousRow.$$nextSibling;
+							if (scope.$parent.$parent.validator!="error") {
+								clickSimulation(thisCell, scope);
+								cellInPreviousRow.children[0].focus();
+								var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
+								if (thisPreviousRow) {
+									for (var i = 0; i < cellNumber-2; i++) {
+										thisPreviousRow = thisPreviousRow.$$nextSibling;
+									};
+									scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
 								};
-								scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
+								cellInPreviousRow.children[0].click();
 							};
-							cellInPreviousRow.children[0].click();
 						}
 					};
 				} //down
@@ -57,14 +59,16 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					if (nextRow) {
 						var cellInNextRow = nextRow.children[cellNumber];
 						if(cellInNextRow.children.length !=0 && cellInNextRow.children[0].name === "formInput"){
-							clickSimulation(thisCell, scope);
-							cellInNextRow.children[0].focus();
-							var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
-							for (var i = 0; i < cellNumber-2; i++) {
-								thisNextRow = thisNextRow.$$nextSibling;
+							if (scope.$parent.$parent.validator!="error") {
+								clickSimulation(thisCell, scope);
+								cellInNextRow.children[0].focus();
+								var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
+								for (var i = 0; i < cellNumber-2; i++) {
+									thisNextRow = thisNextRow.$$nextSibling;
+								};
+								scope.$parent.$parent.openAndFocusedCell = thisNextRow;
+								cellInNextRow.children[0].click();
 							};
-							scope.$parent.$parent.openAndFocusedCell = thisNextRow;
-							cellInNextRow.children[0].click();
 						}
 					};
 				} //right
@@ -72,20 +76,24 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					var thisCell = e.srcElement.offsetParent;
 					var nextParentElement = thisCell.nextElementSibling;
 					if (nextParentElement.children.length!=0 && nextParentElement.children[0].name === "formInput") {
-						clickSimulation(thisCell, scope);
-						nextParentElement.children[0].focus();
-						scope.$parent.$parent.openAndFocusedCell = scope.$$nextSibling;
-						nextParentElement.children[0].click();
+						if (scope.$parent.$parent.validator!="error") {
+							clickSimulation(thisCell, scope);
+							nextParentElement.children[0].focus();
+							scope.$parent.$parent.openAndFocusedCell = scope.$$nextSibling;
+							nextParentElement.children[0].click();
+						};
 					};
 				} //left
 				else if (e.keyCode == 37){ 
 					var thisCell = e.srcElement.offsetParent;
 					var previousParentElement = thisCell.previousElementSibling;
 					if (previousParentElement.children.length!=0 && previousParentElement.children[0].name === "formInput") {
-						clickSimulation(thisCell, scope);
-						previousParentElement.children[0].focus();
-						scope.$parent.$parent.openAndFocusedCell = scope.$$prevSibling;
-						previousParentElement.children[0].click();
+						if (scope.$parent.$parent.validator!="error") {
+							clickSimulation(thisCell, scope);
+							previousParentElement.children[0].focus();
+							scope.$parent.$parent.openAndFocusedCell = scope.$$prevSibling;
+							previousParentElement.children[0].click();
+						};
 					};
 				} else if (e.keyCode == 27) {
 					scope.editmode = false;
@@ -100,18 +108,18 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 })
 .directive('focusMe', function($timeout, $parse) {
 	return {
-    link: function(scope, element, attrs) {
-    	var model = $parse(attrs.focusMe);
-    	scope.$watch(model, function(value) {
-    		console.log('value=',value);
-    		if(value === true) { 
-    			$timeout(function() {
-    				element[0].focus(); 
-    			});
-    		}
-    	});
-    }
-};
+		link: function(scope, element, attrs) {
+			var model = $parse(attrs.focusMe);
+			scope.$watch(model, function(value) {
+				console.log('value=',value);
+				if(value === true) { 
+					$timeout(function() {
+						element[0].focus(); 
+					});
+				}
+			});
+		}
+	};
 });;
 
 var clickSimulation = function (thisCell, scope) {
