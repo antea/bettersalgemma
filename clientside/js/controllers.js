@@ -302,7 +302,8 @@ $scope.calculateColTotal = function () {
 }
 $scope.openAndFocusedCell = undefined;
 $scope.tdClick = function ($event, $index, task) {
-	if($event.srcElement.name != "formInput") {
+	var element = $event.srcElement || $event.target;
+	if(element.name != "formInput") {
 		if ($scope.openAndFocusedCell) {
 			$scope.openAndFocusedCell.editmode = false;
 			$scope.openAndFocusedCell.focused = false;
@@ -314,7 +315,8 @@ $scope.tdClick = function ($event, $index, task) {
 	}
 }
 $scope.removeFocus = function ($event) {
-	var condition = $event.srcElement.id != "repeatedMonth" && $event.srcElement.name != "form" && $event.srcElement.name != "formInput";
+	var element = $event.srcElement || $event.target;
+	var condition = element.id != "repeatedMonth" && element.name != "form" && element.name != "formInput";
 	if(condition) {
 		if ($scope.openAndFocusedCell) {
 			$scope.openAndFocusedCell.editmode = false;

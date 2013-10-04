@@ -28,11 +28,12 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 		restrict: 'A',
 		link: function (scope, element, attributes) {
 			element.bind('keydown', function (e) {
-				if (e.srcElement.offsetParent) {
+				var element = e.srcElement || e.target;
+				if (element.offsetParent) {
 				//up
 				if (e.keyCode == 38) { 
 					var cellNumber = scope.$index + 2;
-					var thisCell = e.srcElement.offsetParent;
+					var thisCell = element.offsetParent;
 					var previousRow = thisCell.parentElement.previousElementSibling;
 					if (previousRow) {
 						var cellInPreviousRow = previousRow.children[cellNumber];
@@ -54,7 +55,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 				} //down
 				else if (e.keyCode == 40) { 
 					var cellNumber = scope.$index + 2;
-					var thisCell = e.srcElement.offsetParent;
+					var thisCell = element.offsetParent;
 					var nextRow = thisCell.parentElement.nextElementSibling;
 					if (nextRow) {
 						var cellInNextRow = nextRow.children[cellNumber];
@@ -73,7 +74,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					};
 				} //right
 				else if (e.keyCode == 39) {
-					var thisCell = e.srcElement.offsetParent;
+					var thisCell = element.offsetParent;
 					var nextParentElement = thisCell.nextElementSibling;
 					if (nextParentElement.children.length!=0 && nextParentElement.children[0].name === "formInput") {
 						if (scope.$parent.$parent.validator!="error") {
@@ -85,7 +86,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					};
 				} //left
 				else if (e.keyCode == 37){ 
-					var thisCell = e.srcElement.offsetParent;
+					var thisCell = element.offsetParent;
 					var previousParentElement = thisCell.previousElementSibling;
 					if (previousParentElement.children.length!=0 && previousParentElement.children[0].name === "formInput") {
 						if (scope.$parent.$parent.validator!="error") {
@@ -97,7 +98,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 					};
 				} else if (e.keyCode == 27) {
 					scope.editmode = false;
-					var thisCell = e.srcElement.offsetParent;
+					var thisCell = element.offsetParent;
 					thisCell.children[0].click();
 					thisCell.children[2][3].click();
 				};
