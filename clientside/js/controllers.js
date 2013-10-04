@@ -82,14 +82,17 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 										ore : undefined,
 										unimis : undefined,
 										secondi : undefined,
-										editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) || $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? false : true
+										editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) ? false : true,
+										isWeekend : $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? true: false
 									}
 								}
 								data.forEach(function (storico) {
+									var index = (new Date(storico.giorno).getDate())-1
 									storico.ore = storico.secondi/3600;
 									storico.unimis = " h";
 									storico.editable = true;
-									task.mese[(new Date(storico.giorno).getDate())-1] = storico;
+									storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
+									task.mese[index] = storico;
 								});
 								$scope.calculateRowTotal(task);
 								$scope.tasks.push(task);

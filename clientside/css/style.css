@@ -137,6 +137,9 @@ input[name="formInput"][type="text"]{
 .we-true{
 	color: #0000a6;
 }
+.wend-true{
+	background-color: #e6e6e6;
+}
 hr{
 	margin: 3px;
 	border-top: 1px solid #cfcfcf;
