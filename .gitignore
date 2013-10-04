@@ -1,9 +1,9 @@
 salgemmaserverside.sublime-project
 salgemmaserverside.sublime-workspace
-serverside/node_modules
+/node_modules
 .*~
 *.log
 ER02.png
 SchemaLogicoSalgemma.pdf
-serverside/nodemonCheck*
+/nodemonCheck*
 

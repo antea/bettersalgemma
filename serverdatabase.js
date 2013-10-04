@@ -9,7 +9,7 @@ var path = require('path');
 server.configure(function () {
 	server.set('port', 8585);
 	server.use(express.bodyParser());
-	server.use(express.static(path.join(__dirname,"../clientside")));
+	server.use(express.static(path.join(__dirname,"/clientside")));
 });
 
 server.listen(server.get('port'), function(){
