@@ -167,12 +167,16 @@ form[name="form"]{
 button[name="filterBtn"]{
 	margin-top: -40%;
 	width: 200px;
+	transform:rotate(90deg);
+	transform-origin: left bottom;
 	-webkit-transform:rotate(90deg);
 	-webkit-transform-origin: left bottom;
 	-moz-transform:rotate(90deg);
 	-moz-transform-origin: left bottom;
 	-o-transform: rotate(90deg);
 	-o-transform-origin: left bottom;
+	-ms-transform: rotate(90deg);
+	-ms-transform-origin: left bottom;
 }
 .row-fluid .span11 {
 	height: 92%;
