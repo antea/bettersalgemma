@@ -296,12 +296,14 @@ $scope.calculateColTotal = function () {
 			if (day.secondi) {
 				$scope.totalTask[index].ore += day.secondi/3600;
 			};
+			$scope.totalTask[index].ore.toFixed(1);
 		});
 	});
 	$scope.totalMonth = 0;
 	$scope.totalTask.forEach(function (totalDay) {
 		$scope.totalMonth += totalDay.ore;
-	})
+	});
+	$scope.totalMonth.toFixed(1);
 }
 $scope.openAndFocusedCell = undefined;
 $scope.tdClick = function ($event, $index, task) {
