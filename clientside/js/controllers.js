@@ -89,7 +89,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 								data.forEach(function (storico) {
 									var index = (new Date(storico.giorno).getDate())-1
 									storico.ore = storico.secondi/3600;
-									storico.unimis = " h";
+									storico.unimis = "h";
 									storico.editable = true;
 									storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
 									task.mese[index] = storico;
@@ -183,7 +183,7 @@ $scope.edit = function ($index, day, task, editore, editnote) {
 $scope.newInsert = function ($index, day, task, editore, editnote) {
 	day.ore = editore;
 	day.secondi = day.ore * 3600;
-	day.unimis = " h";
+	day.unimis = "h";
 	day.giorno = $scope.selectedYear +"-"+($scope.selectedMonth+1)+"-"+($index+1);
 	if (editnote) {
 		day.note = editnote;
