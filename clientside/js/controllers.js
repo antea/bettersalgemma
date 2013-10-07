@@ -53,6 +53,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
 			};
 			$scope.tasks = new Array();
+			$scope.hideOrShowLoadingIcon();
 			$http.get('/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 			success(function (data, status, headers, config) {
 				$scope.errors = [];
@@ -97,14 +98,15 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 								$scope.calculateRowTotal(task);
 								$scope.tasks.push(task);
 								$scope.calculateColTotal();
+								$scope.hideOrShowLoadingIcon();
 							}).
-							error(function (data, status, headers, config) {
-								$scope.errors = [{
-									subject: "Errore del server:",
-									description: "Riprovare, se l'errore persiste contattare l'amministratore."
-								}];
-							});
-						});
+error(function (data, status, headers, config) {
+	$scope.errors = [{
+		subject: "Errore del server:",
+		description: "Riprovare, se l'errore persiste contattare l'amministratore."
+	}];
+});
+});
 }).
 error(function (data, status, headers, config) {
 	$scope.errors = [{
@@ -121,8 +123,6 @@ error(function (data, status, headers, config) {
 	}];
 });
 };
-
-retrieveInfo();
 
 $scope.discard = function ($index, day, task, editore, editnote) {
 	this.editore = undefined;
@@ -248,8 +248,8 @@ $scope.next = function () {
 		if(loop){
 			if(calendario.active == "active "){
 				calendario.active = "";
-				var nextCalendar = $scope.calendar[index+1]
-				nextCalendar.active = "active "
+				var nextCalendar = $scope.calendar[index+1];
+				nextCalendar.active = "active ";
 				$scope.selectedMonth = nextCalendar.monthNumber;
 				$scope.selectedYear = nextCalendar.year;
 				retrieveInfo();
@@ -264,8 +264,8 @@ $scope.prev = function () {
 		if(loop){
 			if(calendario.active == "active "){
 				calendario.active = "";
-				var prevCalendar = $scope.calendar[index-1]
-				prevCalendar.active = "active "
+				var prevCalendar = $scope.calendar[index-1];
+				prevCalendar.active = "active ";
 				$scope.selectedMonth = prevCalendar.monthNumber;
 				$scope.selectedYear = prevCalendar.year;
 				retrieveInfo();
@@ -358,8 +358,9 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 }
-$scope.hideIcon
-$scope.hideLoadingIcon = function () {
-	$scope.hideIcon = true;
+$scope.hideIcon = true;
+$scope.hideOrShowLoadingIcon = function () {
+	$scope.hideIcon = !$scope.hideIcon;
 }
+retrieveInfo();
 }

@@ -2,8 +2,8 @@
 	<div class="navbar-inner">
 		<div class="container" style="width: auto;">
 			<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" class="brand">
-			<div name="q" class="span1.5"><h4><i class="icon-calendar"></i> Calendario:</h4></div>
-			<div name="q" class="span3" id="span">
+			<div name="calendarDiv" class="span1.5"><h4><i class="icon-calendar"></i> Calendario:</h4></div>
+			<div name="calendarDiv" class="span3" id="span">
 				<div id="calendarCarousel" class="carousel slide" data-interval="false">
 					<div class="carousel-inner">
 						<div ng-repeat="calendario in calendar" class="{{calendario.active}}item">
@@ -32,7 +32,7 @@
 </div>
 <div name="mainDiv" id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid" name="notMainDiv">
-		<div class="span1" id="inline" ng-show="dinamicHide"><button class="btn btn-info" ng-click="dinamicMenuFilter()" name="filterBtn"><i class="icon-list"></i> {{dinamicLabelBtn}}</button></div>
+		<div class="span1" ng-show="dinamicHide"><button class="btn btn-info" ng-click="dinamicMenuFilter()" name="filterBtn"><i class="icon-list"></i> {{dinamicLabelBtn}}</button></div>
 		<div class="span2" id="span" ng-hide="dinamicHide">
 			<div class="well">
 				<div>
@@ -52,8 +52,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="span{{dinamicSpan}}" id="span" name="table">
-			<div id="inline">
+		<div class="span{{dinamicSpan}}" id="loadingDiv" ng-hide="hideIcon">
+			<span id="inline" name="img"><img id="loadingAntea" src="img/Antea_loading.png" class="brand"></span><span id="inline"><h5>Loading data...</h5></span>
+		</div>
+		<div class="span{{dinamicSpan}}" id="span" name="table" ng-show="hideIcon">
+			<div>
 				<table class="table table-bordered">
 					<thead>
 						<tr>

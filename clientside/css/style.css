@@ -195,6 +195,25 @@ button[name="filterBtn"]{
 .row-fluid .span2 {
 	margin-left: 0%;
 }
-div[name="q"] {
+div[name="calendarDiv"] {
 	padding-top: 0.5%;
+}
+#loadingDiv{
+	border-radius: 25px;
+	display: inline;
+	height: 5%;
+	margin-top: 20px;
+	background-color: #f5f5f5;
+}
+#loadingAntea{
+	width: 90%;
+	padding-left: 1%;
+	padding-right: 0px;
+}
+#inline{
+	display: inline-block;
+}
+span[name="img"]{
+	width: 50px;
+	padding-left: 1%;
 }
