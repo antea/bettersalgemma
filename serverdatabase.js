@@ -76,10 +76,9 @@ var pool = mysql.createPool({
 				end= end.toISOString();
 				connection.query('SELECT DISTINCT o.id, o.descrizione ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa='+connection.escape(req.params.userId)+
-					'AND ((p.datafineprev>='+connection.escape(start) + ' AND p.datafineprev<='+connection.escape(end) + ')'+
-						'OR (p.datainizioprev>='+connection.escape(start) + ' AND p.datainizioprev<='+connection.escape(end) + ')'+
-						'OR (p.datainizioprev<='+connection.escape(start) + ' AND p.datafineprev>='+connection.escape(end) + '))',
+					'WHERE p.idrisorsa=? AND ((p.datafineprev>=? AND p.datafineprev<=?) OR (p.datainizioprev>=? AND p.datainizioprev<=?)'+
+						'OR (p.datainizioprev<=? AND p.datafineprev>=?))',
+				[req.params.userId,start,end,start,end,start,end],
 				function (err, results) {
 					if (err) {
 						res.send(500, err);
@@ -90,7 +89,7 @@ var pool = mysql.createPool({
 			};
 			connection.end();
 		});
-});
+	});
 
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e quello dell'ordine.
@@ -110,21 +109,20 @@ var pool = mysql.createPool({
 				end= end.toISOString();
 				connection.query('SELECT r.id, r.descrizione, p.datainizioprev, p.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa='+connection.escape(req.params.userId) + ' AND r.idtabella='+connection.escape(req.params.idordine) +' ' +
-					'AND ((p.datafineprev>='+connection.escape(start) + ' AND p.datafineprev<='+connection.escape(end) + ')'+
-						'OR (p.datainizioprev>='+connection.escape(start) + ' AND p.datainizioprev<='+connection.escape(end) + ')'+
-						'OR (p.datainizioprev<='+connection.escape(start) + ' AND p.datafineprev>='+connection.escape(end) + '))',
-					function (err, results) {
-						if (err) {
-							res.send(500, err);
-						} else{
-							res.send(200, results);
-						};
-					});
+					'WHERE p.idrisorsa=? AND r.idtabella=? AND ((p.datafineprev>=? AND p.datafineprev<=?) '+
+						'OR (p.datainizioprev>=? AND p.datainizioprev<=?) OR (p.datainizioprev<=? AND p.datafineprev>=?))',
+				[req.params.userId,req.params.idordine,start,end,start,end,start,end],
+				function (err, results) {
+					if (err) {
+						res.send(500, err);
+					} else{
+						res.send(200, results);
+					};
+				});
 			};
 			connection.end();
 		});
-	});
+});
 
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e il mese e l'anno su cui effettuare la query.
