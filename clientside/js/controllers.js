@@ -53,7 +53,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
 			};
 			$scope.tasks = new Array();
-			$scope.hideOrShowLoadingIcon();
+			//$scope.hideLoadingIcon();
 			$http.get('/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 			success(function (data, status, headers, config) {
 				$scope.errors = [];
@@ -98,7 +98,7 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 								$scope.calculateRowTotal(task);
 								$scope.tasks.push(task);
 								$scope.calculateColTotal();
-								$scope.hideOrShowLoadingIcon();
+								//$scope.showLoadingIcon();
 							}).
 error(function (data, status, headers, config) {
 	$scope.errors = [{
@@ -358,9 +358,12 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 }
-$scope.hideIcon = true;
-$scope.hideOrShowLoadingIcon = function () {
-	$scope.hideIcon = !$scope.hideIcon;
+/*$scope.hideIcon = true;
+$scope.hideLoadingIcon = function () {
+	$scope.hideIcon = false;
 }
+$scope.showLoadingIcon = function () {
+	$scope.hideIcon = true;
+}*/
 retrieveInfo();
 }

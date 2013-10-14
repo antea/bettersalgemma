@@ -1,4 +1,35 @@
-angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () {
+angular.module('salgemmainterfaceFilters', [],
+	function ($provide) {
+
+		$provide.factory('myHttpInterceptor', function ($q, $window, $timeout) {
+			return function (promise) {
+				$q.all(promise).then(function (data) {
+					console.log("Ciao!");
+				})
+				return promise.then(function (response) {
+					$('#loadingDiv').hide();
+					/*$('#loadedSuccessDiv').show();
+					$timeout(function() {
+						$('#loadedSuccessDiv').hide();
+					}, 2000);*/
+				return response;
+			}, function (response) {
+				$('#loadingDiv').hide();
+					//$('#loadedErrorDiv').show();
+					return $q.reject(response);
+				});
+			};
+		});
+	})
+.config(function ($httpProvider) {
+	$httpProvider.responseInterceptors.push('myHttpInterceptor');
+	var spinnerFunction = function (data, headers) {
+		$('#loadingDiv').show();
+		return data;
+	};
+	$httpProvider.defaults.transformRequest.push(spinnerFunction);
+})
+.filter('taskFilter', function () {
 	return function (tasks) {
 		var tasksFiltered = [];
 		if (!tasks) {
@@ -120,7 +151,7 @@ angular.module('salgemmainterfaceFilters', []).filter('taskFilter', function () 
 			});
 		}
 	};
-});;
+});
 
 var clickSimulation = function (thisCell, scope) {
 	if (thisCell.children[0].checked) {

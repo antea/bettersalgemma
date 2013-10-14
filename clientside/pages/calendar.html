@@ -3,7 +3,7 @@
 		<div class="container" style="width: auto;">
 			<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" class="brand">
 			<div name="calendarDiv" class="span1.5"><h4><i class="icon-calendar"></i> Calendario:</h4></div>
-			<div name="calendarDiv" class="span3" id="span">
+			<div name="calendarDiv" class="span3" property="span">
 				<div id="calendarCarousel" class="carousel slide" data-interval="false">
 					<div class="carousel-inner">
 						<div ng-repeat="calendario in calendar" class="{{calendario.active}}item">
@@ -33,7 +33,7 @@
 <div name="mainDiv" id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid" name="notMainDiv">
 		<div class="span1" ng-show="dinamicHide"><button class="btn btn-info" ng-click="dinamicMenuFilter()" name="filterBtn"><i class="icon-list"></i> {{dinamicLabelBtn}}</button></div>
-		<div class="span2" id="span" ng-hide="dinamicHide">
+		<div class="span2" property="span" ng-hide="dinamicHide">
 			<div class="well">
 				<div>
 					<button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button>
@@ -52,10 +52,16 @@
 				</div>
 			</div>
 		</div>
-		<div class="span{{dinamicSpan}}" id="loadingDiv" ng-hide="hideIcon">
-			<span id="inline" name="img"><img id="loadingAntea" src="img/Antea_loading.png" class="brand"></span><span id="inline"><h5>Loading data...</h5></span>
+		<div class="span{{dinamicSpan}}" id="loadingDiv">
+			<span id="inline" name="img"><img id="loadingAntea" src="img/Antea_loading.png" class="brand"></span><span id="inline"><h5>Caricamento...</h5></span>
 		</div>
-		<div class="span{{dinamicSpan}}" id="span" name="table" ng-show="hideIcon">
+		<div class="span{{dinamicSpan}}" id="loadedSuccessDiv" ng-hide="true">
+			<span id="inline" name="img"><img id="loadingAntea" src="img/ok.png" class="brand"></span><span id="inline"><h5>Operazione eseguita</h5></span>
+		</div>
+		<div class="span{{dinamicSpan}}" id="loadedErrorDiv" ng-hide="true">
+			<span id="inline" name="img"><img id="loadingAntea" src="img/stop.png" class="brand"></span><span id="inline"><h5>Operazione fallita</h5></span>
+		</div>
+		<div class="span{{dinamicSpan}}" property="span" name="table" id="loadedDiv">
 			<div>
 				<table class="table table-bordered">
 					<thead>
@@ -67,7 +73,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="task in tasks | orderBy:order.descrizione | taskFilter">
+						<tr ng-repeat="task in tasks | orderBy:task.order.descrizione | taskFilter">
 							<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
 							<td id="headers"><h5>{{task.descrizione}}</h5></td>
 							<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}} wend-{{day.isWeekend}}" key-focus ng-click="tdClick($event, $index, task)">
