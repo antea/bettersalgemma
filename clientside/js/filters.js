@@ -3,19 +3,16 @@ angular.module('salgemmainterfaceFilters', [],
 
 		$provide.factory('myHttpInterceptor', function ($q, $window, $timeout) {
 			return function (promise) {
-				$q.all(promise).then(function (data) {
-					console.log("Ciao!");
-				})
 				return promise.then(function (response) {
 					$('#loadingDiv').hide();
-					/*$('#loadedSuccessDiv').show();
+					$('#loadedSuccessDiv').show();
 					$timeout(function() {
 						$('#loadedSuccessDiv').hide();
-					}, 2000);*/
-				return response;
-			}, function (response) {
-				$('#loadingDiv').hide();
-					//$('#loadedErrorDiv').show();
+					}, 3000);
+					return response;
+				}, function (response) {
+					$('#loadingDiv').hide();
+					$('#loadedErrorDiv').show();
 					return $q.reject(response);
 				});
 			};
@@ -25,6 +22,7 @@ angular.module('salgemmainterfaceFilters', [],
 	$httpProvider.responseInterceptors.push('myHttpInterceptor');
 	var spinnerFunction = function (data, headers) {
 		$('#loadingDiv').show();
+		$('#loadedSuccessDiv').hide();
 		return data;
 	};
 	$httpProvider.defaults.transformRequest.push(spinnerFunction);

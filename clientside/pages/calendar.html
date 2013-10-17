@@ -61,10 +61,10 @@
 		<div class="span{{dinamicSpan}}" id="loadedErrorDiv" ng-hide="true">
 			<span id="inline" name="img"><img id="loadingAntea" src="img/stop.png" class="brand"></span><span id="inline"><h5>Operazione fallita</h5></span>
 		</div>
-		<div class="span{{dinamicSpan}}" property="span" name="table" id="loadedDiv">
+		<div class="span{{dinamicSpan}}" property="span" name="table" id="loadedDiv" ng-cloak>
 			<div>
-				<table class="table table-bordered">
-					<thead>
+				<table class="table table-bordered" ng-cloak>
+					<thead ng-cloak>
 						<tr>
 							<th id="headers" name="headers">Ordine</th>
 							<th id="headers" name="headers">Attività</th>
@@ -72,7 +72,7 @@
 							<th id="headers" name="headers">Totale</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody ng-cloak>
 						<tr ng-repeat="task in tasks | orderBy:task.order.descrizione | taskFilter">
 							<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
 							<td id="headers"><h5>{{task.descrizione}}</h5></td>
@@ -106,7 +106,7 @@
 							<td id="headers" name="headers"><h5>{{task.total}}</h5></td>
 						</tr>
 					</tbody>
-					<tfoot>
+					<tfoot ng-cloak>
 						<tr>
 							<th id="headers" name="headers">Totale</th>
 							<td id="headers" name="headers"><h5>Totale</h5></td>
