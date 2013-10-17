@@ -37,12 +37,12 @@ var pool = mysql.createPool({
 	server.get('/login/:login/:pw', function (req, res) {
 		pool.getConnection( function (err, connection){
 			if (err) {
-				res.send(500, err);
+				res.send(503, err);
 			} else{
 				connection.query('SELECT id, nome FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
 					function (err, results) {
 						if (err) {
-							res.send(500, err);
+							res.send(503, err);
 						} else{
 							if (results.length===0) {
 								//res.header("Access-Control-Allow-Origin", "*");
@@ -66,7 +66,7 @@ var pool = mysql.createPool({
 	server.get('/ordini/:userId/:year/:month', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(500, err);
+				res.send(503, err);
 			} else{
 				var start = new Date(req.params.year,req.params.month,1);
 				start.setHours(2,start.getTimezoneOffset(),0,0);
@@ -81,9 +81,9 @@ var pool = mysql.createPool({
 				[req.params.userId,start,end,start,end,start,end],
 				function (err, results) {
 					if (err) {
-						res.send(500, err);
+						res.send(503, err);
 					} else{
-						res.send(200, results);
+						res.send(201, results);
 					};
 				});
 			};
@@ -99,7 +99,7 @@ var pool = mysql.createPool({
 	server.get('/attivita/:userId/:idordine/:year/:month', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(500, err);
+				res.send(503, err);
 			} else{
 				var start = new Date(req.params.year,req.params.month,1);
 				start.setHours(2,start.getTimezoneOffset(),0,0);
@@ -114,9 +114,9 @@ var pool = mysql.createPool({
 				[req.params.userId,req.params.idordine,start,end,start,end,start,end],
 				function (err, results) {
 					if (err) {
-						res.send(500, err);
+						res.send(503, err);
 					} else{
-						res.send(200, results);
+						res.send(201, results);
 					};
 				});
 			};
@@ -132,11 +132,11 @@ var pool = mysql.createPool({
 	server.get('/storico/:userId/:monthOfYear/:idordine/:idattivita', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(500, err);
+				res.send(503, err);
 			} else{
 				trovaPianificazione(req.params.userId, req.params.idordine, req.params.idattivita, function (err, idPianificazione) {
 					if (err) {
-						res.send(500, err);
+						res.send(503, err);
 					} else{
 						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
 							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
@@ -145,9 +145,9 @@ var pool = mysql.createPool({
 							[req.params.userId, req.params.monthOfYear, idPianificazione],
 							function (err, results) {
 								if (err) {
-									res.send(500, err);
+									res.send(503, err);
 								} else{
-									res.send(200, results);
+									res.send(201, results);
 								};
 							});
 					};
@@ -168,7 +168,7 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 server.post('/insertstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(500, err);
+			res.send(503, err);
 		} else{
 			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idPianificazione){
 				if(err){
@@ -187,9 +187,9 @@ server.post('/insertstorico', function (req, res) {
 							connection.query('INSERT INTO storico SET ?',
 								tupla, function (err, results) {
 									if (err) {
-										res.send(500, err);
+										res.send(503, err);
 									} else{
-										res.send(200, results);
+										res.send(201, results);
 									};
 								});}
 						});}
@@ -210,19 +210,19 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 server.put('/editstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(500,err);
+			res.send(503,err);
 		} else{
 			connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results){
 				if (err) {
-					res.send(500, err);
+					res.send(503, err);
 				} else{
 					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idPianificazione){
 						if (err) {
-							res.send(500, err);
+							res.send(503, err);
 						} else{
 							calcolaCostiRicavi(idPianificazione, req.body.secondi, function(err, nuovaTupla){
 								if (err) {
-									res.send(500, err);
+									res.send(503, err);
 								} else{
 									nuovaTupla.id = req.body.id;
 									nuovaTupla.idrisorsa = req.body.idrisorsa;
@@ -235,14 +235,14 @@ server.put('/editstorico', function (req, res) {
 										nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
 										nuovaTupla.secondi == results[0].secondi &&
 										nuovaTupla.note == results[0].note){
-										res.send(200, 'Nessuna modifica apportata, riga identica.');
+										res.send(201, 'Nessuna modifica apportata, riga identica.');
 								} else{
 									connection.query('UPDATE storico SET ? WHERE id=?',
 										[nuovaTupla, req.body.id], function (err, results){
 											if (err) {
-												res.send(500, err);
+												res.send(503, err);
 											} else{
-												res.send(200, results);
+												res.send(201, results);
 											}
 										});
 								}
@@ -267,14 +267,14 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 server.delete('/deletestorico/:idstorico', function (req,res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(500, err);
+			res.send(503, err);
 		} else{
 			connection.query('DELETE FROM storico WHERE id=?',[req.params.idstorico],
 				function (err, results) {
 					if (err) {
-						res.send(500, err);
+						res.send(503, err);
 					} else{
-						res.send(200, results)
+						res.send(201, results)
 					};
 				})
 		};
