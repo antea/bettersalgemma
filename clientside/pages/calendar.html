@@ -77,8 +77,8 @@
 							<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
 							<td id="headers"><h5>{{task.descrizione}}</h5></td>
 							<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}} wend-{{day.isWeekend}} planned-{{day.planned}}" key-focus ng-click="tdClick($event, $index, task)">
-								<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.id}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1" ng-show="!day.editable">
-								<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.id}}-{{$index}}" name="form">
+								<input name="formInput" type="checkbox" ng-model="editmode" id="check-{{task.ids[0]}}-{{$index}}" ng-click="focusOn($event, $index, task)" tabindex="-1" ng-show="!day.editable">
+								<form popover class="form-inline" ng-hide="editmode && day.editable" id="form-{{task.ids[0]}}-{{$index}}" name="form">
 									<label>{{day.ore}}{{day.unimis}}</label>
 									<i class="icon-comment" ng-show="day.note"></i>
 								</form>
@@ -86,7 +86,7 @@
 									<div class="control-group {{validator}}">
 										<label name="formInput" class="control-label" for="ore">Ore:</label>
 										<div class="controls" name="formInput">
-											<input name="formInput" type="text" id="ore-{{task.id}}-{{$index}}" ng-model="editore" placeholder={{day.ore}} ng-change="validate(editore)" focus-me="editmode">
+											<input name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder={{day.ore}} ng-change="validate(editore)" focus-me="editmode">
 										</div>
 									</div>
 									<div class="control-group">

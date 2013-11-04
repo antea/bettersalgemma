@@ -107,11 +107,11 @@ var pool = mysql.createPool({
 				var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
 				end.setHours(2,end.getTimezoneOffset(),0,0);
 				end= end.toISOString();
-				connection.query('SELECT r.id, r.descrizione, p.datainizioprev, p.datafineprev ' +
+				connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
 					'WHERE p.idrisorsa=? AND r.idtabella=? AND '+
 					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) '+
-					'order by r.descrizione ',
+					'group by r.descrizione order by r.descrizione ',
 					[req.params.userId,req.params.idordine,start,end,end,end],
 					function (err, results) {
 						if (err) {
@@ -130,20 +130,20 @@ var pool = mysql.createPool({
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/storico/:userId/:monthOfYear/:idordine/:idattivita', function (req, res) {
+	server.get('/storico/:userId/:monthOfYear/:idordine/:idsattivita', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(503, err);
 			} else{
-				trovaPianificazione(req.params.userId, req.params.idordine, req.params.idattivita, function (err, idPianificazione) {
+				trovaPianificazione(req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
 					if (err) {
 						res.send(503, err);
 					} else{
 						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
 							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
 							'JOIN ordine AS o ON r.idtabella=o.id '+
-							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione=?',
-							[req.params.userId, req.params.monthOfYear, idPianificazione],
+							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione IN (?)',
+							[req.params.userId, req.params.monthOfYear, idsPianificazione],
 							function (err, results) {
 								if (err) {
 									res.send(503, err);
@@ -171,7 +171,9 @@ server.post('/insertstorico', function (req, res) {
 		if (err) {
 			res.send(503, err);
 		} else{
-			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idPianificazione){
+			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
+				var idPianificazione = idsPianificazione.split(',');
+				idPianificazione = idPianificazione[0];
 				if(err){
 					res.send(500, err);
 				}else {
@@ -217,7 +219,9 @@ server.put('/editstorico', function (req, res) {
 				if (err) {
 					res.send(503, err);
 				} else{
-					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idPianificazione){
+					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
+						var idPianificazione = idsPianificazione.split(',');
+						idPianificazione = idPianificazione[0];
 						if (err) {
 							res.send(503, err);
 						} else{
@@ -370,19 +374,19 @@ La funzione seguente riceve come parametri lo userId, l'id dell'ordine e quello 
 Trova l'id della pianificazione associata a questi parametri e applica la funzione di callback passatagli come ultimo
 parametro all'id della pianificazione appena trovato.
 */
-function trovaPianificazione (userId, idOrdine, idAttivita, callback) {
+function trovaPianificazione (userId, idOrdine, idsAttivita, callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			callback(err, idPianificazione);
 		} else{
-			connection.query('SELECT p.id ' +
+			connection.query('SELECT GROUP_CONCAT(p.id) AS ids ' +
 				'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
-				'WHERE p.idrisorsa=? AND ord.id=? AND r.id=?', [userId, idOrdine, idAttivita],
+				'WHERE p.idrisorsa=? AND ord.id=? AND r.id IN (?)', [userId, idOrdine, idsAttivita],
 				function (err, results) {
 					if (err) {
 						callback(err, idPianificazione);
 					} else{
-						var idPianificazione = results[0].id;
+						var idPianificazione = results[0].ids;
 						callback(err, idPianificazione);
 					};
 				});
