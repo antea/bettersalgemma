@@ -74,18 +74,18 @@ var pool = mysql.createPool({
 				var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
 				end.setHours(2,end.getTimezoneOffset(),0,0);
 				end= end.toISOString();
-				connection.query('SELECT DISTINCT o.id, o.descrizione ' +
+				connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND ((p.datafineprev>=? AND p.datafineprev<=?) OR (p.datainizioprev>=? AND p.datainizioprev<=?)'+
-						'OR (p.datainizioprev<=? AND p.datafineprev>=?))',
-				[req.params.userId,start,end,start,end,start,end],
-				function (err, results) {
-					if (err) {
-						res.send(503, err);
-					} else{
-						res.send(201, results);
-					};
-				});
+					'WHERE p.idrisorsa=? AND ((o.datafineprev>=? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+					'order by o.descrizione',
+					[req.params.userId,start,end,end,end],
+					function (err, results) {
+						if (err) {
+							res.send(503, err);
+						} else{
+							res.send(201, results);
+						};
+					});
 			};
 			connection.end();
 		});
@@ -109,16 +109,17 @@ var pool = mysql.createPool({
 				end= end.toISOString();
 				connection.query('SELECT r.id, r.descrizione, p.datainizioprev, p.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND r.idtabella=? AND ((p.datafineprev>=? AND p.datafineprev<=?) '+
-						'OR (p.datainizioprev>=? AND p.datainizioprev<=?) OR (p.datainizioprev<=? AND p.datafineprev>=?))',
-				[req.params.userId,req.params.idordine,start,end,start,end,start,end],
-				function (err, results) {
-					if (err) {
-						res.send(503, err);
-					} else{
-						res.send(201, results);
-					};
-				});
+					'WHERE p.idrisorsa=? AND r.idtabella=? AND '+
+					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) '+
+					'order by r.descrizione ',
+					[req.params.userId,req.params.idordine,start,end,end,end],
+					function (err, results) {
+						if (err) {
+							res.send(503, err);
+						} else{
+							res.send(201, results);
+						};
+					});
 			};
 			connection.end();
 		});

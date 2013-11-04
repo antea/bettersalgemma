@@ -63,44 +63,59 @@ function CalendarCtrl ($rootScope, $scope, $http) {
 					$http.get('/attivita/'+$rootScope.users[0].id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 					success(function (data, status, headers, config) {
 						data.forEach(function (task, index, array) {
+							var ordineStart = new Date(ordine.datainizioprev);
+							var ordineEnd = new Date(ordine.datafineprev);
 							var taskStart = new Date(task.datainizioprev);
 							var taskEnd = new Date(task.datafineprev);
+							ordineStart = new Date(ordineStart.getFullYear(), ordineStart.getMonth(), ordineStart.getDate());
+							ordineEnd = new Date(ordineEnd.getFullYear(), ordineEnd.getMonth(), ordineEnd.getDate());
 							taskStart = new Date(taskStart.getFullYear(),taskStart.getMonth(), taskStart.getDate());
-							taskEnd = new Date(taskEnd.getFullYear(), taskEnd.getMonth(), taskEnd.getDate());
-							if (index === 0) {
+							taskEnd = new Date(taskEnd.getFullYear(),taskEnd.getMonth(), taskEnd.getDate());
+							//if (index === 0) {
 								task.show = true;
-							} else {
-								task.show = false;
-							}
+							//} else {
+							//	task.show = false;
+							//}
 							task.order = ordine;
-							$http.get('/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
-								'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
-							success(function (data, status, headers, config) {
-								task.mese = new Array($scope.month.length);
-								for (var i = 0; i < (task.mese).length; i++) {
-									task.mese[i] = {
-										note : undefined,
-										ore : undefined,
-										unimis : undefined,
-										secondi : undefined,
-										editable : taskStart > new Date($scope.selectedYear, $scope.selectedMonth, i+1) || taskEnd < new Date($scope.selectedYear, $scope.selectedMonth, i+1) ? false : true,
+							task.mese = new Array($scope.month.length);
+							for (var i = 0; i < (task.mese).length; i++) {
+								var dayOfTask = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
+								task.mese[i] = {
+										//note : undefined,
+										//ore : undefined,
+										//unimis : undefined,
+										//secondi : undefined,
+										planned: taskStart > dayOfTask || taskEnd < dayOfTask ? false : true,
+										editable : ordineStart > dayOfTask || ordineEnd < dayOfTask ? false : true,
 										isWeekend : $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? true: false
 									}
 								}
-								data.forEach(function (storico) {
-									var index = (new Date(storico.giorno).getDate())-1
-									storico.ore = storico.secondi/3600;
-									storico.unimis = "h";
-									storico.editable = true;
-									storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
-									task.mese[index] = storico;
+								$http.get('/storico/'+$rootScope.users[0].id+'/'+($scope.selectedMonth+1)+
+									'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.id).
+								success(function (data, status, headers, config) {
+									data.forEach(function (storico) {
+										var index = (new Date(storico.giorno).getDate())-1
+										storico.ore = storico.secondi/3600;
+										storico.unimis = "h";
+										storico.editable = true;
+										storico.planned = task.mese[index].planned;
+										storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
+										task.mese[index] = storico;
+									});
+								//$scope.showLoadingIcon();
+							}).
+								error(function ()/*(data, status, headers, config)*/ {
+									$scope.errors = [{
+										subject: "Errore del server:",
+										description: "Riprovare, se l'errore persiste contattare l'amministratore."
+									}];
 								});
 								$scope.calculateRowTotal(task);
 								$scope.tasks.push(task);
 								$scope.calculateColTotal();
-								//$scope.showLoadingIcon();
-							}).
-error(function (data, status, headers, config) {
+							});
+}).
+error(function ()/*(data, status, headers, config)*/ {
 	$scope.errors = [{
 		subject: "Errore del server:",
 		description: "Riprovare, se l'errore persiste contattare l'amministratore."
@@ -108,15 +123,7 @@ error(function (data, status, headers, config) {
 });
 });
 }).
-error(function (data, status, headers, config) {
-	$scope.errors = [{
-		subject: "Errore del server:",
-		description: "Riprovare, se l'errore persiste contattare l'amministratore."
-	}];
-});
-});
-}).
-error(function (data, status, headers, config) {
+error(function ()/*(data, status, headers, config)*/ {
 	$scope.errors = [{
 		subject: "Errore del server:",
 		description: "Riprovare, se l'errore persiste contattare l'amministratore."
@@ -358,12 +365,5 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 }
-/*$scope.hideIcon = true;
-$scope.hideLoadingIcon = function () {
-	$scope.hideIcon = false;
-}
-$scope.showLoadingIcon = function () {
-	$scope.hideIcon = true;
-}*/
 retrieveInfo();
 }
