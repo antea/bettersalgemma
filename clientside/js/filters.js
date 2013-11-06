@@ -58,7 +58,7 @@ angular.module('salgemmainterfaceFilters', [],
 		link: function (scope, element, attributes) {
 			element.bind('keydown', function (e) {
 				var element = e.srcElement || e.target;
-				if (element.offsetParent) {
+				if (element.offsetParent && element.id!=="note") {
 				//up
 				if (e.keyCode == 38) { 
 					var cellNumber = scope.$index + 2;
