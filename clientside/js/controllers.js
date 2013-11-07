@@ -148,6 +148,7 @@ $scope.discard = function ($index, day, task, editore, editnote) {
 	$scope.validate(this.editore);
 	this.editmode = false;
 	this.focused = false;
+	this.$parent.rowSelected = false;
 }
 
 $scope.save = function ($index, day, task, editore, editnote) {
@@ -165,6 +166,7 @@ $scope.save = function ($index, day, task, editore, editnote) {
 		};
 		this.editmode = false;
 		this.focused = false;
+		this.$parent.rowSelected = false;
 		$scope.refreshPopover($index, task, day);
 	} else {
 		document.getElementById("ore-"+task.ids[0]+"-"+$index).focus();
@@ -294,6 +296,7 @@ $scope.prev = function () {
 }
 $scope.focusOn = function (event, $index, task) {
 	this.focused = !this.focused;
+	this.$parent.rowSelected = !this.$parent.rowSelected;
 }
 $scope.calculateRowTotal = function (task) {
 	task.total = 0;
@@ -330,9 +333,11 @@ $scope.tdClick = function ($event, $index, task) {
 		if ($scope.openAndFocusedCell) {
 			$scope.openAndFocusedCell.editmode = false;
 			$scope.openAndFocusedCell.focused = false;
+			$scope.openAndFocusedCell.$parent.rowSelected = false;
 		}
 		this.editmode = true;
 		this.focused = true;
+		this.$parent.rowSelected = true;
 		$scope.openAndFocusedCell = this;
 		document.getElementById("check-"+task.ids[0]+"-"+$index).focus();
 	}
@@ -344,6 +349,7 @@ $scope.removeFocus = function ($event) {
 		if ($scope.openAndFocusedCell) {
 			$scope.openAndFocusedCell.editmode = false;
 			$scope.openAndFocusedCell.focused = false;
+			$scope.openAndFocusedCell.$parent.rowSelected = false;
 		};
 	}
 }

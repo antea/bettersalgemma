@@ -73,7 +73,7 @@
 						</tr>
 					</thead>
 					<tbody ng-cloak>
-						<tr ng-repeat="task in tasks | taskFilter" ng-cloak>
+						<tr ng-repeat="task in tasks | taskFilter" ng-cloak class="rowSelected-{{rowSelected}}">
 							<td id="headers"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
 							<td id="headers"><h5>{{task.descrizione}}</h5></td>
 							<td id="repeatedMonth" ng-repeat="day in task.mese" class="editable-{{day.editable}} focused-{{focused}} wend-{{day.isWeekend}} planned-{{day.planned}}" key-focus ng-click="tdClick($event, $index, task)">
