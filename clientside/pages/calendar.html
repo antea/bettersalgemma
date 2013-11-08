@@ -14,6 +14,9 @@
 					<a id="freccia" class="carousel-control right" ng-click="next()">&rsaquo;</a>
 				</div>
 			</div>
+			<div id="loadingDiv"><span id="inline" name="img"><img id="loadingAntea" src="img/Antea_loading.png" class="brand"></span><span id="inline"><h5>Caricamento...</h5></span></div>
+			<div id="loadedSuccessDiv" ng-hide="true"><span id="inline" name="img"><img id="loadingAntea" src="img/ok.png" class="brand"></span><span id="inline"><h5>Operazione eseguita</h5></span></div>
+			<div id="loadedErrorDiv" ng-hide="true"><span id="inline" name="img"><img id="loadingAntea" src="img/stop.png" class="brand"></span><span id="inline"><h5>Operazione fallita</h5></span></div>
 			<ul class="nav pull-right">
 				<li class="dropdown">
 					<a id="dropuser" href="#" role="button" class="dropdown-toggle brand" data-toggle="dropdown" ng-repeat="user in users">
@@ -51,15 +54,6 @@
 					</ul>
 				</div>
 			</div>
-		</div>
-		<div class="span{{dinamicSpan}}" id="loadingDiv">
-			<span id="inline" name="img"><img id="loadingAntea" src="img/Antea_loading.png" class="brand"></span><span id="inline"><h5>Caricamento...</h5></span>
-		</div>
-		<div class="span{{dinamicSpan}}" id="loadedSuccessDiv" ng-hide="true">
-			<span id="inline" name="img"><img id="loadingAntea" src="img/ok.png" class="brand"></span><span id="inline"><h5>Operazione eseguita</h5></span>
-		</div>
-		<div class="span{{dinamicSpan}}" id="loadedErrorDiv" ng-hide="true">
-			<span id="inline" name="img"><img id="loadingAntea" src="img/stop.png" class="brand"></span><span id="inline"><h5>Operazione fallita</h5></span>
 		</div>
 		<div class="span{{dinamicSpan}}" property="span" name="table" id="loadedDiv" ng-cloak>
 			<div>
