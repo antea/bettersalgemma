@@ -154,7 +154,7 @@ angular.module('salgemmainterfaceFilters', [],
 var clickSimulation = function (thisCell, scope) {
 	if (thisCell.children[0].checked) {
 		thisCell.children[0].click();
-		thisCell.children[2][2].click();
+		thisCell.children[2][1].click();
 	} else {
 		scope.focused = false;
 	}

@@ -84,23 +84,25 @@
 								</form>
 								<form class="form-horizontal" ng-show="editmode && day.editable">
 									<div class="control-group {{validator}}">
-										<label name="formInput" class="control-label" for="ore">Ore:</label>
+										<!--label name="formInput" class="control-label" for="ore">Ore:</label-->
 										<div class="controls" name="formInput">
-											<input name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder={{day.ore}} ng-change="validate(editore)" focus-me="editmode">
+											<input name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || 'Ore'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1">
+											<button class="btn control-button" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"><i class="icon-ok"></i></button>
 										</div>
 									</div>
 									<div class="control-group">
-										<label name="formInput" class="control-label" for="note">Note:</label>
+										<!--label name="formInput" class="control-label" for="note">Note:</label-->
 										<div class="controls" name="formInput">
-											<input name="formInput" type="text" id="note" ng-model="editnote" placeholder={{day.note}}>
+											<input name="formInput" type="text" id="note" ng-model="editnote" placeholder="{{day.note && day.note || 'Note'}}" tabindex="2">
+											<button class="btn control-button" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"><i class="icon-remove"></i></button>
 										</div>
 									</div>
-									<div class="control-group">
+									<!--div class="control-group">
 										<div class="controls" name="formInput">
 											<button class="btn" name="formInput" ng-click="save($index, day, task, editore, editnote)"><i class="icon-ok"></i> OK</button>
 											<button class="btn" name="formInput" ng-click="discard($index, day, task, editore, editnote)"><i class="icon-remove"></i> Annulla</button>
 										</div>
-									</div>
+									</div-->
 								</form>
 							</td>
 							<td id="headers" name="headers"><h5>{{task.total}}</h5></td>
