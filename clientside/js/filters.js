@@ -38,6 +38,27 @@ angular.module('salgemmainterfaceFilters', [],
 				tasksFiltered.push(task);
 			}
 		});
+		tasksFiltered.sort(function compare (firstTask, secondTask) {
+			if (firstTask.order.descrizione < secondTask.order.descrizione) {
+				return -1;
+			}
+			else if (firstTask.order.descrizione > secondTask.order.descrizione) {
+				return 1;
+			}
+			else {
+				if (firstTask.descrizione < secondTask.descrizione) {
+					firstTask.show = true;
+					secondTask.show = false;
+					return -1;
+				};
+				if (firstTask.descrizione > secondTask.descrizione) {
+					firstTask.show = false;
+					secondTask.show = true;
+					return 1;
+				};
+				return 0;
+			}
+		})
 		return tasksFiltered;
 	}
 })
