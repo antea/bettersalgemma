@@ -77,11 +77,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout) {
 								datafineprev = new Date(datafineprev);
 								taskEnds[index] = new Date(datafineprev.getFullYear(),datafineprev.getMonth(), datafineprev.getDate());
 							});
-							//if (index === 0) {
-								task.show = true;
-							//} else {
-							//	task.show = false;
-							//}
+							task.show = true;
 							task.order = ordine;
 							task.mese = new Array($scope.month.length);
 							for (var i = 0; i < (task.mese).length; i++) {
