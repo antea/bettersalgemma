@@ -18,7 +18,7 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location) {
 	};
 }
 
-function CalendarCtrl ($rootScope, $scope, $http) {
+function CalendarCtrl ($rootScope, $scope, $http, $timeout) {
 	$scope.ordini = [];
 	var week = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 	var now = new Date();
@@ -245,12 +245,16 @@ $scope.delete = function (day, task, $index) {
 }
 $scope.selectedAll = true;
 $scope.selectOrDeselectAll = function () {
-	$scope.selectedAll = !$scope.selectedAll
-	if ($scope.selectedAll) {
-		$scope.selectAllOrders();
-	} else {
-		$scope.deselectAllOrders();
-	};
+	$('#loadingDiv').show();
+	$timeout(function() {
+		$scope.selectedAll = !$scope.selectedAll
+		if ($scope.selectedAll) {
+			$scope.selectAllOrders();
+		} else {
+			$scope.deselectAllOrders();
+		};
+		$('#loadingDiv').hide();
+	});
 }
 $scope.selectAllOrders = function() {
 	$scope.tasks.forEach(function (task) {
