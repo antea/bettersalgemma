@@ -53,6 +53,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout) {
 				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
 			};
 			$scope.tasks = new Array();
+			$scope.totalTask = new Array($scope.month.length);
 			$http.get('/ordini/'+$rootScope.users[0].id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 			success(function (data, status, headers, config) {
 				$scope.errors = [];
@@ -112,7 +113,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout) {
 								});
 								$scope.calculateRowTotal(task);
 								$scope.tasks.push(task);
-								$scope.calculateColTotal();
+								$scope.calculateColTotal(task);
 							}).
 							error(function ()/*(data, status, headers, config)*/ {
 								$scope.errors = [{
@@ -191,7 +192,7 @@ $scope.edit = function ($index, day, task, editore, editnote) {
 	$http.put('/editstorico', dati)
 	.success(function (argument) {
 		$scope.calculateRowTotal(task);
-		$scope.calculateColTotal();
+		$scope.calculateColTotal(task, $index);
 		console.log("Edit Successo!!");
 	})
 	.error(function (argument) {
@@ -217,7 +218,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 	$http.post('/insertstorico', dati)
 	.success(function (argument) {
 		$scope.calculateRowTotal(task);
-		$scope.calculateColTotal();
+		$scope.calculateColTotal(task, $index);
 		day.id = argument.insertId;
 		console.log("Inserimento effettuato con successo.\n");
 	})
@@ -233,7 +234,7 @@ $scope.delete = function (day, task, $index) {
 		day.note = undefined;
 		day.unimis = undefined;
 		$scope.calculateRowTotal(task);
-		$scope.calculateColTotal();
+		$scope.calculateColTotal(task, $index);
 		$scope.refreshPopover($index, task, day);
 		console.log("cancellazione effettuata");
 	})
@@ -309,24 +310,34 @@ $scope.calculateRowTotal = function (task) {
 	});
 	task.total = task.total/3600;
 }
-$scope.calculateColTotal = function () {
-	$scope.totalTask = new Array($scope.month.length);
-	$scope.tasks.forEach(function (task) {
-		task.mese.forEach(function (day, index) {
-			if (!$scope.totalTask[index]) {
-				$scope.totalTask[index] = {ore : 0};
-			}
-			if (day.secondi) {
-				$scope.totalTask[index].ore += day.secondi/3600;
+$scope.calculateColTotal = function (task, index) {
+	//$scope.totalTask = new Array($scope.month.length);
+	if (index) {
+		$scope.totalTask[index].ore = 0;
+		$scope.tasks.forEach(function (oneTask) {
+			if (oneTask.mese[index].ore) {
+				var somma = $scope.totalTask[index].ore*10 + oneTask.mese[index].ore*10;
+				$scope.totalTask[index].ore = somma/10;
 			};
-			$scope.totalTask[index].ore.toFixed(1);
 		});
-	});
+	} else {
+		task.mese.forEach(function (day, $index) {
+			if (!$scope.totalTask[$index]) {
+				$scope.totalTask[$index] = {ore : 0};
+			}
+			if (day.ore) {
+				console.log($scope.totalTask[$index].ore + " + " + day.ore + " =")
+				var somma = $scope.totalTask[$index].ore*10 + day.ore*10;
+				$scope.totalTask[$index].ore = somma/10;
+				console.log(somma);
+			};
+		});
+	}
 	$scope.totalMonth = 0;
 	$scope.totalTask.forEach(function (totalDay) {
-		$scope.totalMonth += totalDay.ore;
+		var somma = $scope.totalMonth*10 + totalDay.ore*10;
+		$scope.totalMonth = somma/10;
 	});
-	$scope.totalMonth.toFixed(1);
 }
 $scope.openAndFocusedCell = undefined;
 $scope.tdClick = function ($event, $index, task) {
