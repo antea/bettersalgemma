@@ -326,10 +326,8 @@ $scope.calculateColTotal = function (task, index) {
 				$scope.totalTask[$index] = {ore : 0};
 			}
 			if (day.ore) {
-				console.log($scope.totalTask[$index].ore + " + " + day.ore + " =")
 				var somma = $scope.totalTask[$index].ore*10 + day.ore*10;
 				$scope.totalTask[$index].ore = somma/10;
-				console.log(somma);
 			};
 		});
 	}
