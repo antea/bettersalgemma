@@ -138,16 +138,18 @@ error(function ()/*(data, status, headers, config)*/ {
 });
 };
 
-$scope.discard = function ($index, day, task, editore, editnote) {
-	this.editore = undefined;
-	this.editnote = undefined;
+$scope.discard = function ($index, day, task, editore, editnote, scope) {
+	var myThis = scope ? scope : this;
+	myThis.editore = undefined;
+	myThis.editnote = undefined;
 	$scope.validate(this.editore);
-	this.editmode = false;
-	this.focused = false;
-	this.$parent.rowSelected = false;
+	myThis.editmode = false;
+	myThis.focused = false;
+	myThis.$parent.rowSelected = false;
 }
 
-$scope.save = function ($index, day, task, editore, editnote) {
+$scope.save = function ($index, day, task, editore, editnote, scope) {
+	var myThis = scope ? scope : this;
 	if($scope.validator != "error") {
 		if (day.ore) {
 			if (editore !=0) {
@@ -160,13 +162,13 @@ $scope.save = function ($index, day, task, editore, editnote) {
 				$scope.newInsert($index, day, task, editore, editnote);
 			};
 		};
-		this.editmode = false;
-		this.focused = false;
-		this.$parent.rowSelected = false;
+		myThis.editmode = false;
+		myThis.focused = false;
+		myThis.$parent.rowSelected = false;
 		$scope.refreshPopover($index, task, day);
 	} else {
 		document.getElementById("ore-"+task.ids[0]+"-"+$index).focus();
-		this.editnote = undefined;
+		myThis.editnote = undefined;
 	}
 }
 $scope.edit = function ($index, day, task, editore, editnote) {

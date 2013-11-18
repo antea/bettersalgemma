@@ -66,7 +66,7 @@ angular.module('salgemmainterfaceFilters', [],
 		});
 	}
 })
-.directive('keyFocus', function () {
+.directive('keyFocus', function ($timeout) {
 	return {
 		restrict: 'A',
 		link: function (scope, element, attributes) {
@@ -75,75 +75,98 @@ angular.module('salgemmainterfaceFilters', [],
 				if (element.offsetParent && element.id!=="note") {
 				//up
 				if (e.keyCode == 38) { 
-					var cellNumber = scope.$index + 2;
-					var thisCell = element.offsetParent;
-					var previousRow = thisCell.parentElement.previousElementSibling;
-					if (previousRow) {
-						var cellInPreviousRow = previousRow.children[cellNumber];
-						if(cellInPreviousRow.children.length !=0 && cellInPreviousRow.children[0].name === "formInput"){
-							if (scope.$parent.$parent.validator!="error") {
-								clickSimulation(thisCell, scope);
-								cellInPreviousRow.children[0].focus();
-								var thisPreviousRow = scope.$parent.$$prevSibling.$$childHead;
-								if (thisPreviousRow) {
-									for (var i = 0; i < cellNumber-2; i++) {
-										thisPreviousRow = thisPreviousRow.$$nextSibling;
+					$timeout(function () {
+						var cellNumber = scope.$index + 2;
+						var thisCell = element.offsetParent;
+						if (thisCell) {
+							var previousRow = thisCell.parentElement.previousElementSibling;
+							if (previousRow) {
+								var cellInPreviousRow = previousRow.children[cellNumber];
+								var scopeCellPreviousRow = angular.element(cellInPreviousRow).scope();
+								if(cellInPreviousRow.children.length !=0 && cellInPreviousRow.children[0].name === "formInput"){
+									if (scope.$parent.$parent.validator!="error") {
+										clickSimulation(thisCell, scope);
+										cellInPreviousRow.children[0].focus();
+										scope.$parent.$parent.openAndFocusedCell = scopeCellPreviousRow;
+										scopeCellPreviousRow.focused = !scopeCellPreviousRow.focused;
+										scopeCellPreviousRow.editmode = !scopeCellPreviousRow.editmode;
+										scopeCellPreviousRow.$parent.rowSelected = !scopeCellPreviousRow.$parent.rowSelected;
 									};
-									scope.$parent.$parent.openAndFocusedCell = thisPreviousRow;
-								};
-								cellInPreviousRow.children[0].click();
+								}
 							};
-						}
-					};
+						};
+					});
 				} //down
 				else if (e.keyCode == 40) { 
-					var cellNumber = scope.$index + 2;
-					var thisCell = element.offsetParent;
-					var nextRow = thisCell.parentElement.nextElementSibling;
-					if (nextRow) {
-						var cellInNextRow = nextRow.children[cellNumber];
-						if(cellInNextRow.children.length !=0 && cellInNextRow.children[0].name === "formInput"){
-							if (scope.$parent.$parent.validator!="error") {
-								clickSimulation(thisCell, scope);
-								cellInNextRow.children[0].focus();
-								var thisNextRow = scope.$parent.$$nextSibling.$$childHead;
-								for (var i = 0; i < cellNumber-2; i++) {
-									thisNextRow = thisNextRow.$$nextSibling;
-								};
-								scope.$parent.$parent.openAndFocusedCell = thisNextRow;
-								cellInNextRow.children[0].click();
+					$timeout(function () {
+						var cellNumber = scope.$index + 2;
+						var thisCell = element.offsetParent;
+						if (thisCell) {
+							var nextRow = thisCell.parentElement.nextElementSibling;
+							if (nextRow) {
+								var cellInNextRow = nextRow.children[cellNumber];
+								var scopeCellNextRow = angular.element(cellInNextRow).scope();
+								if(cellInNextRow.children.length !=0 && cellInNextRow.children[0].name === "formInput"){
+									if (scope.$parent.$parent.validator!="error") {
+										clickSimulation(thisCell, scope);
+										cellInNextRow.children[0].focus();
+										scope.$parent.$parent.openAndFocusedCell = scopeCellNextRow;
+										scopeCellNextRow.focused = !scopeCellNextRow.focused;
+										scopeCellNextRow.editmode = !scopeCellNextRow.editmode;
+										scopeCellNextRow.$parent.rowSelected = !scopeCellNextRow.$parent.rowSelected;
+									};
+								}
 							};
-						}
-					};
+						};
+					});
 				} //right
 				else if (e.keyCode == 39) {
-					var thisCell = element.offsetParent;
-					var nextParentElement = thisCell.nextElementSibling;
-					if (nextParentElement.children.length!=0 && nextParentElement.children[0].name === "formInput") {
-						if (scope.$parent.$parent.validator!="error") {
-							clickSimulation(thisCell, scope);
-							nextParentElement.children[0].focus();
-							scope.$parent.$parent.openAndFocusedCell = scope.$$nextSibling;
-							nextParentElement.children[0].click();
+					$timeout(function () {
+						var thisCell = element.offsetParent;
+						if (thisCell) {
+							var nextCellElement = thisCell.nextElementSibling;
+							var scopeNextCell = angular.element(nextCellElement).scope();
+							if (nextCellElement.children.length!=0 && nextCellElement.children[0].name === "formInput") {
+								if (scope.$parent.$parent.validator!="error") {
+									clickSimulation(thisCell, scope);
+									nextCellElement.children[0].focus();
+									scope.$parent.$parent.openAndFocusedCell = scopeNextCell;
+									scopeNextCell.focused = !scopeNextCell.focused;
+									scopeNextCell.editmode = !scopeNextCell.editmode;
+									scopeNextCell.$parent.rowSelected = !scopeNextCell.$parent.rowSelected;
+								};
+							};
 						};
-					};
+					});
 				} //left
 				else if (e.keyCode == 37){ 
-					var thisCell = element.offsetParent;
-					var previousParentElement = thisCell.previousElementSibling;
-					if (previousParentElement.children.length!=0 && previousParentElement.children[0].name === "formInput") {
-						if (scope.$parent.$parent.validator!="error") {
-							clickSimulation(thisCell, scope);
-							previousParentElement.children[0].focus();
-							scope.$parent.$parent.openAndFocusedCell = scope.$$prevSibling;
-							previousParentElement.children[0].click();
+					$timeout(function () {
+						var thisCell = element.offsetParent;
+						if (thisCell) {
+							var previousCellElement = thisCell.previousElementSibling;
+							var scopePreviousRow = angular.element(previousCellElement).scope();
+							if (previousCellElement.children.length!=0 && previousCellElement.children[0].name === "formInput") {
+								if (scope.$parent.$parent.validator!="error") {
+									clickSimulation(thisCell, scope);
+									previousCellElement.children[0].focus();
+									scope.$parent.$parent.openAndFocusedCell = scopePreviousRow;
+									scopePreviousRow.focused = !scopePreviousRow.focused;
+									scopePreviousRow.editmode = !scopePreviousRow.editmode;
+									scopePreviousRow.$parent.rowSelected = !scopePreviousRow.$parent.rowSelected;
+								};
+							};
 						};
-					};
+					});
 				} else if (e.keyCode == 27) {
-					scope.editmode = false;
-					var thisCell = element.offsetParent;
-					thisCell.children[0].click();
-					thisCell.children[2][3].click();
+					$timeout(function () {
+						scope.editmode = false;
+						scope.focused = !scope.focused;
+						scope.$parent.rowSelected = !scope.$parent.rowSelected;
+						scope.$parent.$parent.discard(scope.$index, scope.day, scope.$parent.task, scope.editore, scope.editnote, scope);
+					});
+					//var thisCell = element.offsetParent;
+					//thisCell.children[0].click();
+					//thisCell.children[2][3].click();
 				};
 			};
 		});
@@ -167,8 +190,10 @@ angular.module('salgemmainterfaceFilters', [],
 
 var clickSimulation = function (thisCell, scope) {
 	if (thisCell.children[0].checked) {
-		thisCell.children[0].click();
-		thisCell.children[2][1].click();
+		//thisCell.children[0].click();
+		scope.editmode = !scope.editmode;
+		//thisCell.children[2][1].click();
+		scope.$parent.$parent.save(scope.$index, scope.day, scope.$parent.task, scope.editore, scope.editnote, scope);
 	} else {
 		scope.focused = false;
 	}
