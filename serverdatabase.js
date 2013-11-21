@@ -39,7 +39,8 @@ var pool = mysql.createPool({
 			if (err) {
 				res.send(503, err);
 			} else{
-				connection.query('SELECT id, nome FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
+				connection.query('SELECT id, nome, partitaiva, codicefiscale, indirizzo, cap, citta, provincia, nazione, telefono, cellulare, email, password ' +
+					'FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
 					function (err, results) {
 						if (err) {
 							res.send(503, err);
@@ -260,6 +261,23 @@ server.put('/editstorico', function (req, res) {
 }
 connection.end();
 });
+});
+
+server.put("/edituser" , function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else{
+			connection.query('UPDATE risorsa SET ? WHERE id=? ', [req.body, req.body.id], function (err, results) {
+				if (err) {
+					res.send(503, err);
+				} else{
+					res.send(201, results);
+				};
+			})
+			
+		};
+	})
 });
 
 //  <--------------------------> RICHIESTE DELETE <-------------------------->

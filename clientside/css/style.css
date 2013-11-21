@@ -273,3 +273,16 @@ span[name="img"]{
 #notFound{
 	margin-top: 20%;
 }
+.modal-body {
+	max-height: 800px;
+}
+#userEdit .control-label {
+	text-align: center;
+	width: 40%;
+}
+#wellPw {
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}

@@ -394,4 +394,86 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicHide = !$scope.dinamicHide;
 }
 retrieveInfo();
+/*----------------- Profile Controller ---------------------------------*/
+$scope.editpw = false;
+$scope.userEdit = false;
+$scope.userEditChange = function () {
+	$scope.userEdit = !$scope.userEdit;
+}
+$scope.saveUserEdit = function (editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva) {
+	//$timeout(function () {
+		$scope.users[0].id = $rootScope.users[0].id;
+		$scope.users[0].nome = editnome ? editnome : $scope.users[0].nome;
+		$scope.users[0].email = editmail ? editmail : $scope.users[0].email;
+		$scope.users[0].cellulare = editcel ? editcel : $scope.users[0].cellulare;
+		$scope.users[0].telefono = edittel ? edittel : $scope.users[0].telefono;
+		$scope.users[0].indirizzo = editaddress ? editaddress : $scope.users[0].indirizzo;
+		$scope.users[0].cap = editcap ? editcap : $scope.users[0].cap;
+		$scope.users[0].citta = editcitta ? editcitta : $scope.users[0].citta;
+		$scope.users[0].provincia = editprov ? editprov : $scope.users[0].provincia;
+		$scope.users[0].nazione = editnazione ? editnazione : $scope.users[0].nazione;
+		$scope.users[0].codicefiscale = editcodf ? editcodf : $scope.users[0].codicefiscale;
+		$scope.users[0].partitaiva = editpiva ? editpiva : $scope.users[0].partitaiva;
+		$http.put('/edituser', $scope.users[0])
+		.success(function (argument) {
+			$scope.userEditChange();
+			console.log("Edit Successo!!");
+		})
+		.error(function (argument) {
+			console.log("Errore edit!! " + argument);
+		});
+	//});
+}
+$scope.discardUserEdit = function (editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva) {
+	this.editnome = undefined;
+	this.editmail = undefined;
+	this.editcel = undefined;
+	this.edittel = undefined;
+	this.editaddress = undefined;
+	this.editcap = undefined;
+	this.editcitta = undefined;
+	this.editprov = undefined;
+	this.editnazione = undefined;
+	this.editcodf = undefined;
+	this.editpiva = undefined;
+	$scope.userEditChange();
+}
+$scope.mismatchNewPw = undefined;
+$scope.oldPwWrong = undefined;
+$scope.saveUserPw = function (editoldpw, editnewpw, editrenewpw) {
+	$scope.oldPwWrong = undefined;
+	$scope.mismatchNewPw = undefined;
+	if (CryptoJS.MD5(editoldpw) == $scope.users[0].password && editnewpw == editrenewpw) {
+		$scope.users[0].password = CryptoJS.MD5(editnewpw).toString();
+		$http.put('/edituser', $scope.users[0])
+		.success(function (argument) {
+			$scope.editPwChange();
+			console.log("Password Modificata!!");
+			this.editoldpw = undefined;
+			this.editnewpw = undefined;
+			this.editrenewpw = undefined;
+		})
+		.error(function (argument) {
+			console.log("Errore cambio password!! " + argument);
+		});
+	}else{
+		if (CryptoJS.MD5(editoldpw) != $scope.users[0].password) {
+			$scope.oldPwWrong = "error";
+		}
+		if(editnewpw != editrenewpw){
+			$scope.mismatchNewPw = "error";
+		} 
+	}
+}
+$scope.discardUserPw = function (editoldpw, editnewpw, editrenewpw) {
+	this.editoldpw = undefined;
+	this.editnewpw = undefined;
+	this.editrenewpw = undefined;
+	$scope.mismatchNewPw = undefined;
+	$scope.oldPwWrong = undefined;
+	$scope.editPwChange();
+}
+$scope.editPwChange = function () {
+	$scope.editpw = !$scope.editpw;
+}
 }
