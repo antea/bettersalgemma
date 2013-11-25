@@ -154,13 +154,13 @@ $scope.save = function ($index, day, task, editore, editnote, scope) {
 	if($scope.validator != "error") {
 		if (day.ore) {
 			if (editore !=0) {
-				$scope.edit($index, day, task, editore, editnote);
+				$scope.edit($index, day, task, editore, editnote, scope);
 			} else{
-				$scope.delete(day, task, $index);
+				$scope.delete(day, task, $index, scope);
 			};
 		} else{
 			if (editore && editore!=0) {
-				$scope.newInsert($index, day, task, editore, editnote);
+				$scope.newInsert($index, day, task, editore, editnote, scope);
 			};
 		};
 		myThis.editmode = false;
@@ -172,7 +172,7 @@ $scope.save = function ($index, day, task, editore, editnote, scope) {
 		myThis.editnote = undefined;
 	}
 }
-$scope.edit = function ($index, day, task, editore, editnote) {
+$scope.edit = function ($index, day, task, editore, editnote, scope) {
 	if (editnote) {
 		day.note = editnote;
 	}
@@ -193,13 +193,15 @@ $scope.edit = function ($index, day, task, editore, editnote) {
 	.success(function (argument) {
 		$scope.calculateRowTotal(task);
 		$scope.calculateColTotal(task, $index);
+		scope.editore = undefined;
+		scope.editnote = undefined;
 		console.log("Edit Successo!!");
 	})
 	.error(function (argument) {
 		console.log("Errore edit!! " + argument);
 	});
 }
-$scope.newInsert = function ($index, day, task, editore, editnote) {
+$scope.newInsert = function ($index, day, task, editore, editnote, scope) {
 	day.ore = editore;
 	day.secondi = day.ore * 3600;
 	day.unimis = "h";
@@ -220,13 +222,15 @@ $scope.newInsert = function ($index, day, task, editore, editnote) {
 		$scope.calculateRowTotal(task);
 		$scope.calculateColTotal(task, $index);
 		day.id = argument.insertId;
+		scope.editore = undefined;
+		scope.editnote = undefined;
 		console.log("Inserimento effettuato con successo.\n");
 	})
 	.error(function (argument) {
 		console.log("Errore!! " + argument);
 	});
 }
-$scope.delete = function (day, task, $index) {
+$scope.delete = function (day, task, $index, scope) {
 	$http.delete('/deletestorico/'+day.id)
 	.success(function (argument) {
 		day.ore = undefined;
@@ -237,6 +241,8 @@ $scope.delete = function (day, task, $index) {
 		$scope.calculateColTotal(task, $index);
 		$scope.refreshPopover($index, task, day);
 		console.log("cancellazione effettuata");
+		scope.editore = undefined;
+		scope.editnote = undefined;
 	})
 	.error(function (argument) {
 		console.log("Errore cancellazione!! " + argument);
@@ -397,23 +403,34 @@ retrieveInfo();
 /*----------------- Profile Controller ---------------------------------*/
 $scope.editpw = false;
 $scope.userEdit = false;
+$scope.editnome = $scope.users[0].nome;
+$scope.editmail = $scope.users[0].email;
+$scope.editcel = $scope.users[0].cellulare;
+$scope.edittel = $scope.users[0].telefono;
+$scope.editaddress = $scope.users[0].indirizzo;
+$scope.editcap = $scope.users[0].cap;
+$scope.editcitta = $scope.users[0].citta;
+$scope.editprov = $scope.users[0].provincia;
+$scope.editnazione = $scope.users[0].nazione;
+$scope.editcodf = $scope.users[0].codicefiscale;
+$scope.editpiva = $scope.users[0].partitaiva;
 $scope.userEditChange = function () {
 	$scope.userEdit = !$scope.userEdit;
 }
 $scope.saveUserEdit = function (editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva) {
 	//$timeout(function () {
 		$scope.users[0].id = $rootScope.users[0].id;
-		$scope.users[0].nome = editnome ? editnome : $scope.users[0].nome;
-		$scope.users[0].email = editmail ? editmail : $scope.users[0].email;
-		$scope.users[0].cellulare = editcel ? editcel : $scope.users[0].cellulare;
-		$scope.users[0].telefono = edittel ? edittel : $scope.users[0].telefono;
-		$scope.users[0].indirizzo = editaddress ? editaddress : $scope.users[0].indirizzo;
-		$scope.users[0].cap = editcap ? editcap : $scope.users[0].cap;
-		$scope.users[0].citta = editcitta ? editcitta : $scope.users[0].citta;
-		$scope.users[0].provincia = editprov ? editprov : $scope.users[0].provincia;
-		$scope.users[0].nazione = editnazione ? editnazione : $scope.users[0].nazione;
-		$scope.users[0].codicefiscale = editcodf ? editcodf : $scope.users[0].codicefiscale;
-		$scope.users[0].partitaiva = editpiva ? editpiva : $scope.users[0].partitaiva;
+		$scope.users[0].nome = editnome;
+		$scope.users[0].email = editmail;
+		$scope.users[0].cellulare = editcel;
+		$scope.users[0].telefono = edittel;
+		$scope.users[0].indirizzo = editaddress;
+		$scope.users[0].cap = editcap;
+		$scope.users[0].citta = editcitta;
+		$scope.users[0].provincia = editprov;
+		$scope.users[0].nazione = editnazione;
+		$scope.users[0].codicefiscale = editcodf;
+		$scope.users[0].partitaiva = editpiva;
 		$http.put('/edituser', $scope.users[0])
 		.success(function (argument) {
 			$scope.userEditChange();
@@ -424,18 +441,18 @@ $scope.saveUserEdit = function (editnome, editmail, editcel, edittel, editaddres
 		});
 	//});
 }
-$scope.discardUserEdit = function (editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva) {
-	this.editnome = undefined;
-	this.editmail = undefined;
-	this.editcel = undefined;
-	this.edittel = undefined;
-	this.editaddress = undefined;
-	this.editcap = undefined;
-	this.editcitta = undefined;
-	this.editprov = undefined;
-	this.editnazione = undefined;
-	this.editcodf = undefined;
-	this.editpiva = undefined;
+$scope.discardUserEdit = function () {
+	this.editnome = $scope.users[0].nome;
+	this.editmail = $scope.users[0].email;
+	this.editcel = $scope.users[0].cellulare;
+	this.edittel = $scope.users[0].telefono;
+	this.editaddress = $scope.users[0].indirizzo;
+	this.editcap = $scope.users[0].cap;
+	this.editcitta = $scope.users[0].citta;
+	this.editprov = $scope.users[0].provincia;
+	this.editnazione = $scope.users[0].nazione;
+	this.editcodf = $scope.users[0].codicefiscale;
+	this.editpiva = $scope.users[0].partitaiva;
 	$scope.userEditChange();
 }
 $scope.mismatchNewPw = undefined;
@@ -445,13 +462,14 @@ $scope.saveUserPw = function (editoldpw, editnewpw, editrenewpw) {
 	$scope.mismatchNewPw = undefined;
 	if (CryptoJS.MD5(editoldpw) == $scope.users[0].password && editnewpw == editrenewpw) {
 		$scope.users[0].password = CryptoJS.MD5(editnewpw).toString();
+		var itself = this;
 		$http.put('/edituser', $scope.users[0])
 		.success(function (argument) {
-			$scope.editPwChange();
+			itself.editoldpw = undefined;
+			itself.editnewpw = undefined;
+			itself.editrenewpw = undefined;
 			console.log("Password Modificata!!");
-			this.editoldpw = undefined;
-			this.editnewpw = undefined;
-			this.editrenewpw = undefined;
+			$scope.editPwChange();
 		})
 		.error(function (argument) {
 			console.log("Errore cambio password!! " + argument);
@@ -465,7 +483,7 @@ $scope.saveUserPw = function (editoldpw, editnewpw, editrenewpw) {
 		} 
 	}
 }
-$scope.discardUserPw = function (editoldpw, editnewpw, editrenewpw) {
+$scope.discardUserPw = function () {
 	this.editoldpw = undefined;
 	this.editnewpw = undefined;
 	this.editrenewpw = undefined;

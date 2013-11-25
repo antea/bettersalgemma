@@ -6,59 +6,59 @@
 	<div class="modal-body" ng-repeat="user in users">
 		<button class="btn" ng-click="userEditChange()" ng-hide="userEdit"><i class="icon-edit"></i> Modifica</button>
 		<button class="btn" ng-click="saveUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcod, editpiva)" ng-show="userEdit"><i class="icon-ok"></i> Salva</button>
-		<button class="btn" ng-click="discardUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva)" ng-show="userEdit"><i class="icon-remove"></i> Annulla</button>
+		<button class="btn" ng-click="discardUserEdit()" ng-show="userEdit"><i class="icon-remove"></i> Annulla</button>
 		<form class="form-horizontal" id="userEdit">
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputName">Nome: </label>
 				<label class="control-label" for="inputName" ng-hide="userEdit"><strong>{{user.nome}}</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputName" placeholder="{{user.nome && user.nome || 'Nome'}}" ng-show="userEdit" ng-model="editnome">
+					<input type="text" id="inputName" ng-show="userEdit" ng-model="editnome">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputEmail">E-mail: </label>
 				<label class="control-label" for="inputEmail" ng-hide="userEdit"><strong>{{user.email}}</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputEmail" placeholder="{{user.email && user.email || 'Email'}}" ng-show="userEdit" ng-model="editmail">
+					<input type="text" id="inputEmail" placeholder="Email" ng-show="userEdit" ng-model="editmail">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputCel">Cellulare: </label>
 				<label class="control-label" for="inputCel" ng-hide="userEdit"><strong>{{user.cellulare}}</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputCel" placeholder="{{user.cellulare && user.cellulare || 'Cellulare'}}" ng-show="userEdit" ng-model="editcel">
+					<input type="text" id="inputCel" placeholder="Cellulare" ng-show="userEdit" ng-model="editcel">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputTel">Telefono: </label>
 				<label class="control-label" for="inputTel" ng-hide="userEdit"><strong>{{user.telefono}}</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputTel" placeholder="{{user.telefono && user.telefono || 'Telefono'}}" ng-show="userEdit" ng-model="edittel">
+					<input type="text" id="inputTel" placeholder="Telefono" ng-show="userEdit" ng-model="edittel">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputAddress">Indirizzo: </label>
 				<label class="control-label" for="inputAddress" ng-hide="userEdit"><strong>{{user.indirizzo}},</br>{{user.cap}} {{user.citta}}, ({{user.provincia}},{{user.nazione}})</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputAddress" placeholder="{{user.indirizzo && user.indirizzo || 'Indirizzo'}}" ng-show="userEdit" ng-model="editaddress">
-					<input type="text" id="inputAddress" placeholder="{{user.cap && user.cap || 'Cap'}}" ng-show="userEdit" ng-model="editcap">
-					<input type="text" id="inputAddress" placeholder="{{user.citta && user.citta || 'Città'}}" ng-show="userEdit" ng-model="editcitta">
-					<input type="text" id="inputAddress" placeholder="{{user.provincia && user.provincia || 'Provincia'}}" ng-show="userEdit" ng-model="editprov">
-					<input type="text" id="inputAddress" placeholder="{{user.nazione && user.nazione || 'Nazione'}}" ng-show="userEdit" ng-model="editnazione">
+					<input type="text" id="inputAddress" placeholder="Indirizzo" ng-show="userEdit" ng-model="editaddress">
+					<input type="text" id="inputAddress" placeholder="Cap" ng-show="userEdit" ng-model="editcap">
+					<input type="text" id="inputAddress" placeholder="Città" ng-show="userEdit" ng-model="editcitta">
+					<input type="text" id="inputAddress" placeholder="Provincia" ng-show="userEdit" ng-model="editprov">
+					<input type="text" id="inputAddress" placeholder="Nazione" ng-show="userEdit" ng-model="editnazione">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputCodF">Cod.Fiscale: </label>
 				<label class="control-label" for="inputCodF" ng-hide="userEdit"><strong>{{user.codicefiscale}}</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputCodF" placeholder="{{user.codicefiscale && user.codicefiscale || 'Codice Fiscale'}}" ng-show="userEdit" ng-model="editcodf">
+					<input type="text" id="inputCodF" placeholder="Codice Fiscale" ng-show="userEdit" ng-model="editcodf">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" id="stdLabel" for="inputPiva">P.Iva: </label>
 				<label class="control-label" for="inputPiva" ng-hide="userEdit"><strong>{{user.partitaiva}}</strong></label>
 				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputPiva" placeholder="{{user.partitaiva && user.partitaiva || 'Partita Iva'}}" ng-show="userEdit" ng-model="editpiva">
+					<input type="text" id="inputPiva" placeholder="Partita Iva" ng-show="userEdit" ng-model="editpiva">
 				</div>
 			</div>
 			<div class="control-group">
@@ -69,7 +69,7 @@
 				<div class="control-group {{oldPwWrong}}">
 					<label class="control-label" for="inputOldPw">Vecchia password: </label>
 					<div class="controls" id="inputEditPw">
-						<input type="password" id="inputOldPw" placeholder="" ng-model="editoldpw" autofocus>
+						<input type="password" id="inputOldPw" placeholder="" ng-model="editoldpw" focus-me="editpw">
 						<span ng-show="oldPwWrong" class="help-inline">Vecchia password errata</span>
 					</div>
 				</div>
@@ -88,12 +88,12 @@
 				</div>
 				<div class="control-group">
 					<button class="btn" ng-click="saveUserPw(editoldpw, editnewpw, editrenewpw)"><i class="icon-ok"></i> Salva</button>
-					<button class="btn" ng-click="discardUserPw(editoldpw, editnewpw, editrenewpw)"><i class="icon-remove"></i> Annulla</button>
+					<button class="btn" ng-click="discardUserPw()"><i class="icon-remove"></i> Annulla</button>
 				</div>
 			</div>
 		</form>
 	</div>
 	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal" aria-hidden="true" ng-click="userEdit=false"><i class="icon-remove"></i> Chiudi</a>
+		<a href="#" class="btn" data-dismiss="modal" aria-hidden="true" ng-click="$scope.userEdit=false"><i class="icon-remove"></i> Chiudi</a>
 	</div>
 </div>
