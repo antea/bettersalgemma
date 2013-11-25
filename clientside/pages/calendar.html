@@ -40,9 +40,9 @@
 <div name="mainDiv" id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid" name="notMainDiv">
 		<div class="span1" ng-show="dinamicHide"><button class="btn btn-info" ng-click="dinamicMenuFilter()" name="filterBtn">{{dinamicLabelBtn}}</button></div>
-		<div class="span2" property="span" ng-hide="dinamicHide">
-			<div class="well">
-				<div>
+		<div class="span2" property="span" ng-hide="dinamicHide" id="outerFilters">
+			<div id="filters">
+				<div id="innerFilters">
 					<button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button>
 					<h5><i class="icon-list"></i> Ordini visualizzati:</h5>
 					<ul class="unstyled">

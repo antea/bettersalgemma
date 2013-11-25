@@ -12,8 +12,8 @@ html{
 	width: 100%;
 }
 #bigDiv{
-	min-height: 100%;
-	max-height: 100%;
+	min-height: 98%;
+	max-height: 98%;
 	width: 100%;
 	position: absolute;
 }
@@ -48,11 +48,18 @@ html{
 input[name="inputAuth"]{
 	width: 60%;
 }
-.well {
+#filters {
+	padding-left: 30px;
+	padding-right: 30px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	border-radius: 5px;
+	background-color: #f5f5f5;
+}
+#outerFilters{
+	background-color: #f5f5f5;
 	margin-top: 20px;
-	margin-bottom: 20px;
 	margin-left: 5px;
-	margin-right: 0px;
 }
 .table-bordered {
 	padding-left: 30px;
@@ -86,9 +93,9 @@ input[name="inputAuth"]{
 	border: 3px solid black;
 }
 div[property="span"] {
-	height: 92%;
-	overflow-x: auto;
+	max-height: 92%;
 	overflow-y: auto;
+	overflow-x: auto;
 }
 #calendarMonth {
 	text-align: center;
@@ -189,7 +196,7 @@ hr{
 	padding-left: 0%
 }
 div[name="mainDiv"]{
-	margin-top: 5%;
+	margin-top: 3%;
 	display: block;
 	height: 100%;
 }
@@ -220,18 +227,20 @@ button[name="filterBtn"]{
 	-ms-transform-origin: left bottom;
 }
 .row-fluid .span11 {
-	height: 92%;
+	max-height: 92%;
 	width: 97.5%;
 	margin-left: 1px;
+	margin-bottom: 1%;
 }
 .row-fluid .span10 {
 	margin-left: 0.5%;
 	width: 84.5%;
+	margin-bottom: 1%;
 }
 .row-fluid .span1 {
 	margin-left: 0%;
 	width: 2%;
-	height: 96%;
+	max-height: 96%;
 }
 .row-fluid .span2 {
 	margin-left: 0%;
