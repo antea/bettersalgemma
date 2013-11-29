@@ -403,17 +403,19 @@ retrieveInfo();
 /*----------------- Profile Controller ---------------------------------*/
 $scope.editpw = false;
 $scope.userEdit = false;
-$scope.editnome = $scope.users[0].nome;
-$scope.editmail = $scope.users[0].email;
-$scope.editcel = $scope.users[0].cellulare;
-$scope.edittel = $scope.users[0].telefono;
-$scope.editaddress = $scope.users[0].indirizzo;
-$scope.editcap = $scope.users[0].cap;
-$scope.editcitta = $scope.users[0].citta;
-$scope.editprov = $scope.users[0].provincia;
-$scope.editnazione = $scope.users[0].nazione;
-$scope.editcodf = $scope.users[0].codicefiscale;
-$scope.editpiva = $scope.users[0].partitaiva;
+$scope.instantiatesProfileField = function () {
+	$scope.editnome = $scope.users[0].nome;
+	$scope.editmail = $scope.users[0].email;
+	$scope.editcel = $scope.users[0].cellulare;
+	$scope.edittel = $scope.users[0].telefono;
+	$scope.editaddress = $scope.users[0].indirizzo;
+	$scope.editcap = $scope.users[0].cap;
+	$scope.editcitta = $scope.users[0].citta;
+	$scope.editprov = $scope.users[0].provincia;
+	$scope.editnazione = $scope.users[0].nazione;
+	$scope.editcodf = $scope.users[0].codicefiscale;
+	$scope.editpiva = $scope.users[0].partitaiva;
+}
 $scope.userEditChange = function () {
 	$scope.userEdit = !$scope.userEdit;
 }
