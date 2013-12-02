@@ -10,7 +10,7 @@ server.configure(function () {
 	server.set('port', 8585);
 	server.use(express.bodyParser());
 	server.use(express.cookieParser());
-	server.use(express.session({secret: 'salgemmaSecret', cookie: {maxAge: 60 * 5000}}));
+	server.use(express.session({secret: 'salgemmaSecret', cookie: {maxAge: 60 * 15000}}));
 	server.use(express.static(path.join(__dirname,"/clientside")));
 });
 
