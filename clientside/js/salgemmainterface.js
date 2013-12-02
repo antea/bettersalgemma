@@ -7,12 +7,18 @@ config(['$routeProvider', function ($routeProvider) {
 	when('/', {redirectTo:'/salgemmainterface/login'}).
 	otherwise({templateUrl: 'pages/notFound.html'});
 }]).
-run( function ($rootScope, $location) {
+run( function ($rootScope, $location, $http) {
 	$rootScope.$on( "$routeChangeStart", function (event, next, current) {
-		if(!$rootScope.users || $rootScope.users.length == 0){
-			if (next.templateUrl !== "pages/autenticazione.html") {
-				$location.path("/salgemmainterface/login")
+		$http.get('/isAuth')
+		.success(function (results) {
+			$rootScope.user = results;
+			if(!$rootScope.user){
+				if (next.templateUrl !== "pages/autenticazione.html") {
+					$location.path("/salgemmainterface/login")
+				};
 			};
-		};
+		})
+		.error(function (argument) {
+		})
 	})
 });

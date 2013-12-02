@@ -9,6 +9,8 @@ var path = require('path');
 server.configure(function () {
 	server.set('port', 8585);
 	server.use(express.bodyParser());
+	server.use(express.cookieParser());
+	server.use(express.session({secret: 'salgemmaSecret', cookie: {maxAge: 60 * 5000}}));
 	server.use(express.static(path.join(__dirname,"/clientside")));
 });
 
@@ -26,6 +28,21 @@ var pool = mysql.createPool({
 	connectionLimit:1, //default 10
 	waitForConnection:false //default=true
 	*/
+});
+
+//  <--------------------------> SESSIONE <-------------------------->
+
+server.get('/isAuth', function (req, res) {
+	if(req.session.user){
+		res.send(200, req.session.user);
+	} else {
+		res.send(200, undefined);
+	}
+});
+
+server.delete('/deleteSessionUser', function (req, res) {
+	req.session.destroy(function () {
+	})
 });
 
 //  <--------------------------> RICHIESTE GET <-------------------------->
@@ -50,7 +67,8 @@ var pool = mysql.createPool({
 								res.send(401, "Autenticazione fallita: username e/o password errati");
 							} else{
 								//res.header("Access-Control-Allow-Origin", "*");
-								res.send(200, results);
+								req.session.user = results[0];
+								res.send(200, results[0]);
 							};
 						};
 						connection.end();

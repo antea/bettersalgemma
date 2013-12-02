@@ -19,7 +19,7 @@
 			<div id="loadedErrorDiv" ng-hide="true"><span id="inline" name="img"><img id="loadingAntea" src="img/stop.png" class="brand"></span><span id="inline"><h5>Operazione fallita</h5></span></div>
 			<ul class="nav pull-right">
 				<li class="dropdown">
-					<a id="dropuser" href="#" role="button" class="dropdown-toggle brand" data-toggle="dropdown" ng-repeat="user in users">
+					<a id="dropuser" href="#" role="button" class="dropdown-toggle brand" data-toggle="dropdown">
 						{{user.nome}}
 						<b class="caret"></b>
 					</a>
@@ -27,7 +27,7 @@
 						<li role="presentation">
 							<a role="menuitem" tabindex="-1" href="#infoModal" data-toggle="modal"><i class="icon-info-sign"></i> Info</a>
 							<a role="menuitem" tabindex="-1" href="#modalProfilo" data-toggle="modal" ng-click="instantiatesProfileField()"><i class="icon-user"></i> Profilo</a>
-							<a role="menuitem" tabindex="-1" href="#/salgemmainterface/logout"><i class="icon-off"></i> Logout</a>
+							<a role="menuitem" tabindex="-1" href="#/salgemmainterface/logout" ng-click="logout()"><i class="icon-off"></i> Logout</a>
 						</li>
 					</ul>
 				</li>

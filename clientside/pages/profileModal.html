@@ -1,9 +1,9 @@
 <div id="modalProfilo" class="modal hide fade">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3 ng-repeat="user in users">Profilo di {{user.nome}}</h3>
+		<h3>Profilo di {{user.nome}}</h3>
 	</div>
-	<div class="modal-body" ng-repeat="user in users">
+	<div class="modal-body">
 		<button class="btn" ng-click="userEditChange()" ng-hide="userEdit"><i class="icon-edit"></i> Modifica</button>
 		<button class="btn" ng-click="saveUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcod, editpiva)" ng-show="userEdit"><i class="icon-ok"></i> Salva</button>
 		<button class="btn" ng-click="discardUserEdit()" ng-show="userEdit"><i class="icon-remove"></i> Annulla</button>
