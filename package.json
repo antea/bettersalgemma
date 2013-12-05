@@ -7,7 +7,7 @@
 		"start":"nodemon serverdatabase.js"},
 	"dependencies":{
 		"express":"3.2.1",
-		"mysql":"2.0.0-alpha8"},
+		"mysql":"2.0.0-alpha9"},
 	"devDependencies":{
 		"nodemon":"*"}
 	}

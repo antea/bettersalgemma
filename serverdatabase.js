@@ -21,12 +21,9 @@ var pool = mysql.createPool({
 	host:'mysql.antea.bogus',
 	database:'matteos',
 	user:'matteos',
-	password:'matteos'
-	/* Decommentare le righe seguenti per attivare il limite di connessione e 
-	togliere l'attesa in caso di limite raggiunto e lanciare errore; 
-	connectionLimit:1, //default 10
-	waitForConnection:false //default=true
-	*/
+	password:'matteos',
+	waitForConnections:false,
+	connectionLimit:10
 });
 
 //  <--------------------------> RICHIESTE GET <-------------------------->
@@ -54,7 +51,7 @@ var pool = mysql.createPool({
 								res.cookie('user', user, {maxAge : 60*60*1000}).send(200, results[0]);
 							};
 						};
-						connection.end();
+						connection.release();
 					});
 			};
 		});
@@ -89,7 +86,7 @@ var pool = mysql.createPool({
 						};
 					});
 			};
-			connection.end();
+			connection.release();
 		});
 	});
 
@@ -123,7 +120,7 @@ var pool = mysql.createPool({
 						};
 					});
 			};
-			connection.end();
+			connection.release();
 		});
 });
 
@@ -137,8 +134,9 @@ var pool = mysql.createPool({
 			if (err) {
 				res.send(503, err);
 			} else{
-				trovaPianificazione(req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
+				trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
 					if (err) {
+						connection.release();
 						res.send(503, err);
 					} else{
 						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
@@ -147,6 +145,7 @@ var pool = mysql.createPool({
 							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione IN (?)',
 							[req.params.userId, req.params.monthOfYear, idsPianificazione],
 							function (err, results) {
+								connection.release();
 								if (err) {
 									res.send(503, err);
 								} else{
@@ -156,7 +155,6 @@ var pool = mysql.createPool({
 					};
 				})
 			};
-			connection.end();
 		});
 	});
 
@@ -173,7 +171,7 @@ server.post('/insertstorico', function (req, res) {
 		if (err) {
 			res.send(503, err);
 		} else{
-			trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
+			trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
 				var idPianificazione = idsPianificazione.split(',');
 				idPianificazione = idPianificazione[0];
 				if(err){
@@ -200,7 +198,7 @@ server.post('/insertstorico', function (req, res) {
 						});}
 				});
 		};
-		connection.end();
+		connection.release();
 	});
 });
 
@@ -221,7 +219,7 @@ server.put('/editstorico', function (req, res) {
 				if (err) {
 					res.send(503, err);
 				} else{
-					trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
+					trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
 						var idPianificazione = idsPianificazione.split(',');
 						idPianificazione = idPianificazione[0];
 						if (err) {
@@ -260,7 +258,7 @@ server.put('/editstorico', function (req, res) {
 }
 });
 }
-connection.end();
+connection.release();
 });
 });
 
@@ -302,7 +300,7 @@ server.delete('/deletestorico/:idstorico', function (req,res) {
 					};
 				})
 		};
-		connection.end();
+		connection.release();
 	});
 });
 
@@ -313,7 +311,7 @@ La funzione richiede come parametri l'idPianificazione, i secondi lavorati e il 
 Calcola i costi e i ricavi, affidandosi alle funzioni calcolaCosto e caloclaRicavo e ritorna l'oggetto contenente
 i parametri costo e ricavo utilizzabile attraverso callback.
 */
-function calcolaCostiRicavi (pianificazione, secondi, callback) {
+function calcolaCostiRicavi(pianificazione, secondi, callback) {
 	calcolaCosto(pianificazione, secondi, function(err, costi){
 		if(err){
 			callback(err)
@@ -355,7 +353,7 @@ function calcolaCosto (pianificazione, secondi, callback) {
 					};
 				});
 		};
-		connection.end();
+		connection.release();
 	});
 };
 
@@ -384,7 +382,7 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 				};
 			});
 		};
-		connection.end();
+		connection.release();
 	});
 };
 
@@ -393,23 +391,16 @@ La funzione seguente riceve come parametri lo userId, l'id dell'ordine e quello 
 Trova l'id della pianificazione associata a questi parametri e applica la funzione di callback passatagli come ultimo
 parametro all'id della pianificazione appena trovato.
 */
-function trovaPianificazione (userId, idOrdine, idsAttivita, callback) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			callback(err, idPianificazione);
-		} else{
-			connection.query('SELECT GROUP_CONCAT(p.id) AS ids ' +
-				'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
-				'WHERE p.idrisorsa=? AND ord.id=? AND r.id IN (?)', [userId, idOrdine, idsAttivita],
-				function (err, results) {
-					if (err) {
-						callback(err, idPianificazione);
-					} else{
-						var idPianificazione = results[0].ids;
-						callback(err, idPianificazione);
-					};
-				});
-		};
-		connection.end();
-	});
+function trovaPianificazione(connection, userId, idOrdine, idsAttivita, callback) {
+	connection.query('SELECT GROUP_CONCAT(p.id) AS ids ' +
+		'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
+		'WHERE p.idrisorsa=? AND ord.id=? AND r.id IN (?)', [userId, idOrdine, idsAttivita],
+		function (err, results) {
+			if (err) {
+				callback(err);
+			} else{
+				var idPianificazione = results[0].ids;
+				callback(null, idPianificazione);
+			};
+		});
 };
