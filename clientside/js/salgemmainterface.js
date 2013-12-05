@@ -1,4 +1,4 @@
-angular.module('salgemmaclientinterface', ['salgemmainterfaceFilters']).
+angular.module('salgemmaclientinterface', ['salgemmainterfaceFilters', 'ngCookies']).
 config(['$routeProvider', function ($routeProvider) {
 	$routeProvider.
 	when('/salgemmainterface/login', {templateUrl: 'pages/autenticazione.html', controller: AutenticazioneCtrl}).
@@ -7,18 +7,16 @@ config(['$routeProvider', function ($routeProvider) {
 	when('/', {redirectTo:'/salgemmainterface/login'}).
 	otherwise({templateUrl: 'pages/notFound.html'});
 }]).
-run( function ($rootScope, $location, $http) {
+run( function ($rootScope, $location, $cookies) {
 	$rootScope.$on( "$routeChangeStart", function (event, next, current) {
-		$http.get('/isAuth')
-		.success(function (results) {
-			$rootScope.user = results;
-			if(!$rootScope.user){
+		if(!$rootScope.user){
+			if(!$cookies.user){
 				if (next.templateUrl !== "pages/autenticazione.html") {
 					$location.path("/salgemmainterface/login")
 				};
+			} else{
+				$rootScope.user = JSON.parse(decodeURIComponent($cookies.user));
 			};
-		})
-		.error(function (argument) {
-		})
+		}
 	})
 });

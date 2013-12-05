@@ -10,7 +10,6 @@ server.configure(function () {
 	server.set('port', 8585);
 	server.use(express.bodyParser());
 	server.use(express.cookieParser());
-	server.use(express.session({secret: 'salgemmaSecret', cookie: {maxAge: 60 * 15000}}));
 	server.use(express.static(path.join(__dirname,"/clientside")));
 });
 
@@ -28,21 +27,6 @@ var pool = mysql.createPool({
 	connectionLimit:1, //default 10
 	waitForConnection:false //default=true
 	*/
-});
-
-//  <--------------------------> SESSIONE <-------------------------->
-
-server.get('/isAuth', function (req, res) {
-	if(req.session.user){
-		res.send(200, req.session.user);
-	} else {
-		res.send(200, undefined);
-	}
-});
-
-server.delete('/deleteSessionUser', function (req, res) {
-	req.session.destroy(function () {
-	})
 });
 
 //  <--------------------------> RICHIESTE GET <-------------------------->
@@ -63,12 +47,11 @@ server.delete('/deleteSessionUser', function (req, res) {
 							res.send(503, err);
 						} else{
 							if (results.length===0) {
-								//res.header("Access-Control-Allow-Origin", "*");
 								res.send(401, "Autenticazione fallita: username e/o password errati");
 							} else{
-								//res.header("Access-Control-Allow-Origin", "*");
-								req.session.user = results[0];
-								res.send(200, results[0]);
+								var user = encodeURIComponent(JSON.stringify(results[0]));
+								//cookies non possono contenere caratteri speciali se non sono codificati
+								res.cookie('user', user, {maxAge : 60*60*1000}).send(200, results[0]);
 							};
 						};
 						connection.end();
