@@ -353,11 +353,14 @@ $scope.tdClick = function ($event, $index, task) {
 			$scope.openAndFocusedCell.focused = false;
 			$scope.openAndFocusedCell.$parent.rowSelected = false;
 		}
-		this.editmode = true;
-		this.focused = true;
-		this.$parent.rowSelected = true;
-		$scope.openAndFocusedCell = this;
-		document.getElementById("check-"+task.ids[0]+"-"+$index).focus();
+		var self = this;
+		$timeout(function () {
+			self.editmode = true;
+			self.focused = true;
+			self.$parent.rowSelected = true;
+			$scope.openAndFocusedCell = self;
+			document.getElementById("check-"+task.ids[0]+"-"+$index).focus();
+		})
 	}
 }
 $scope.removeFocus = function ($event) {
