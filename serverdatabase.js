@@ -84,9 +84,9 @@ var pool = mysql.createPool({
 						} else{
 							res.send(201, results);
 						};
+						connection.release();
 					});
 			};
-			connection.release();
 		});
 	});
 
@@ -118,9 +118,9 @@ var pool = mysql.createPool({
 						} else{
 							res.send(201, results);
 						};
+						connection.release();
 					});
 			};
-			connection.release();
 		});
 });
 
@@ -145,12 +145,12 @@ var pool = mysql.createPool({
 							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione IN (?)',
 							[req.params.userId, req.params.monthOfYear, idsPianificazione],
 							function (err, results) {
-								connection.release();
 								if (err) {
 									res.send(503, err);
 								} else{
 									res.send(201, results);
 								};
+								connection.release();
 							});
 					};
 				})
@@ -194,11 +194,11 @@ server.post('/insertstorico', function (req, res) {
 									} else{
 										res.send(201, results);
 									};
+									connection.release();
 								});}
 						});}
 				});
 		};
-		connection.release();
 	});
 });
 
@@ -256,9 +256,9 @@ server.put('/editstorico', function (req, res) {
 }
 });
 }
+connection.release();
 });
 }
-connection.release();
 });
 });
 
@@ -298,9 +298,9 @@ server.delete('/deletestorico/:idstorico', function (req,res) {
 					} else{
 						res.send(201, results)
 					};
+					connection.release();
 				})
 		};
-		connection.release();
 	});
 });
 
@@ -351,9 +351,9 @@ function calcolaCosto (pianificazione, secondi, callback) {
 						var costo = results[0].costo*(secondi/3600);
 						callback(err, costo);
 					};
+					connection.release();
 				});
 		};
-		connection.release();
 	});
 };
 
@@ -380,9 +380,9 @@ function calcolaRicavo (pianificazione, secondi, callback) {
 					var ricavo = results[0].ricavo*(secondi/3600);
 					callback(err, ricavo);
 				};
+				connection.release();
 			});
 		};
-		connection.release();
 	});
 };
 
