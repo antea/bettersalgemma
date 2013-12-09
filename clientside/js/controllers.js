@@ -174,9 +174,7 @@ $scope.save = function ($index, day, task, editore, editnote, scope) {
 	}
 }
 $scope.edit = function ($index, day, task, editore, editnote, scope) {
-	if (editnote) {
-		day.note = editnote;
-	}
+	day.note = editnote;
 	if (editore) {
 		day.ore = editore;
 		day.secondi = day.ore*3600;
@@ -207,9 +205,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote, scope) {
 	day.secondi = day.ore * 3600;
 	day.unimis = "h";
 	day.giorno = $scope.selectedYear +"-"+($scope.selectedMonth+1)+"-"+($index+1);
-	if (editnote) {
-		day.note = editnote;
-	}
+	day.note = editnote;
 	var dati = {
 		idordine : task.order.id,
 		idattivita : task.ids,
@@ -355,6 +351,7 @@ $scope.tdClick = function ($event, $index, task) {
 		}
 		var self = this;
 		$timeout(function () {
+			self.editnote = task.mese[$index].note;
 			self.editmode = true;
 			self.focused = true;
 			self.$parent.rowSelected = true;

@@ -91,6 +91,7 @@ angular.module('salgemmainterfaceFilters', [],
 										scopeCellPreviousRow.focused = !scopeCellPreviousRow.focused;
 										scopeCellPreviousRow.editmode = !scopeCellPreviousRow.editmode;
 										scopeCellPreviousRow.$parent.rowSelected = !scopeCellPreviousRow.$parent.rowSelected;
+										scopeCellPreviousRow.editnote = scopePreviousRow.day.note;
 									};
 								}
 							};
@@ -114,6 +115,7 @@ angular.module('salgemmainterfaceFilters', [],
 										scopeCellNextRow.focused = !scopeCellNextRow.focused;
 										scopeCellNextRow.editmode = !scopeCellNextRow.editmode;
 										scopeCellNextRow.$parent.rowSelected = !scopeCellNextRow.$parent.rowSelected;
+										scopeCellNextRow.editnote = scopeCellNextRow.day.note;
 									};
 								}
 							};
@@ -134,6 +136,7 @@ angular.module('salgemmainterfaceFilters', [],
 									scopeNextCell.focused = !scopeNextCell.focused;
 									scopeNextCell.editmode = !scopeNextCell.editmode;
 									scopeNextCell.$parent.rowSelected = !scopeNextCell.$parent.rowSelected;
+									scopeNextCell.editnote = scopeNextCell.day.note;
 								};
 							};
 						};
@@ -153,6 +156,7 @@ angular.module('salgemmainterfaceFilters', [],
 									scopePreviousRow.focused = !scopePreviousRow.focused;
 									scopePreviousRow.editmode = !scopePreviousRow.editmode;
 									scopePreviousRow.$parent.rowSelected = !scopePreviousRow.$parent.rowSelected;
+									scopePreviousRow.editnote = scopePreviousRow.day.note;
 								};
 							};
 						};
