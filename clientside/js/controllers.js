@@ -377,7 +377,7 @@ $scope.refreshPopover = function ($index, task, day) {
 	myPopover.options.title = day.note ? "<strong>Note:</strong>" : undefined;
 }
 $scope.validate = function (editore) {
-	var pattern = /^\d{0,2}(\.\d{1})?$/;
+	var pattern = /^\d{0,2}(\.\d{1,2})?$/;
 	if(editore){
 		if(pattern.test(editore)){
 			if(parseFloat(editore) <= 24){

@@ -91,7 +91,7 @@ angular.module('salgemmainterfaceFilters', [],
 										scopeCellPreviousRow.focused = !scopeCellPreviousRow.focused;
 										scopeCellPreviousRow.editmode = !scopeCellPreviousRow.editmode;
 										scopeCellPreviousRow.$parent.rowSelected = !scopeCellPreviousRow.$parent.rowSelected;
-										scopeCellPreviousRow.editnote = scopePreviousRow.day.note;
+										scopeCellPreviousRow.editnote = scopeCellPreviousRow.day.note;
 									};
 								}
 							};
