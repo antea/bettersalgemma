@@ -42,6 +42,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 
 	//recupero informazioni dal database;
 	var retrieveInfo = function () {
+		$('#loadingDiv').show();
 		$scope.month = [];
 		var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
 		for (var i = 0; i < lastOfMonth; i++) {
@@ -53,6 +54,8 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 			};
 			if ($rootScope.user) {
 				$scope.tasks = new Array();
+				var tasksNoDom = new Array();
+				var tasksNumber = 0;
 				$scope.totalTask = new Array($scope.month.length);
 				$http.get('/ordini/'+$rootScope.user.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 				success(function (data, status, headers, config) {
@@ -62,6 +65,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 						ordine.selected = true;
 						$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 						success(function (data, status, headers, config) {
+							tasksNumber += data.length;
 							data.forEach(function (task, index, array) {
 								task.ids = task.ids.split(',');
 								var ordineStart = new Date(ordine.datainizioprev);
@@ -111,9 +115,13 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 										storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
 										task.mese[index] = storico;
 									});
+									tasksNoDom.push(task);
 									$scope.calculateRowTotal(task);
-									$scope.tasks.push(task);
 									$scope.calculateColTotal(task);
+									if (tasksNoDom.length == tasksNumber) {
+										$scope.tasks = tasksNoDom;
+										$('#loadingDiv').hide();
+									};
 								}).
 								error(function ()/*(data, status, headers, config)*/ {
 									$scope.errors = [{
@@ -148,6 +156,7 @@ $scope.discard = function ($index, day, task, editore, editnote, scope) {
 	myThis.editmode = false;
 	myThis.focused = false;
 	myThis.$parent.rowSelected = false;
+	myThis.innerform = $scope.emptyForm;
 }
 
 $scope.save = function ($index, day, task, editore, editnote, scope) {
@@ -155,18 +164,22 @@ $scope.save = function ($index, day, task, editore, editnote, scope) {
 	if($scope.validator != "error") {
 		if (day.ore) {
 			if (editore !=0) {
-				$scope.edit($index, day, task, editore, editnote, scope);
+				$scope.edit($index, day, task, editore, editnote, myThis);
 			} else{
-				$scope.delete(day, task, $index, scope);
+				$scope.delete(day, task, $index, myThis);
 			};
 		} else{
 			if (editore && editore!=0) {
-				$scope.newInsert($index, day, task, editore, editnote, scope);
+				$scope.newInsert($index, day, task, editore, editnote, myThis);
 			};
 		};
-		myThis.editmode = false;
-		myThis.focused = false;
-		myThis.$parent.rowSelected = false;
+		$timeout(function () {
+			myThis.editmode = false;
+			myThis.focused = false;
+			if (!scope) {
+				myThis.$parent.rowSelected = false;
+			};
+		});
 		$scope.refreshPopover($index, task, day);
 	} else {
 		document.getElementById("ore-"+task.ids[0]+"-"+$index).focus();
@@ -319,8 +332,8 @@ $scope.calculateColTotal = function (task, index) {
 		$scope.totalTask[index].ore = 0;
 		$scope.tasks.forEach(function (oneTask) {
 			if (oneTask.mese[index].ore) {
-				var somma = $scope.totalTask[index].ore*10 + oneTask.mese[index].ore*10;
-				$scope.totalTask[index].ore = somma/10;
+				var somma = $scope.totalTask[index].ore*100 + oneTask.mese[index].ore*100;
+				$scope.totalTask[index].ore = somma/100;
 			};
 		});
 	} else {
@@ -329,35 +342,37 @@ $scope.calculateColTotal = function (task, index) {
 				$scope.totalTask[$index] = {ore : 0};
 			}
 			if (day.ore) {
-				var somma = $scope.totalTask[$index].ore*10 + day.ore*10;
-				$scope.totalTask[$index].ore = somma/10;
+				var somma = $scope.totalTask[$index].ore*100 + day.ore*100;
+				$scope.totalTask[$index].ore = somma/100;
 			};
 		});
 	}
 	$scope.totalMonth = 0;
 	$scope.totalTask.forEach(function (totalDay) {
-		var somma = $scope.totalMonth*10 + totalDay.ore*10;
-		$scope.totalMonth = somma/10;
+		var somma = $scope.totalMonth*100 + totalDay.ore*100;
+		$scope.totalMonth = somma/100;
 	});
 }
 $scope.openAndFocusedCell = undefined;
 $scope.tdClick = function ($event, $index, task) {
 	var element = $event.srcElement || $event.target;
-	if(element.name != "formInput") {
+	if(element.name != "formInput" && element.nodeName!="I") {
 		if ($scope.openAndFocusedCell) {
 			$scope.openAndFocusedCell.editmode = false;
 			$scope.openAndFocusedCell.focused = false;
 			$scope.openAndFocusedCell.$parent.rowSelected = false;
+			$scope.openAndFocusedCell.innerform = $scope.emptyForm;
 		}
 		var self = this;
 		$timeout(function () {
+			self.innerform = $scope.editingForm;
 			self.editnote = task.mese[$index].note;
 			self.editmode = true;
 			self.focused = true;
 			self.$parent.rowSelected = true;
 			$scope.openAndFocusedCell = self;
-			document.getElementById("check-"+task.ids[0]+"-"+$index).focus();
-		})
+//			document.getElementById("check-"+task.ids[0]+"-"+$index).focus();
+})
 	}
 }
 $scope.removeFocus = function ($event) {
@@ -400,6 +415,8 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 }
+$scope.editingForm = '<form class="form-horizontal" ng-show="editmode && day.editable"><div class="control-group {{validator}}"><div class="controls" name="formInput"><input name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn control-button" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"><i class="icon-ok"></i></button></div></div><div class="control-group"><div class="controls" name="formInput"><input name="formInput" type="text" id="note" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"><button class="btn control-button" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"><i class="icon-remove"></i></button></div></div></form>';
+$scope.emptyForm = '';
 retrieveInfo();
 /*----------------- Profile Controller ---------------------------------*/
 $scope.editpw = false;

@@ -1,27 +1,4 @@
-angular.module('salgemmainterfaceFilters', [],
-	function ($provide) {
-
-		$provide.factory('myHttpInterceptor', function ($q, $window, $timeout) {
-			return function (promise) {
-				return promise.then(function (response) {
-					$('#loadingDiv').hide();
-					return response;
-				}, function (response) {
-					$('#loadingDiv').hide();
-					$('#loadedErrorDiv').show();
-					return $q.reject(response);
-				});
-			};
-		});
-	})
-.config(function ($httpProvider) {
-	$httpProvider.responseInterceptors.push('myHttpInterceptor');
-	var spinnerFunction = function (data, headers) {
-		$('#loadingDiv').show();
-		return data;
-	};
-	$httpProvider.defaults.transformRequest.push(spinnerFunction);
-})
+angular.module('salgemmainterfaceFilters', [])
 .filter('taskFilter', function () {
 	return function (tasks) {
 		var tasksFiltered = [];
@@ -90,8 +67,9 @@ angular.module('salgemmainterfaceFilters', [],
 										scope.$parent.$parent.openAndFocusedCell = scopeCellPreviousRow;
 										scopeCellPreviousRow.focused = !scopeCellPreviousRow.focused;
 										scopeCellPreviousRow.editmode = !scopeCellPreviousRow.editmode;
-										scopeCellPreviousRow.$parent.rowSelected = !scopeCellPreviousRow.$parent.rowSelected;
+										scopeCellPreviousRow.$parent.rowSelected = true;
 										scopeCellPreviousRow.editnote = scopeCellPreviousRow.day.note;
+										scopeCellPreviousRow.innerform = scope.editingForm;
 									};
 								}
 							};
@@ -114,8 +92,9 @@ angular.module('salgemmainterfaceFilters', [],
 										scope.$parent.$parent.openAndFocusedCell = scopeCellNextRow;
 										scopeCellNextRow.focused = !scopeCellNextRow.focused;
 										scopeCellNextRow.editmode = !scopeCellNextRow.editmode;
-										scopeCellNextRow.$parent.rowSelected = !scopeCellNextRow.$parent.rowSelected;
+										scopeCellNextRow.$parent.rowSelected = true;
 										scopeCellNextRow.editnote = scopeCellNextRow.day.note;
+										scopeCellNextRow.innerform = scope.editingForm;
 									};
 								}
 							};
@@ -135,8 +114,9 @@ angular.module('salgemmainterfaceFilters', [],
 									scope.$parent.$parent.openAndFocusedCell = scopeNextCell;
 									scopeNextCell.focused = !scopeNextCell.focused;
 									scopeNextCell.editmode = !scopeNextCell.editmode;
-									scopeNextCell.$parent.rowSelected = !scopeNextCell.$parent.rowSelected;
+									scopeNextCell.$parent.rowSelected = true;
 									scopeNextCell.editnote = scopeNextCell.day.note;
+									scopeNextCell.innerform = scope.editingForm;
 								};
 							};
 						};
@@ -155,8 +135,9 @@ angular.module('salgemmainterfaceFilters', [],
 									scope.$parent.$parent.openAndFocusedCell = scopePreviousRow;
 									scopePreviousRow.focused = !scopePreviousRow.focused;
 									scopePreviousRow.editmode = !scopePreviousRow.editmode;
-									scopePreviousRow.$parent.rowSelected = !scopePreviousRow.$parent.rowSelected;
+									scopePreviousRow.$parent.rowSelected = true;
 									scopePreviousRow.editnote = scopePreviousRow.day.note;
+									scopePreviousRow.innerform = scope.editingForm;
 								};
 							};
 						};
@@ -165,12 +146,9 @@ angular.module('salgemmainterfaceFilters', [],
 					$timeout(function () {
 						scope.editmode = false;
 						scope.focused = !scope.focused;
-						scope.$parent.rowSelected = !scope.$parent.rowSelected;
+						scope.$parent.rowSelected = false;
 						scope.$parent.$parent.discard(scope.$index, scope.day, scope.$parent.task, scope.editore, scope.editnote, scope);
 					});
-					//var thisCell = element.offsetParent;
-					//thisCell.children[0].click();
-					//thisCell.children[2][3].click();
 				};
 			};
 		});
@@ -190,13 +168,28 @@ angular.module('salgemmainterfaceFilters', [],
 			});
 		}
 	};
+})
+.directive('changeform',function ($compile) {
+	return {
+		link: function (scope, element, attrs) {
+			var el;
+			attrs.$observe('template', function (tpl) {
+				if (angular.isDefined(tpl)) {
+					el = $compile(tpl)(scope);
+
+					element.html("");
+					element.append(el);
+				};
+			})
+		}
+	}
 });
 
 var clickSimulation = function (thisCell, scope) {
 	if (thisCell.children[0].checked) {
-		//thisCell.children[0].click();
-		scope.editmode = !scope.editmode;
-		//thisCell.children[2][1].click();
+		scope.editmode = false;
+		scope.$parent.rowSelected = false;
+		scope.innerform = scope.emptyForm;
 		scope.$parent.$parent.save(scope.$index, scope.day, scope.$parent.task, scope.editore, scope.editnote, scope);
 	} else {
 		scope.focused = false;
