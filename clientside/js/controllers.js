@@ -128,6 +128,8 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 										subject: "Errore del server:",
 										description: "Riprovare, se l'errore persiste contattare l'amministratore."
 									}];
+									$('#loadingDiv').hide();
+									$('#loadedErrorDiv').show();
 								});
 							});
 }).
@@ -136,6 +138,8 @@ error(function ()/*(data, status, headers, config)*/ {
 		subject: "Errore del server:",
 		description: "Riprovare, se l'errore persiste contattare l'amministratore."
 	}];
+	$('#loadingDiv').hide();
+	$('#loadedErrorDiv').show();
 });
 });
 }).
@@ -144,6 +148,8 @@ error(function ()/*(data, status, headers, config)*/ {
 		subject: "Errore del server:",
 		description: "Riprovare, se l'errore persiste contattare l'amministratore."
 	}];
+	$('#loadingDiv').hide();
+	$('#loadedErrorDiv').show();
 });
 }
 };
