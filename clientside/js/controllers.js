@@ -297,6 +297,7 @@ $scope.next = function () {
 				nextCalendar.active = "active ";
 				$scope.selectedMonth = nextCalendar.monthNumber;
 				$scope.selectedYear = nextCalendar.year;
+				$scope.tasks = undefined;
 				retrieveInfo();
 				loop = false;
 			}
@@ -313,6 +314,7 @@ $scope.prev = function () {
 				prevCalendar.active = "active ";
 				$scope.selectedMonth = prevCalendar.monthNumber;
 				$scope.selectedYear = prevCalendar.year;
+				$scope.tasks = undefined;
 				retrieveInfo();
 				loop = false;
 			}
