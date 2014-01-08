@@ -59,12 +59,18 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 				$scope.totalTask = new Array($scope.month.length);
 				$http.get('/ordini/'+$rootScope.user.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 				success(function (data, status, headers, config) {
+					if (data.length==0) {
+						$('#loadingDiv').hide();
+					};
 					$scope.errors = [];
 					$scope.ordini = data;
 					$scope.ordini.forEach(function (ordine) {
 						ordine.selected = true;
 						$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 						success(function (data, status, headers, config) {
+							if (data.length==0) {
+								$('#loadingDiv').hide();
+							};
 							tasksNumber += data.length;
 							data.forEach(function (task, index, array) {
 								task.ids = task.ids.split(',');
