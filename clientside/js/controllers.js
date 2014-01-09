@@ -74,6 +74,17 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
 							tasksNumber += data.length;
 							data.forEach(function (task, index, array) {
 								task.ids = task.ids.split(',');
+								task.ids.sort(function compare (firstIds, secondIds) {
+									if (firstIds < secondIds) {
+										return -1;
+									}
+									else if (firstIds > secondIds) {
+										return 1;
+									}
+									else {
+										return 0;
+									}
+								})
 								var ordineStart = new Date(ordine.datainizioprev);
 								var ordineEnd = new Date(ordine.datafineprev);
 								var taskStarts = task.dateinizioprev.split(',');
@@ -334,11 +345,11 @@ $scope.focusOn = function (event, $index, task) {
 $scope.calculateRowTotal = function (task) {
 	task.total = 0;
 	task.mese.forEach(function (day) {
-		if(day.secondi){
-			task.total += day.secondi;
+		if(day.ore){
+			task.total += day.ore*100;
 		}
 	});
-	task.total = task.total/3600;
+	task.total = task.total/100;
 }
 $scope.calculateColTotal = function (task, index) {
 	//$scope.totalTask = new Array($scope.month.length);
