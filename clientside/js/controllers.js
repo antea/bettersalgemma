@@ -342,6 +342,11 @@ $scope.focusOn = function (event, $index, task) {
 	this.focused = !this.focused;
 	this.$parent.rowSelected = !this.$parent.rowSelected;
 }
+/*
+Per problemi di calcolo i numeri vengono moltiplicati per 100 in quanto non possono, per come è costruito il sistema, avere più di 2 decimali,
+successivamente viene fatta la somma, poi vengono divisi per 100, trasformati in stringhe con al massimo 2 decimali e ritrasformati in float tramite il parseFloat
+per essere sicuri che i numeri, sebbene non dovrebbero più essere usati, siano numeri anche alla fine del processo.
+*/
 $scope.calculateRowTotal = function (task) {
 	task.total = 0;
 	task.mese.forEach(function (day) {
@@ -349,7 +354,7 @@ $scope.calculateRowTotal = function (task) {
 			task.total += day.ore*100;
 		}
 	});
-	task.total = task.total/100;
+	task.total = parseFloat((task.total/100).toFixed(2));
 }
 $scope.calculateColTotal = function (task, index) {
 	//$scope.totalTask = new Array($scope.month.length);
@@ -358,7 +363,7 @@ $scope.calculateColTotal = function (task, index) {
 		$scope.tasks.forEach(function (oneTask) {
 			if (oneTask.mese[index].ore) {
 				var somma = $scope.totalTask[index].ore*100 + oneTask.mese[index].ore*100;
-				$scope.totalTask[index].ore = somma/100;
+				$scope.totalTask[index].ore = parseFloat((somma/100).toFixed(2));
 			};
 		});
 	} else {
@@ -368,14 +373,14 @@ $scope.calculateColTotal = function (task, index) {
 			}
 			if (day.ore) {
 				var somma = $scope.totalTask[$index].ore*100 + day.ore*100;
-				$scope.totalTask[$index].ore = somma/100;
+				$scope.totalTask[$index].ore = parseFloat((somma/100).toFixed(2));
 			};
 		});
 	}
 	$scope.totalMonth = 0;
 	$scope.totalTask.forEach(function (totalDay) {
 		var somma = $scope.totalMonth*100 + totalDay.ore*100;
-		$scope.totalMonth = somma/100;
+		$scope.totalMonth = parseFloat((somma/100).toFixed(2));
 	});
 }
 $scope.openAndFocusedCell = undefined;
