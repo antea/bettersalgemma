@@ -17,7 +17,7 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location, $cookies) {
 	};
 }
 
-function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies) {
+function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 	$scope.ordini = [];
 	var week = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 	var now = new Date();
@@ -550,5 +550,12 @@ $scope.editPwChange = function () {
 $scope.logout = function () {
 	delete $cookies.user;
 	delete $rootScope.user;
+}
+$scope.makeReport = function () {
+	var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
+	lastOfMonth = lastOfMonth + "-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear;
+	firstOfMonth = "01-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear;
+	$window.open("http://salgemma.antea.bogus/salgemma/report/generate?format=pdf&dagiorno="
+		+firstOfMonth+"&agiorno="+lastOfMonth+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
 }
 }
