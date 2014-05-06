@@ -555,7 +555,7 @@ $scope.makeReport = function () {
 	var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
 	lastOfMonth = lastOfMonth + "-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear;
 	firstOfMonth = "01-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear;
-	$window.open("http://salgemma.antea.bogus/salgemma/report/generate?format=pdf&dagiorno="
+	$window.open("http://salgemma.anteash.com:8081/salgemma/report/generate?format=pdf&dagiorno="
 		+firstOfMonth+"&agiorno="+lastOfMonth+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
 }
 }
