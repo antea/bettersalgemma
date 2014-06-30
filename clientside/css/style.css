@@ -319,4 +319,8 @@ span[name="img"]{
 }
 textarea {
 	width: 50%;
+	height: 20px;
+	min-height: 20px;
+	min-width: 50%;
+	max-width: 92%;
 }
