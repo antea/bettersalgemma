@@ -1,4 +1,4 @@
-angular.module('salgemmaclientinterface', ['salgemmainterfaceFilters', 'ngCookies']).
+angular.module('salgemmaclientinterface', ['salgemmainterfaceFilters', 'ngCookies', 'ngRoute']).
 config(['$routeProvider', function ($routeProvider) {
 	$routeProvider.
 	when('/salgemmainterface/login', {templateUrl: 'pages/autenticazione.html', controller: AutenticazioneCtrl}).

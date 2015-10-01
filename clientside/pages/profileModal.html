@@ -1,99 +1,103 @@
-<div id="modalProfilo" class="modal hide fade">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3>Profilo di {{user.nome}}</h3>
-	</div>
-	<div class="modal-body">
-		<button class="btn" ng-click="userEditChange()" ng-hide="userEdit"><i class="icon-edit"></i> Modifica</button>
-		<button class="btn" ng-click="saveUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcod, editpiva)" ng-show="userEdit"><i class="icon-ok"></i> Salva</button>
-		<button class="btn" ng-click="discardUserEdit()" ng-show="userEdit"><i class="icon-remove"></i> Annulla</button>
-		<form class="form-horizontal" id="userEdit">
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputName">Nome: </label>
-				<label class="control-label" for="inputName" ng-hide="userEdit"><strong>{{user.nome}}</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputName" ng-show="userEdit" ng-model="editnome">
-				</div>
+<div id="modalProfilo" class="modal fade" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="modalExit()">&times;</button>
+				<h3>Profilo di {{user.nome}}</h3>
 			</div>
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputEmail">E-mail: </label>
-				<label class="control-label" for="inputEmail" ng-hide="userEdit"><strong>{{user.email}}</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputEmail" placeholder="Email" ng-show="userEdit" ng-model="editmail">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputCel">Cellulare: </label>
-				<label class="control-label" for="inputCel" ng-hide="userEdit"><strong>{{user.cellulare}}</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputCel" placeholder="Cellulare" ng-show="userEdit" ng-model="editcel">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputTel">Telefono: </label>
-				<label class="control-label" for="inputTel" ng-hide="userEdit"><strong>{{user.telefono}}</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputTel" placeholder="Telefono" ng-show="userEdit" ng-model="edittel">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputAddress">Indirizzo: </label>
-				<label class="control-label" for="inputAddress" ng-hide="userEdit"><strong>{{user.indirizzo}},</br>{{user.cap}} {{user.citta}}, ({{user.provincia}},{{user.nazione}})</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputAddress" placeholder="Indirizzo" ng-show="userEdit" ng-model="editaddress">
-					<input type="text" id="inputAddress" placeholder="Cap" ng-show="userEdit" ng-model="editcap">
-					<input type="text" id="inputAddress" placeholder="Città" ng-show="userEdit" ng-model="editcitta">
-					<input type="text" id="inputAddress" placeholder="Provincia" ng-show="userEdit" ng-model="editprov">
-					<input type="text" id="inputAddress" placeholder="Nazione" ng-show="userEdit" ng-model="editnazione">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputCodF">Cod.Fiscale: </label>
-				<label class="control-label" for="inputCodF" ng-hide="userEdit"><strong>{{user.codicefiscale}}</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputCodF" placeholder="Codice Fiscale" ng-show="userEdit" ng-model="editcodf">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label" id="stdLabel" for="inputPiva">P.Iva: </label>
-				<label class="control-label" for="inputPiva" ng-hide="userEdit"><strong>{{user.partitaiva}}</strong></label>
-				<div class="controls" id="inputEditUser">
-					<input type="text" id="inputPiva" placeholder="Partita Iva" ng-show="userEdit" ng-model="editpiva">
-				</div>
-			</div>
-			<div class="control-group">
-				<button class="btn" ng-click="editPwChange()" ng-hide="editpw"><i class="icon-eye-open"></i> Modifica Password</button>
-			</div>
-			<div class="well" ng-show="editpw" id="wellPw">
-				<h5>Modifica Password:</h5>
-				<div class="control-group {{oldPwWrong}}">
-					<label class="control-label" for="inputOldPw">Vecchia password: </label>
-					<div class="controls" id="inputEditPw">
-						<input type="password" id="inputOldPw" placeholder="" ng-model="editoldpw" focus-me="editpw">
-						<span ng-show="oldPwWrong" class="help-inline">Vecchia password errata</span>
+			<div class="modal-body">
+				<button class="btn btn-default" ng-click="userEditChange()" ng-hide="isUserEditing"><span class="glyphicon glyphicon-edit"></span> Modifica</button>
+				<button class="btn btn-default" ng-click="saveUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcod, editpiva)" ng-show="isUserEditing"><span class="glyphicon glyphicon-ok"></span> Salva</button>
+				<button class="btn btn-default" ng-click="discardUserEdit()" ng-show="isUserEditing"><span class="glyphicon glyphicon-remove"></span> Annulla</button>
+				<form class="form-horizontal" id="userEdit">
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputName">Nome: </label>
+						<label class="control-label" for="inputName" ng-hide="isUserEditing"><strong>{{user.nome}}</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputName" ng-show="isUserEditing" ng-model="editnome" class="form-control">
+						</div>
 					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="inputNewPw">Nuova password: </label>
-					<div class="controls" id="inputEditPw">
-						<input type="password" id="inputNewPw" placeholder="" ng-model="editnewpw">
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputEmail">E-mail: </label>
+						<label class="control-label" for="inputEmail" ng-hide="isUserEditing"><strong>{{user.email}}</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputEmail" placeholder="Email" ng-show="isUserEditing" ng-model="editmail" class="form-control">
+						</div>
 					</div>
-				</div>
-				<div class="control-group {{mismatchNewPw}}">
-					<label class="control-label" for="inputReNewPw">Reinserire nuova password: </label>
-					<div class="controls" id="inputEditPw">
-						<input type="password" id="inputReNewPw" placeholder="" ng-model="editrenewpw">
-						<span ng-show="mismatchNewPw" class="help-inline">Nuove password differenti</span>
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputCel">Cellulare: </label>
+						<label class="control-label" for="inputCel" ng-hide="isUserEditing"><strong>{{user.cellulare}}</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputCel" placeholder="Cellulare" ng-show="isUserEditing" ng-model="editcel" class="form-control">
+						</div>
 					</div>
-				</div>
-				<div class="control-group">
-					<button class="btn" ng-click="saveUserPw(editoldpw, editnewpw, editrenewpw)"><i class="icon-ok"></i> Salva</button>
-					<button class="btn" ng-click="discardUserPw()"><i class="icon-remove"></i> Annulla</button>
-				</div>
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputTel">Telefono: </label>
+						<label class="control-label" for="inputTel" ng-hide="isUserEditing"><strong>{{user.telefono}}</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputTel" placeholder="Telefono" ng-show="isUserEditing" ng-model="edittel" class="form-control">
+						</div>
+					</div>
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputAddress">Indirizzo: </label>
+						<label class="control-label" for="inputAddress" ng-hide="isUserEditing"><strong>{{user.indirizzo}},<!--/br-->{{user.cap}} {{user.citta}}, ({{user.provincia}},{{user.nazione}})</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputAddress" placeholder="Indirizzo" ng-show="isUserEditing" ng-model="editaddress" class="form-control">
+							<input type="text" id="inputAddress" placeholder="Cap" ng-show="isUserEditing" ng-model="editcap" class="form-control">
+							<input type="text" id="inputAddress" placeholder="Città" ng-show="isUserEditing" ng-model="editcitta" class="form-control">
+							<input type="text" id="inputAddress" placeholder="Provincia" ng-show="isUserEditing" ng-model="editprov" class="form-control">
+							<input type="text" id="inputAddress" placeholder="Nazione" ng-show="isUserEditing" ng-model="editnazione" class="form-control">
+						</div>
+					</div>
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputCodF">Cod.Fiscale: </label>
+						<label class="control-label" for="inputCodF" ng-hide="isUserEditing"><strong>{{user.codicefiscale}}</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputCodF" placeholder="Codice Fiscale" ng-show="isUserEditing" ng-model="editcodf" class="form-control">
+						</div>
+					</div>
+					<div class="form-group" type="userEdit">
+						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputPiva">P.Iva: </label>
+						<label class="control-label" for="inputPiva" ng-hide="isUserEditing"><strong>{{user.partitaiva}}</strong></label>
+						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+							<input type="text" id="inputPiva" placeholder="Partita Iva" ng-show="isUserEditing" ng-model="editpiva" class="form-control">
+						</div>
+					</div>
+					<div class="form-group" type="userEdit">
+						<button class="btn btn-default" ng-click="editPwChange()" ng-hide="editpw"><span class="glyphicon glyphicon-eye-open"></span> Modifica Password</button>
+					</div>
+					<div class="well" ng-show="editpw" id="wellPw">
+						<h5>Modifica Password:</h5>
+						<div class="form-group {{oldPwWrong}}" type="userEdit">
+							<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label" for="inputOldPw">Vecchia password: </label>
+							<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 controls" id="inputEditPw">
+								<input type="password" id="inputOldPw" placeholder="" ng-model="editoldpw" focus-me="editpw" class="form-control">
+								<span ng-show="oldPwWrong" class="help-inline">Vecchia password errata</span>
+							</div>
+						</div>
+						<div class="form-group" type="userEdit">
+							<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label" for="inputNewPw">Nuova password: </label>
+							<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 controls" id="inputEditPw">
+								<input type="password" id="inputNewPw" placeholder="" ng-model="editnewpw" class="form-control">
+							</div>
+						</div>
+						<div class="form-group {{mismatchNewPw}}" type="userEdit">
+							<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label" for="inputReNewPw">Reinserire nuova password: </label>
+							<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 controls" id="inputEditPw">
+								<input type="password" id="inputReNewPw" placeholder="" ng-model="editrenewpw" class="form-control">
+								<span ng-show="mismatchNewPw" class="help-inline">Nuove password differenti</span>
+							</div>
+						</div>
+						<div class="form-group" type="userEdit">
+							<button class="btn btn-default" ng-click="saveUserPw(editoldpw, editnewpw, editrenewpw)"><span class="glyphicon glyphicon-ok"></span> Salva</button>
+							<button class="btn btn-default" ng-click="discardUserPw()"><span class="glyphicon glyphicon-remove"></span> Annulla</button>
+						</div>
+					</div>
+				</form>
 			</div>
-		</form>
-	</div>
-	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal" aria-hidden="true" ng-click="$scope.userEdit=false"><i class="icon-remove"></i> Chiudi</a>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-default" data-dismiss="modal" aria-hidden="true" ng-click="modalExit()"><span class="glyphicon glyphicon-remove"></span> Chiudi</a>
+			</div>
+		</div>
 	</div>
 </div>

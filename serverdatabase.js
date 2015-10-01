@@ -5,6 +5,8 @@ var http = require('http');
 var mysql = require('mysql');
 var server = express();
 var path = require('path');
+var moment = require('moment');
+moment().locale('it');
 
 server.configure(function () {
 	server.set('port', 8585);
@@ -19,7 +21,7 @@ server.listen(server.get('port'), function(){
 
 var pool = mysql.createPool({
 	host:'mysql.antea.bogus',
-	database:'matteos',
+	database:'matteos2',
 	user:'matteos',
 	password:'matteos',
 	waitForConnections:false,
@@ -62,7 +64,7 @@ var pool = mysql.createPool({
 	Se ha successo ritorna id e descrizione di tutti gli ordini associati alla risorsa con quel particolare id nell'anno specificato.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/ordini/:userId/:year/:month', function (req, res) {
+	/*server.get('/ordini/:userId/:year/:month', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(503, err);
@@ -88,6 +90,34 @@ var pool = mysql.createPool({
 					});
 			};
 		});
+	});*/
+
+server.get('/ordini/:userId/:start/:end', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else{
+				var start = moment(req.params.start).toDate();
+				//start.setHours(2,start.getTimezoneOffset(),0,0);
+				//start = start.toISOString();
+				var end = moment(req.params.end).toDate();
+				//end.setHours(2,end.getTimezoneOffset(),0,0);
+				//end= end.toISOString();
+				connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+					'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+					'order by o.descrizione',
+					[req.params.userId,start,end,end,end],
+					function (err, results) {
+						if (err) {
+							res.send(503, err);
+						} else{
+							res.send(201, results);
+						};
+						connection.release();
+					});
+			};
+		});
 	});
 
 /*
@@ -95,7 +125,7 @@ var pool = mysql.createPool({
 	Se ha successo ritorna id e descrizione di tutte le attività collegate a quel particolare orine per quel particolare utente.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/attivita/:userId/:idordine/:year/:month', function (req, res) {
+	/*server.get('/attivita/:userId/:idordine/:year/:month', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(503, err);
@@ -122,6 +152,34 @@ var pool = mysql.createPool({
 					});
 			};
 		});
+});*/
+server.get('/attivita/:userId/:idordine/:start/:end', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else{
+				var start = moment(req.params.start).toDate();
+				//start.setHours(2,start.getTimezoneOffset(),0,0);
+				//start = start.toISOString();
+				var end = moment(req.params.end).toDate();
+				//end.setHours(2,end.getTimezoneOffset(),0,0);
+				//end= end.toISOString();
+				connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+					'WHERE p.idrisorsa=? AND r.idtabella=? AND '+
+					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) '+
+					'group by r.descrizione order by r.descrizione ',
+					[req.params.userId,req.params.idordine,start,end,end,end],
+					function (err, results) {
+						if (err) {
+							res.send(503, err);
+						} else{
+							res.send(201, results);
+						};
+						connection.release();
+					});
+			};
+		});
 });
 
 /*
@@ -129,7 +187,7 @@ var pool = mysql.createPool({
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	server.get('/storico/:userId/:monthOfYear/:idordine/:idsattivita', function (req, res) {
+	/*server.get('/storico/:userId/:monthOfYear/:idordine/:idsattivita', function (req, res) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				res.send(503, err);
@@ -144,6 +202,36 @@ var pool = mysql.createPool({
 							'JOIN ordine AS o ON r.idtabella=o.id '+
 							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione IN (?)',
 							[req.params.userId, req.params.monthOfYear, idsPianificazione],
+							function (err, results) {
+								if (err) {
+									res.send(503, err);
+								} else{
+									res.send(201, results);
+								};
+								connection.release();
+							});
+					};
+				})
+			};
+		});
+	});*/
+server.get('/storico/:userId/:start/:end/:idordine/:idsattivita', function (req, res) {
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else{
+				trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
+					if (err) {
+						connection.release();
+						res.send(503, err);
+					} else{
+						var start = moment(req.params.start).toDate();
+						var end = moment(req.params.end).toDate();
+						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
+							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
+							'JOIN ordine AS o ON r.idtabella=o.id '+
+							'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
+							[req.params.userId, start, end, idsPianificazione],
 							function (err, results) {
 								if (err) {
 									res.send(503, err);

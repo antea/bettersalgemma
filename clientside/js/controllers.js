@@ -18,16 +18,26 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location, $cookies) {
 }
 
 function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
+	$scope.selectedDate = new Date();
+	$scope.isMonthSelected = true;
+	$scope.selectedMoment = moment($scope.selectedDate);
+	//var monthTest = selectedMoment.get('month');
+	$scope.selectedMonth = $scope.selectedMoment.get('month');
+	$scope.selectedYear = $scope.selectedMoment.get('year');
 	$scope.ordini = [];
 	var week = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-	var now = new Date();
-	var thisMonth = now.getMonth();
-	var thisYear = now.getFullYear();
-	$scope.selectedMonth = thisMonth;
-	$scope.selectedYear = thisYear;
+	$scope.calendarType="month";
+	$scope.calendarPlaceholder = "yyyy-MM";
+	$scope.calendarMin = ($scope.selectedYear - 2) + "-01";
+	$scope.calendarMax = ($scope.selectedYear + 2) + "-12";
+	//var now = new Date();
+	//var thisMonth = $scope.selectedMonth;// now.getMonth();
+	//var thisYear = $scope.selectedYear;// now.getFullYear();
+	//$scope.selectedMonth = thisMonth;
+	//$scope.selectedYear = thisYear;
 
 	//Crea il piccolo calendario con 5 anni;
-	$scope.mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+	/*$scope.mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
 	$scope.anni = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
 	$scope.calendar = [];
 	$scope.anni.forEach(function (anno) {
@@ -38,26 +48,44 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 			};
 			$scope.calendar.push({year: anno, monthDescription: mese, monthNumber: index, active: active});
 		});
-	});
+});*/
 
 	//recupero informazioni dal database;
 	var retrieveInfo = function () {
 		$('#loadingDiv').show();
+
 		$scope.month = [];
-		var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
-		for (var i = 0; i < lastOfMonth; i++) {
+		var monthIndex = 0;
+		//var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
+		$scope.firstOfMoment = moment($scope.selectedMoment).startOf($scope.calendarType);
+		$scope.lastOfMoment = moment($scope.selectedMoment).endOf($scope.calendarType);
+		var firstOfMomentISO = moment($scope.firstOfMoment).toISOString();
+		var lastOfMomentISO = moment($scope.lastOfMoment).toISOString();
+		var indexMoment = moment($scope.firstOfMoment);
+		/*for (var i = firstOfMoment; i < lastOfMoment; i++) {
 			var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
 			$scope.month[i] = {number: dayi.getDate(),
 				day: week[dayi.getDay()],
 				date: dayi.getDate()+"-"+($scope.selectedMonth+1)+"-"+$scope.selectedYear,
 				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
+			};*/
+			while(moment(indexMoment).isBefore(moment($scope.lastOfMoment))) {
+				//var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
+				$scope.month[monthIndex] = {number: indexMoment.date(),
+					day: week[indexMoment.day()],
+					date: ($scope.calendarType!='month') ? indexMoment.format('ddd ll') : indexMoment.format('ddd D'),
+					isWeekend: week[indexMoment.day()]==="Sab" || week[indexMoment.day()]==="Dom" ? true : false
+				};
+				indexMoment.add(1,'d');
+				monthIndex++;
 			};
 			if ($rootScope.user) {
 				$scope.tasks = new Array();
 				var tasksNoDom = new Array();
 				var tasksNumber = 0;
 				$scope.totalTask = new Array($scope.month.length);
-				$http.get('/ordini/'+$rootScope.user.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
+				//$http.get('/ordini/'+$rootScope.user.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
+				$http.get('/ordini/'+$rootScope.user.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
 				success(function (data, status, headers, config) {
 					if (data.length==0) {
 						$('#loadingDiv').hide();
@@ -66,7 +94,8 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					$scope.ordini = data;
 					$scope.ordini.forEach(function (ordine) {
 						ordine.selected = true;
-						$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
+						//$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
+						$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
 						success(function (data, status, headers, config) {
 							if (data.length==0) {
 								$('#loadingDiv').hide();
@@ -120,35 +149,38 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 										isWeekend : $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? true: false
 									}
 								}
-								$http.get('/storico/'+$rootScope.user.id+'/'+($scope.selectedMonth+1)+
-									'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.ids).
-								success(function (data, status, headers, config) {
-									data.forEach(function (storico) {
-										var index = (new Date(storico.giorno).getDate())-1
-										storico.ore = storico.secondi/3600;
-										storico.unimis = "h";
-										storico.editable = true;
-										storico.planned = task.mese[index].planned;
-										storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
-										task.mese[index] = storico;
-									});
-									tasksNoDom.push(task);
-									$scope.calculateRowTotal(task);
-									$scope.calculateColTotal(task);
-									if (tasksNoDom.length == tasksNumber) {
-										$scope.tasks = tasksNoDom;
-										$('#loadingDiv').hide();
-									};
-								}).
-								error(function ()/*(data, status, headers, config)*/ {
-									$scope.errors = [{
-										subject: "Errore del server:",
-										description: "Riprovare, se l'errore persiste contattare l'amministratore."
-									}];
-									$('#loadingDiv').hide();
-									$('#loadedErrorDiv').show();
-								});
-							});
+								/*$http.get('/storico/'+$rootScope.user.id+'/'+($scope.selectedMonth+1)+
+									'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.ids).*/
+$http.get('/storico/'+$rootScope.user.id+'/'+firstOfMomentISO+
+	'/'+lastOfMomentISO+'/'+ordine.id+'/'+task.ids).
+success(function (data, status, headers, config) {
+	data.forEach(function (storico) {
+										//var index = (new Date(storico.giorno).getDate())-1
+										var index = (moment(storico.giorno).diff(moment($scope.firstOfMoment), 'days'));//.getDate())-1
+	storico.ore = storico.secondi/3600;
+	storico.unimis = "h";
+	storico.editable = true;
+	storico.planned = task.mese[index].planned;
+	storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
+	task.mese[index] = storico;
+});
+	tasksNoDom.push(task);
+	$scope.calculateRowTotal(task);
+	$scope.calculateColTotal(task);
+	if (tasksNoDom.length == tasksNumber) {
+		$scope.tasks = tasksNoDom;
+		$('#loadingDiv').hide();
+	};
+}).
+error(function ()/*(data, status, headers, config)*/ {
+	$scope.errors = [{
+		subject: "Errore del server:",
+		description: "Riprovare, se l'errore persiste contattare l'amministratore."
+	}];
+	$('#loadingDiv').hide();
+	$('#loadedErrorDiv').show();
+});
+});
 }).
 error(function ()/*(data, status, headers, config)*/ {
 	$scope.errors = [{
@@ -172,41 +204,41 @@ error(function ()/*(data, status, headers, config)*/ {
 };
 
 $scope.discard = function ($index, day, task, editore, editnote, scope) {
-	var myThis = scope ? scope : this;
-	myThis.editore = undefined;
-	myThis.editnote = undefined;
+	$scope.tempScope = scope ? scope : this;
+	$scope.tempScope.editore = undefined;
+	$scope.tempScope.editnote = undefined;
 	$scope.validate(this.editore);
-	myThis.editmode = false;
-	myThis.focused = false;
-	myThis.$parent.rowSelected = false;
-	myThis.innerform = $scope.emptyForm;
+	$scope.tempScope.editmode = false;
+	$scope.tempScope.focused = false;
+	$scope.tempScope.$parent.rowSelected = false;
+	$scope.tempScope.innerform = $scope.emptyForm;
 }
 
 $scope.save = function ($index, day, task, editore, editnote, scope) {
-	var myThis = scope ? scope : this;
-	if($scope.validator != "error") {
+	$scope.tempScope = scope ? scope : this;
+	if($scope.validator != "has-error") {
 		if (day.ore) {
 			if (editore !=0) {
-				$scope.edit($index, day, task, editore, editnote, myThis);
+				$scope.edit($index, day, task, editore, editnote, $scope.tempScope);
 			} else{
-				$scope.delete(day, task, $index, myThis);
+				$scope.delete(day, task, $index, $scope.tempScope);
 			};
 		} else{
 			if (editore && editore!=0) {
-				$scope.newInsert($index, day, task, editore, editnote, myThis);
+				$scope.newInsert($index, day, task, editore, editnote, $scope.tempScope);
 			};
 		};
 		$timeout(function () {
-			myThis.editmode = false;
-			myThis.focused = false;
+			$scope.tempScope.editmode = false;
+			$scope.tempScope.focused = false;
 			if (!scope) {
-				myThis.$parent.rowSelected = false;
+				$scope.tempScope.$parent.rowSelected = false;
 			};
 		});
 		$scope.refreshPopover($index, task, day);
 	} else {
 		document.getElementById("ore-"+task.ids[0]+"-"+$index).focus();
-		myThis.editnote = undefined;
+		$scope.tempScope.editnote = undefined;
 	}
 }
 $scope.edit = function ($index, day, task, editore, editnote, scope) {
@@ -240,7 +272,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote, scope) {
 	day.ore = editore;
 	day.secondi = day.ore * 3600;
 	day.unimis = "h";
-	day.giorno = $scope.selectedYear +"-"+($scope.selectedMonth+1)+"-"+($index+1);
+	day.giorno = moment($scope.firstOfMoment).add($index, 'd');//$scope.selectedYear +"-"+($scope.selectedMonth+1)+"-"+($index+1);
 	day.note = editnote;
 	var dati = {
 		idordine : task.order.id,
@@ -304,7 +336,7 @@ $scope.deselectAllOrders = function() {
 		task.order.selected = false;
 	});
 }
-$scope.next = function () {
+/*$scope.next = function () {
 	var loop = true;
 	$scope.calendar.forEach(function (calendario, index) {
 		if(loop){
@@ -337,7 +369,7 @@ $scope.prev = function () {
 			}
 		}
 	});
-}
+}*/
 $scope.focusOn = function (event, $index, task) {
 	this.focused = !this.focused;
 	this.$parent.rowSelected = !this.$parent.rowSelected;
@@ -417,7 +449,7 @@ $scope.removeFocus = function ($event) {
 	}
 }
 $scope.refreshPopover = function ($index, task, day) {
-	var myPopover = $("#form-" + task.ids[0] + "-" +$index).data('popover');
+	var myPopover = $("#form-" + task.ids[0] + "-" +$index).data('bs.popover');
 	myPopover.options.content = day.note ? day.note : undefined;
 	myPopover.options.title = day.note ? "<strong>Note:</strong>" : undefined;
 }
@@ -428,27 +460,27 @@ $scope.validate = function (editore) {
 			if(parseFloat(editore) <= 24){
 				$scope.validator = "";
 			} else {
-				$scope.validator = "error";
+				$scope.validator = "has-error";
 			}
 		} else{
-			$scope.validator = "error";
+			$scope.validator = "has-error";
 		}
 	} else {
 		$scope.validator = "";
 	}
 }
 $scope.dinamicHide = true;
-$scope.dinamicSpan = 11;
+$scope.dinamicSpan = 14;
 $scope.dinamicLabelBtn = "Visualizza Filtri ▲"
 $scope.dinamicMenuFilter = function () {
-	$scope.dinamicSpan = $scope.dinamicSpan===11 ? $scope.dinamicSpan=10 : 11;
+	$scope.dinamicSpan = $scope.dinamicSpan===14 ? $scope.dinamicSpan=10 : 14;
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 	$scope.filtersview = $scope.filtersview === $scope.emptyForm ? $scope.filtersViewing : $scope.emptyForm
 }
-$scope.editingForm = '<form class="form-horizontal" ng-show="editmode && day.editable"><div class="control-group {{validator}}"><div class="controls" name="formInput"><input name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn control-button" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"><i class="icon-ok"></i></button></div></div><div class="control-group"><div class="controls" name="formInput"><textarea name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn control-button" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"><i class="icon-remove"></i></button></div></div></form>';
+$scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:100%"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:100%"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
 $scope.emptyForm = '';
-$scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><i class="icon-list"></i> Ordini visualizzati:</h5><ul class="unstyled"><li><input type="checkbox" ng-click="selectOrDeselectAll()" checked><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
+$scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><span class="glyphicon glyphicon-th-list"></span> Ordini visualizzati:</h5><ul style="list-style-type:none; padding-left:0px;"><li><input type="checkbox" ng-click="selectOrDeselectAll()" checked><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
 $scope.filtersview = $scope.emptyForm;
 retrieveInfo();
 /*----------------- Profile Controller ---------------------------------*/
@@ -468,7 +500,7 @@ $scope.instantiatesProfileField = function () {
 	$scope.editpiva = $rootScope.user.partitaiva;
 }
 $scope.userEditChange = function () {
-	$scope.userEdit = !$scope.userEdit;
+	$scope.isUserEditing = !$scope.isUserEditing;
 }
 $scope.saveUserEdit = function (editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva) {
 	//$timeout(function () {
@@ -486,7 +518,7 @@ $scope.saveUserEdit = function (editnome, editmail, editcel, edittel, editaddres
 		$rootScope.user.partitaiva = editpiva;
 		$http.put('/edituser', $rootScope.user)
 		.success(function (argument) {
-			$scope.userEditChange();
+			$scope.isUserEditing = false;
 			console.log("Edit Successo!!");
 		})
 		.error(function (argument) {
@@ -506,7 +538,7 @@ $scope.discardUserEdit = function () {
 	this.editnazione = $rootScope.user.nazione;
 	this.editcodf = $rootScope.user.codicefiscale;
 	this.editpiva = $rootScope.user.partitaiva;
-	$scope.userEditChange();
+	$scope.isUserEditing = false;
 }
 $scope.mismatchNewPw = undefined;
 $scope.oldPwWrong = undefined;
@@ -522,17 +554,17 @@ $scope.saveUserPw = function (editoldpw, editnewpw, editrenewpw) {
 			itself.editnewpw = undefined;
 			itself.editrenewpw = undefined;
 			console.log("Password Modificata!!");
-			$scope.editPwChange();
+			$scope.editpw = false;
 		})
 		.error(function (argument) {
 			console.log("Errore cambio password!! " + argument);
 		});
 	}else{
 		if (CryptoJS.MD5(editoldpw) != $rootScope.user.password) {
-			$scope.oldPwWrong = "error";
+			$scope.oldPwWrong = "has-error";
 		}
 		if(editnewpw != editrenewpw){
-			$scope.mismatchNewPw = "error";
+			$scope.mismatchNewPw = "has-error";
 		} 
 	}
 }
@@ -542,7 +574,7 @@ $scope.discardUserPw = function () {
 	this.editrenewpw = undefined;
 	$scope.mismatchNewPw = undefined;
 	$scope.oldPwWrong = undefined;
-	$scope.editPwChange();
+	$scope.editpw = false;
 }
 $scope.editPwChange = function () {
 	$scope.editpw = !$scope.editpw;
@@ -558,4 +590,35 @@ $scope.makeReport = function () {
 	$window.open("http://salgemma.anteash.com:8080/salgemma/report/generate?format=pdf&dagiorno="
 		+firstOfMonth+"&agiorno="+lastOfMonth+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
 }
+$scope.calculateCalendar = function() {
+	$scope.selectedMoment = moment($scope.selectedDate);
+	$scope.selectedMonth = $scope.selectedMoment.get('month');
+	$scope.selectedYear = $scope.selectedMoment.get('year');
+	retrieveInfo();
+}
+$scope.calendarTypeMonth =  function() {
+	$scope.calendarType = "month";
+	$scope.isMonthSelected = true;
+	/*$scope.calendarPlaceholder = "yyyy-MM";
+	$scope.calendarMin = ($scope.selectedYear - 2) + "-01";
+	$scope.calendarMax = ($scope.selectedYear + 2) + "-12";*/
+	$scope.calculateCalendar();
+};
+$scope.calendarTypeWeek = function() {
+	$scope.calendarType = "week";
+	$scope.isMonthSelected = false;
+	/*$scope.selectedDate = "2015-W40";
+	$scope.calendarPlaceholder = "yyyy-W##";
+	$scope.calendarMin = ($scope.selectedYear - 2) + "-W01";
+	$scope.calendarMax = ($scope.selectedYear + 2) + "-W52";*/
+	$scope.calculateCalendar();
+};
+$scope.modalExit = function () {
+	if ($scope.isUserEditing) {
+		$scope.discardUserEdit();
+	};
+	if ($scope.editpw) {
+		$scope.discardUserPw();
+	};
+};
 }

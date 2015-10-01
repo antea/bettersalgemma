@@ -1,30 +1,34 @@
-<div id="infoModal" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>BetterSalgemma</h3>
-  </div>
-  <div class="modal-body">
-  <p>Benvenuti nella nuova interfaccia web di salgemma.</p>
-  <p>In questa nuova interfaccia è possibile inserire ore e note direttamente tramite tastiera:</p>
-  <ol><h5>Per inserire ore:</h5>
-    <li>Cliccare col mouse su una cella;</li>
-    <li>Inserire le ore (con al massimo due decimali separati col carattere punto['.']);</li>
-    <li>Inserire le eventuali note;</li>
-    <li>Cliccare con il mouse sul pulsante <button class="btn control-button" disabled><i class="icon-ok"></i></button>, oppure spostarsi con le frecce della tastiera direttamente nelle celle circostanti.</li>
-  </ol>
-  <p>Nel caso di utilizzo della tastiera l'interfaccia provvederà a salvare automaticamente i dati. Tale funzione non è prevista nel campo note, dove con le frecce ci si sposterà all'interno della digitazione</p>
-  <p><h5>Per annullare un inserimento</h5>Cliccare con il mouse il pulsante <button class="btn control-button" disabled><i class="icon-remove"></i></button>, oppure premere <u>Esc</u> dalla tastiera.</p>
-  <p><h5>Per eliminare un inserimento errato</h5>Digitare il numero 0 nel campo ore.</p>
-  <p><h5>Per diminuire il numero di attività visualizzate</h5>Premere il pulsante <button class="btn btn-info" disabled>Visualizza Filtri ▲</button> e selezionare gli ordini che si vogliono visualizzare</p>
-  <ul><h5>Legenda:</h5>
-    <li><img id="plannedDay" src="img/Planned.png" class="brand"> Giorno in cui l'attività è pianificata;</li>
-    <li><img id="notPlannedDay" src="img/NotPlanned.png" class="brand"> Giorno in cui l'attività non è pianificata (è possibile inserire ore);</li>
-    <li><img id="closeOrderDay" src="img/CloseOrder.png" class="brand"> Giorno in cui l'ordine risulta chiuso (per inserire ore contattare il responsabile del personale);</li>
-    <li><img id="weDay" src="img/Weekend.png" class="brand"> Weekend (è possibile inserire ore);</li>
-    <li><i class="icon-comment"></i> Sono presenti delle note, per visualizzarle posizionarsi sopra col mouse (non è necessario cliccare);</li>
-  </ul>
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i> Chiudi</a>
+<div id="infoModal" class="modal fade" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>BetterSalgemma</h3>
+      </div>
+      <div class="modal-body">
+        <p>Benvenuti nella nuova interfaccia web di salgemma.</p>
+        <p>In questa nuova interfaccia è possibile inserire ore e note direttamente tramite tastiera:</p>
+        <ol><h5>Per inserire ore:</h5>
+          <li>Cliccare col mouse su una cella;</li>
+          <li>Inserire le ore (con al massimo due decimali separati col carattere punto['.']);</li>
+          <li>Inserire le eventuali note;</li>
+          <li>Cliccare con il mouse sul pulsante <button class="btn control-button" disabled><span class="glyphicon glyphicon-ok"></span></button>, oppure spostarsi con le frecce della tastiera direttamente nelle celle circostanti.</li>
+        </ol>
+        <p>Nel caso di utilizzo della tastiera l'interfaccia provvederà a salvare automaticamente i dati. Tale funzione non è prevista nel campo note, dove con le frecce ci si sposterà all'interno della digitazione</p>
+        <p><h5>Per annullare un inserimento</h5>Cliccare con il mouse il pulsante <button class="btn control-button" disabled><span class="glyphicon glyphicon-remove"></span></button>, oppure premere <u>Esc</u> dalla tastiera.</p>
+        <p><h5>Per eliminare un inserimento errato</h5>Digitare il numero 0 nel campo ore.</p>
+        <p><h5>Per diminuire il numero di attività visualizzate</h5>Premere il pulsante <button class="btn btn-info" disabled>Visualizza Filtri ▲</button> e selezionare gli ordini che si vogliono visualizzare</p>
+        <ul><h5>Legenda:</h5>
+          <li><img id="plannedDay" src="img/Planned.png" class="brand"> Giorno in cui l'attività è pianificata;</li>
+          <li><img id="notPlannedDay" src="img/NotPlanned.png" class="brand"> Giorno in cui l'attività non è pianificata (è possibile inserire ore);</li>
+          <li><img id="closeOrderDay" src="img/CloseOrder.png" class="brand"> Giorno in cui l'ordine risulta chiuso (per inserire ore contattare il responsabile del personale);</li>
+          <li><img id="weDay" src="img/Weekend.png" class="brand"> Weekend (è possibile inserire ore);</li>
+          <li><span class="glyphicon glyphicon-comment"></span> Sono presenti delle note, per visualizzarle posizionarsi sopra col mouse (non è necessario cliccare);</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> Chiudi</a>
+      </div>
+    </div>
   </div>
 </div>

@@ -15,14 +15,16 @@ html{
 	min-height: 98%;
 	max-height: 98%;
 	width: 100%;
+	padding-left: 0px;
+	padding-right: 0px;
 	position: absolute;
 }
 #logoAnteaLogin {
 	width: 20%;
 }
 #logoAnteaCalendar {
-	width: 6%;
-	margin-left: 0.1%
+	padding-top: 1%;
+	padding-left: 2%;
 }
 #ord {
 	vertical-align: middle;
@@ -31,7 +33,7 @@ html{
 	margin-top: 50%;
 	margin-bottom: 50%;
 	background-color: #f5f5f5;
-	padding: 10%;
+	padding: 8%;
 	border-radius: 25px;
 }
 .control-label[name="authForm"]{
@@ -56,22 +58,30 @@ input[name="inputAuth"]{
 	border-radius: 5px;
 	background-color: #f5f5f5;
 }
-#outerFilters{
+/*#outerFilters{
 	background-color: #f5f5f5;
-	margin-top: 20px;
 	margin-left: 5px;
-}
+	margin-top: 1%;
+}*/
 .table-bordered {
-	padding-left: 30px;
+	/*padding-left: 30px;
 	padding-right: 30px;
 	padding-top: 30px;
 	padding-bottom: 30px;
 	margin-left: 0px;
 	margin-right: 0px;
 	margin-bottom: 0px;
-	background-color: #f5f5f5;
+	background-color: #f5f5f5;*/
+	border: 20px solid;
+	border-radius: 5px;
+	border-color: #f5f5f5;
 }
-.table td, .table th{
+.panel {
+	border: 20px solid;
+	border-radius: 5px;
+	border-color: #f5f5f5;	
+}
+.table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th{
 	margin: 4px;
 	padding: 4px;
 	padding-bottom: 1px;
@@ -123,15 +133,28 @@ td>input[type=checkbox]{
 	text-align: right;
 }
 .form-horizontal .control-group{
-	margin-bottom: 4px;
+	margin-bottom: 3%;
+}
+.form-inline {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 input[name="formInput"][type="text"]{
 	width: 50%;
+	margin-right: 5%;
 }
-.form-horizontal{
+textarea[name="formInput"][type="text"]{
+	width: 50%;
+	margin-right: 5%;
+}
+.form-horizontal .form-group {
+    margin-right: 1px;
+    margin-left: 1px;
+}/*{
 	margin-bottom: 4px;
 	margin-top: 4px;
-}
+}*/
+
 #headers{
 	background-color: #d1d1d1;
 	border: 1px solid black;
@@ -192,30 +215,62 @@ hr{
 	margin: 3px;
 	border-top: 1px solid #d1d1d1;
 }
-.container-fluid {
-	padding-left: 0%
+/*.container-fluid */
+#authContainer {
+	padding-left: 2%;
+	padding-right: 2%;
+	padding-bottom: 2%;
 }
 div[name="mainDiv"]{
-	margin-top: 3%;
+/*	margin-top: 3%;*/
 	display: block;
 	height: 100%;
 }
 div[name="notMainDiv"]{
 	height: inherit;
 }
-div[name="table"]{
-	margin-top: 20px;
+/*div[name="table"]{
+	margin-top: 1%;
 }
 h5 {
 	margin: 1px;
-}
+}*/
 form[name="form"]{
 	margin: 0px;
 }
 button[name="filterBtn"]{
-	margin-top: -40%;
-	width: 200px;
-	transform:rotate(90deg);
+	/*margin-top: -40%;
+	width: 200px;*/
+	width: 100%;
+	height: 200px;
+	/*float: left;
+	/*transform:rotate(90deg);
+	transform-origin: left bottom;
+	-webkit-transform:rotate(90deg);
+	-webkit-transform-origin: left bottom;
+	-moz-transform:rotate(90deg);
+	-moz-transform-origin: left bottom;
+	-o-transform: rotate(90deg);
+	-o-transform-origin: left bottom;
+	-ms-transform: rotate(90deg);
+	-ms-transform-origin: left bottom;*/
+}
+.col-lg-14 {
+	max-height: 92%;
+	width: 96.5%;
+	margin-bottom: 1%;
+	padding-right: 15px;
+	padding-left: 15px;
+	float:left;
+}
+.verticaltext{
+    /*width:1px;
+    word-wrap: break-word;
+    font-family: monospace; /* this is just for good looks */
+    /*white-space: pre-wrap;/* this is for displaying whitespaces including Firefox */
+    margin-top: -75px;
+    margin-left: -4px;
+    transform:rotate(90deg);
 	transform-origin: left bottom;
 	-webkit-transform:rotate(90deg);
 	-webkit-transform-origin: left bottom;
@@ -226,21 +281,17 @@ button[name="filterBtn"]{
 	-ms-transform: rotate(90deg);
 	-ms-transform-origin: left bottom;
 }
-.row-fluid .span11 {
-	max-height: 92%;
-	width: 97.5%;
-	margin-left: 1px;
-	margin-bottom: 1%;
-}
-.row-fluid .span10 {
+/*.row-fluid .span10 {
 	margin-left: 0.5%;
 	width: 84.5%;
 	margin-bottom: 1%;
-}
-.row-fluid .span1 {
-	margin-left: 0%;
-	width: 2%;
-	max-height: 96%;
+}*/
+div[name="rotatedButton"] {
+	/*margin-top: 1.6%;*/
+	width: 3.5%;
+	padding-left: 15px;
+	padding-right: 15px;
+	float: left;
 }
 .row-fluid .span2 {
 	margin-left: 0%;
@@ -248,18 +299,18 @@ button[name="filterBtn"]{
 div[name="calendarDiv"] {
 	padding-top: 0.5%;
 }
-#loadingDiv{
+/*#loadingDiv{
 	margin-left: 10%;
 	text-align: right;
 	border-radius: 10px;
 	display: inline;
-}
-#loadedErrorDiv{
+}*/
+/*#loadedErrorDiv{
 	margin-left: 10%;
 	text-align: right;
 	border-radius: 10px;
 	display: inline;
-}
+}*/
 #loadedSuccessDiv{
 	margin-left: 10%;
 	text-align: right;
@@ -267,11 +318,11 @@ div[name="calendarDiv"] {
 	display: inline;
 }
 #loadingAntea{
-	width: 90%;
-	padding-left: 1%;
-	padding-right: 0px;
+	width: 8.5%;
+	margin-left: 50%;
+	margin-right: 5%;
 }
-#inline{
+span[name="inline"] {
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -285,7 +336,7 @@ span[name="img"]{
 .modal-body {
 	max-height: 800px;
 }
-#userEdit .control-label {
+/*#userEdit .control-label {
 	text-align: left;
 	width: 55%;
 }
@@ -293,17 +344,18 @@ span[name="img"]{
 	text-align: left;
 	width: 25% !important;
 	margin-left: 5%;
-}
+}*/
 #wellPw {
 	margin-right: 0px;
 	margin-left: 0px;
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
-#inputEditUser {
-	margin-left: 30%;
+div[type="userEdit"] {
+	margin-top: 7px;
+	margin-bottom: 7px;
 }
-#modalProfilo{
+/*#modalProfilo{
 	width: 20%;
 	left: 55%;
 }
@@ -316,7 +368,7 @@ span[name="img"]{
 }
 #inputEditPw > input {
 	width: 70%;
-}
+}*/
 textarea {
 	width: 50%;
 	height: 20px;

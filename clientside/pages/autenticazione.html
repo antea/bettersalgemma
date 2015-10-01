@@ -1,37 +1,42 @@
-<div class="navbar navbar-fixed-top">
-	<div class="navbar-inner">
-		<div class="container" style="width: auto;">
-			<img id="logoAnteaLogin" src="img/Antea_logo_colore_def.png" class="brand">
-			<ul class="nav pull-right">
+<nav class="navbar navbar-default navbar-fixed-top">
+	<div class="container-fluid" id="authContainer">
+		<div class="navbar-header">
+			<a class="navbar-brand">
+				<img id="logoAnteaLogin" src="img/Antea_logo_colore_def.png" alt="Brand">
+			</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav navbar-right">
 				<li>
-					<h1>Better Salgemma</h1>
+					<h1 class="navbar-text navbar-right">Better Salgemma</h1>
 				</li>
 			</ul>
 		</div>
 	</div>
-</div>
+</nav>
 <div class="container-fluid">
 	<div class="row-fluid">
-		<div class="span4 offset4">
+		<!--div class="span4 offset4"-->
+		<div class="col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-4 col-xs-offset-4 col-lg-4 col-lg-offset-4">
 			<div id="auth">
 				<h2>Autenticazione:</h2>
 				<p>
 					<form class="form-horizontal" id="authForm">
 						<div class="control-group">
-							<label class="control-label" name="authForm" for="login"><i class="icon-user"></i></label>
+							<label class="control-label" name="authForm" for="login"><span class="glyphicon glyphicon-user"></span></label>
 							<div class="controls" name="authForm">
 								<input type="text" id="login" name="inputAuth" ng-model="userName" placeholder="UserName" autofocus="autofocus">
 							</div>
 						</div>
 						<div class="control-group">
-							<label class="control-label" name="authForm" for="password"><i class="icon-lock"></i></label>
+							<label class="control-label" name="authForm" for="password"><span class="glyphicon glyphicon-lock"></span></label>
 							<div class="controls" name="authForm">
 								<input type="password" id="password" name="inputAuth" ng-model="pw" placeholder="Password">
 							</div>
 						</div>
 						<div class="control-group">
 							<div class="controls" name="authForm">
-								<button class="btn" ng-click="submitLogin()"><i class="icon-ok"></i> OK</button>
+								<button class="btn btn-default" ng-click="submitLogin()"><span class="glyphicon glyphicon-ok"></span> OK</button>
 							</div>
 						</div>
 					</form>
