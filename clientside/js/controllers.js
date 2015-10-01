@@ -21,7 +21,6 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 	$scope.selectedDate = new Date();
 	$scope.isMonthSelected = true;
 	$scope.selectedMoment = moment($scope.selectedDate);
-	//var monthTest = selectedMoment.get('month');
 	$scope.selectedMonth = $scope.selectedMoment.get('month');
 	$scope.selectedYear = $scope.selectedMoment.get('year');
 	$scope.ordini = [];
@@ -30,25 +29,6 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 	$scope.calendarPlaceholder = "yyyy-MM";
 	$scope.calendarMin = ($scope.selectedYear - 2) + "-01";
 	$scope.calendarMax = ($scope.selectedYear + 2) + "-12";
-	//var now = new Date();
-	//var thisMonth = $scope.selectedMonth;// now.getMonth();
-	//var thisYear = $scope.selectedYear;// now.getFullYear();
-	//$scope.selectedMonth = thisMonth;
-	//$scope.selectedYear = thisYear;
-
-	//Crea il piccolo calendario con 5 anni;
-	/*$scope.mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-	$scope.anni = [thisYear-2, thisYear-1, thisYear, thisYear+1, thisYear+2];
-	$scope.calendar = [];
-	$scope.anni.forEach(function (anno) {
-		$scope.mesi.forEach(function (mese, index) {
-			var active = "";
-			if (anno === thisYear && index === thisMonth) {
-				active = "active "
-			};
-			$scope.calendar.push({year: anno, monthDescription: mese, monthNumber: index, active: active});
-		});
-});*/
 
 	//recupero informazioni dal database;
 	var retrieveInfo = function () {
@@ -62,15 +42,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 		var firstOfMomentISO = moment($scope.firstOfMoment).toISOString();
 		var lastOfMomentISO = moment($scope.lastOfMoment).toISOString();
 		var indexMoment = moment($scope.firstOfMoment);
-		/*for (var i = firstOfMoment; i < lastOfMoment; i++) {
-			var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
-			$scope.month[i] = {number: dayi.getDate(),
-				day: week[dayi.getDay()],
-				date: dayi.getDate()+"-"+($scope.selectedMonth+1)+"-"+$scope.selectedYear,
-				isWeekend: week[dayi.getDay()]==="Sab" || week[dayi.getDay()]==="Dom" ? true : false};
-			};*/
 			while(moment(indexMoment).isBefore(moment($scope.lastOfMoment))) {
-				//var dayi = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
 				$scope.month[monthIndex] = {number: indexMoment.date(),
 					day: week[indexMoment.day()],
 					date: ($scope.calendarType!='month') ? indexMoment.format('ddd ll') : indexMoment.format('ddd D'),
@@ -84,7 +56,6 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 				var tasksNoDom = new Array();
 				var tasksNumber = 0;
 				$scope.totalTask = new Array($scope.month.length);
-				//$http.get('/ordini/'+$rootScope.user.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 				$http.get('/ordini/'+$rootScope.user.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
 				success(function (data, status, headers, config) {
 					if (data.length==0) {
@@ -94,7 +65,6 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					$scope.ordini = data;
 					$scope.ordini.forEach(function (ordine) {
 						ordine.selected = true;
-						//$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+$scope.selectedYear+'/'+$scope.selectedMonth).
 						$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
 						success(function (data, status, headers, config) {
 							if (data.length==0) {
@@ -149,13 +119,10 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 										isWeekend : $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? true: false
 									}
 								}
-								/*$http.get('/storico/'+$rootScope.user.id+'/'+($scope.selectedMonth+1)+
-									'-'+$scope.selectedYear+'/'+ordine.id+'/'+task.ids).*/
 $http.get('/storico/'+$rootScope.user.id+'/'+firstOfMomentISO+
 	'/'+lastOfMomentISO+'/'+ordine.id+'/'+task.ids).
 success(function (data, status, headers, config) {
 	data.forEach(function (storico) {
-										//var index = (new Date(storico.giorno).getDate())-1
 										var index = (moment(storico.giorno).diff(moment($scope.firstOfMoment), 'days'));//.getDate())-1
 	storico.ore = storico.secondi/3600;
 	storico.unimis = "h";
@@ -272,7 +239,7 @@ $scope.newInsert = function ($index, day, task, editore, editnote, scope) {
 	day.ore = editore;
 	day.secondi = day.ore * 3600;
 	day.unimis = "h";
-	day.giorno = moment($scope.firstOfMoment).add($index, 'd');//$scope.selectedYear +"-"+($scope.selectedMonth+1)+"-"+($index+1);
+	day.giorno = moment($scope.firstOfMoment).add($index, 'd');
 	day.note = editnote;
 	var dati = {
 		idordine : task.order.id,
@@ -336,40 +303,6 @@ $scope.deselectAllOrders = function() {
 		task.order.selected = false;
 	});
 }
-/*$scope.next = function () {
-	var loop = true;
-	$scope.calendar.forEach(function (calendario, index) {
-		if(loop){
-			if(calendario.active == "active "){
-				calendario.active = "";
-				var nextCalendar = $scope.calendar[index+1];
-				nextCalendar.active = "active ";
-				$scope.selectedMonth = nextCalendar.monthNumber;
-				$scope.selectedYear = nextCalendar.year;
-				$scope.tasks = undefined;
-				retrieveInfo();
-				loop = false;
-			}
-		}
-	});
-}
-$scope.prev = function () {
-	var loop = true;
-	$scope.calendar.forEach(function (calendario, index) {
-		if(loop){
-			if(calendario.active == "active "){
-				calendario.active = "";
-				var prevCalendar = $scope.calendar[index-1];
-				prevCalendar.active = "active ";
-				$scope.selectedMonth = prevCalendar.monthNumber;
-				$scope.selectedYear = prevCalendar.year;
-				$scope.tasks = undefined;
-				retrieveInfo();
-				loop = false;
-			}
-		}
-	});
-}*/
 $scope.focusOn = function (event, $index, task) {
 	this.focused = !this.focused;
 	this.$parent.rowSelected = !this.$parent.rowSelected;
@@ -389,7 +322,6 @@ $scope.calculateRowTotal = function (task) {
 	task.total = parseFloat((task.total/100).toFixed(2));
 }
 $scope.calculateColTotal = function (task, index) {
-	//$scope.totalTask = new Array($scope.month.length);
 	if (index) {
 		$scope.totalTask[index].ore = 0;
 		$scope.tasks.forEach(function (oneTask) {
@@ -433,7 +365,6 @@ $scope.tdClick = function ($event, $index, task) {
 			self.focused = true;
 			self.$parent.rowSelected = true;
 			$scope.openAndFocusedCell = self;
-//			document.getElementById("check-"+task.ids[0]+"-"+$index).focus();
 })
 	}
 }
@@ -599,18 +530,11 @@ $scope.calculateCalendar = function() {
 $scope.calendarTypeMonth =  function() {
 	$scope.calendarType = "month";
 	$scope.isMonthSelected = true;
-	/*$scope.calendarPlaceholder = "yyyy-MM";
-	$scope.calendarMin = ($scope.selectedYear - 2) + "-01";
-	$scope.calendarMax = ($scope.selectedYear + 2) + "-12";*/
 	$scope.calculateCalendar();
 };
 $scope.calendarTypeWeek = function() {
 	$scope.calendarType = "week";
 	$scope.isMonthSelected = false;
-	/*$scope.selectedDate = "2015-W40";
-	$scope.calendarPlaceholder = "yyyy-W##";
-	$scope.calendarMin = ($scope.selectedYear - 2) + "-W01";
-	$scope.calendarMax = ($scope.selectedYear + 2) + "-W52";*/
 	$scope.calculateCalendar();
 };
 $scope.modalExit = function () {
