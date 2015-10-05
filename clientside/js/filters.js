@@ -183,6 +183,49 @@ angular.module('salgemmainterfaceFilters', [])
 			})
 		}
 	}
+})
+.directive('dayOffPopover', function ($parse) {
+	return function(scope, element, attrs) {
+		var _scope = scope;
+		$(element).popover({
+			html:true,
+			content: '<a name="popoverLink" tabindex="-1" id="dayOff-'+scope.day.day+scope.day.number+'"><span class="glyphicon glyphicon-sunglasses"></span> Segna come ferie</a>',
+			trigger: "manual",
+			placement: "right"
+		})
+		.on('click', function (scope) {
+			var _this = this;
+			$(_this).data('bs.popover').options.content = !_scope.day.ferie ? '<a name="popoverLink" tabindex="-1" id="dayOff-'+_scope.day.day+_scope.day.number+'"><span class="glyphicon glyphicon-sunglasses"></span> Segna come ferie</a>' : 
+			'<a name="popoverLink" tabindex="-1" id="dayOn-'+_scope.day.day+_scope.day.number+'"><span class="glyphicon glyphicon-eur"></span> Segna come lavorativo</a>';
+			$(this).popover('show');
+			$(this).siblings(".popover").on("mouseleave", function () {
+				$(_this).popover('hide');
+			});
+			$("#dayOff-"+_scope.day.day+_scope.day.number).on("click", function () {
+				$(_this).data('bs.popover').options.content = '<a name="popoverLink" tabindex="-1" id="dayOn-'+_scope.day.day+_scope.day.number+'"><span class="glyphicon glyphicon-eur"></span> Segna come lavorativo</a>';
+				_scope.day.ferie = true;
+				var allTasks = _scope.$parent.tasks;
+				allTasks.forEach(function (singleTask) {
+					singleTask.mese[_scope.$index].editable = false;
+					singleTask.mese[_scope.$index].ferie = true;
+					_scope.setFerie(_scope.$index, singleTask.mese[_scope.$index], singleTask, true, _scope);
+				});
+				$(_this).popover('hide');
+			});
+			$("#dayOn-"+_scope.day.day+_scope.day.number).on("click", function () {
+				$(_this).data('bs.popover').options.content = '<a name="popoverLink" tabindex="-1" id="dayOff-'+_scope.day.day+_scope.day.number+'"><span class="glyphicon glyphicon-sunglasses"></span> Segna come ferie</a>';
+				_scope.day.ferie = false;
+				var allTasks = _scope.$parent.tasks;
+				allTasks.forEach(function (singleTask) {
+					singleTask.mese[_scope.$index].editable = true;
+					singleTask.mese[_scope.$index].ferie = false;
+					_scope.setFerie(_scope.$index, singleTask.mese[_scope.$index], singleTask, false, _scope);
+				});
+				$(_this).popover('hide');
+			});
+		})
+.mouseleave(hidePopover);
+}
 });
 
 var clickSimulation = function (thisCell, scope) {
@@ -195,3 +238,23 @@ var clickSimulation = function (thisCell, scope) {
 		scope.focused = false;
 	}
 }
+
+var showPopover = function (scope) {
+	var _this = this;
+	$(this).popover('show');
+	$(this).siblings(".popover").on("mouseleave", function () {
+		$(_this).popover('hide');
+	});
+	$(this).siblings(".popover#dayOff").on("click", function () {
+		$(_this).popover({content: '<a role="menuitem" tabindex="-1" id="dayOn"><span class="glyphicon glyphicon-eur"></span> Segna come lavorativo</a>'});
+		scope.day.ferie = true;
+	});
+}
+var hidePopover = function () {
+	var _this = this;
+	setTimeout(function () {
+		if (!$(".popover:hover").length) {
+			$(_this).popover("hide")
+		}
+	}, 100);
+};

@@ -227,7 +227,7 @@ server.get('/storico/:userId/:start/:end/:idordine/:idsattivita', function (req,
 					} else{
 						var start = moment(req.params.start).toDate();
 						var end = moment(req.params.end).toDate();
-						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
+						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie '+
 							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
 							'JOIN ordine AS o ON r.idtabella=o.id '+
 							'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
@@ -275,6 +275,7 @@ server.post('/insertstorico', function (req, res) {
 							tupla.giorno= new Date(req.body.giorno);
 							tupla.secondi= req.body.secondi;
 							tupla.note= req.body.note;
+							tupla.ferie = req.body.ferie ? req.body.ferie : false;
 							connection.query('INSERT INTO storico SET ?',
 								tupla, function (err, results) {
 									if (err) {
@@ -324,10 +325,12 @@ server.put('/editstorico', function (req, res) {
 									nuovaTupla.giorno = new Date(req.body.giorno);
 									nuovaTupla.secondi = req.body.secondi;
 									nuovaTupla.note = req.body.note;
+									nuovaTupla.ferie = req.body.ferie ? req.body.ferie : false;
 									if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
 										nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
 										nuovaTupla.secondi == results[0].secondi &&
-										nuovaTupla.note == results[0].note){
+										nuovaTupla.note == results[0].note &&
+										nuovaTupla.ferie == results[0].ferie){
 										res.send(201, 'Nessuna modifica apportata, riga identica.');
 								} else{
 									connection.query('UPDATE storico SET ? WHERE id=?',

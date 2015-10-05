@@ -1,5 +1,5 @@
 <div id="infoModal" class="modal fade" role="dialog">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -8,17 +8,21 @@
       <div class="modal-body">
         <p>Benvenuti nella nuova interfaccia web di salgemma.</p>
         <p>In questa nuova interfaccia è possibile inserire ore e note direttamente tramite tastiera:</p>
-        <ol><h5>Per inserire ore:</h5>
+        <strong>Per inserire ore:</strong>
+        <ol>
           <li>Cliccare col mouse su una cella;</li>
           <li>Inserire le ore (con al massimo due decimali separati col carattere punto['.']);</li>
           <li>Inserire le eventuali note;</li>
           <li>Cliccare con il mouse sul pulsante <button class="btn control-button" disabled><span class="glyphicon glyphicon-ok"></span></button>, oppure spostarsi con le frecce della tastiera direttamente nelle celle circostanti.</li>
         </ol>
         <p>Nel caso di utilizzo della tastiera l'interfaccia provvederà a salvare automaticamente i dati. Tale funzione non è prevista nel campo note, dove con le frecce ci si sposterà all'interno della digitazione</p>
-        <p><h5>Per annullare un inserimento</h5>Cliccare con il mouse il pulsante <button class="btn control-button" disabled><span class="glyphicon glyphicon-remove"></span></button>, oppure premere <u>Esc</u> dalla tastiera.</p>
-        <p><h5>Per eliminare un inserimento errato</h5>Digitare il numero 0 nel campo ore.</p>
-        <p><h5>Per diminuire il numero di attività visualizzate</h5>Premere il pulsante <button class="btn btn-info" disabled>Visualizza Filtri ▲</button> e selezionare gli ordini che si vogliono visualizzare</p>
-        <ul><h5>Legenda:</h5>
+        <p><h5><strong>Per annullare un inserimento</strong></h5>Cliccare con il mouse il pulsante <button class="btn control-button" disabled><span class="glyphicon glyphicon-remove"></span></button>, oppure premere <u>Esc</u> dalla tastiera.</p>
+        <p><h5><strong>Per eliminare un inserimento errato</strong></h5>Digitare il numero 0 nel campo ore.</p>
+        <p><h5><strong>Per diminuire il numero di attività visualizzate</strong></h5>Premere il pulsante <button class="btn btn-info" disabled>Visualizza Filtri ▲</button> e selezionare gli ordini che si vogliono visualizzare.</p>
+        <p><h5><strong>Per visualizzare il calendario una settimana alla volta</strong></h5>Premere il pulsante <button class="btn control-button" disabled>Settimana</button>, quindi sceglierne una dal calendario. Viceversa per tornare alla modalità mensile.</p>
+        <p><h5><strong>Per impostare come giorno di ferie</strong></h5>Premere sul giorno nella tabella, quindi su <button class="btn control-button" disabled><span class="glyphicon glyphicon-sunglasses"></span>Segna come ferie</button>. Per impostare nuovamente il giorno come lavorativo seguire la stessa procedura al contrario.<strong> ATTENZIONE:</strong>Nel caso ci siano dei dati in quel giorno verranno cancellati.</p>
+        <h5><strong>Legenda:</strong></h5>
+        <ul>
           <li><img id="plannedDay" src="img/Planned.png" class="brand"> Giorno in cui l'attività è pianificata;</li>
           <li><img id="notPlannedDay" src="img/NotPlanned.png" class="brand"> Giorno in cui l'attività non è pianificata (è possibile inserire ore);</li>
           <li><img id="closeOrderDay" src="img/CloseOrder.png" class="brand"> Giorno in cui l'ordine risulta chiuso (per inserire ore contattare il responsabile del personale);</li>

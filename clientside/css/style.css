@@ -159,6 +159,9 @@ textarea[name="formInput"][type="text"]{
 .we-true{
 	color: #0000a6;
 }
+.ferie-true {
+	color: red !important;
+}
 .wend-true{
 	background-color: #d1d1d1;
 	background: #d1d1d1;
@@ -280,7 +283,7 @@ span[name="img"]{
 	margin-top: 20%;
 }
 .modal-body {
-	max-height: 800px;
+	/*max-height: 800px;*/
 }
 #wellPw {
 	margin-right: 0px;
@@ -298,4 +301,21 @@ textarea {
 	min-height: 20px;
 	min-width: 50%;
 	max-width: 92%;
+}
+.popover.right {
+	margin-left: 0px;
+}
+a[name="popoverLink"] {
+	display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+}
+a[name="popoverLink"]:hover {
+	background-color: #f5f5f5;
 }

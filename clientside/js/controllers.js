@@ -42,112 +42,114 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 		var firstOfMomentISO = moment($scope.firstOfMoment).toISOString();
 		var lastOfMomentISO = moment($scope.lastOfMoment).toISOString();
 		var indexMoment = moment($scope.firstOfMoment);
-			while(moment(indexMoment).isBefore(moment($scope.lastOfMoment))) {
-				$scope.month[monthIndex] = {number: indexMoment.date(),
-					day: week[indexMoment.day()],
-					date: ($scope.calendarType!='month') ? indexMoment.format('ddd ll') : indexMoment.format('ddd D'),
-					isWeekend: week[indexMoment.day()]==="Sab" || week[indexMoment.day()]==="Dom" ? true : false
-				};
-				indexMoment.add(1,'d');
-				monthIndex++;
+		while(moment(indexMoment).isBefore(moment($scope.lastOfMoment))) {
+			$scope.month[monthIndex] = {number: indexMoment.date(),
+				day: week[indexMoment.day()],
+				date: ($scope.calendarType!='month') ? indexMoment.format('ddd ll') : indexMoment.format('ddd D'),
+				isWeekend: week[indexMoment.day()]==="Sab" || week[indexMoment.day()]==="Dom" ? true : false
 			};
-			if ($rootScope.user) {
-				$scope.tasks = new Array();
-				var tasksNoDom = new Array();
-				var tasksNumber = 0;
-				$scope.totalTask = new Array($scope.month.length);
-				$http.get('/ordini/'+$rootScope.user.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
-				success(function (data, status, headers, config) {
-					if (data.length==0) {
-						$('#loadingDiv').hide();
-					};
-					$scope.errors = [];
-					$scope.ordini = data;
-					$scope.ordini.forEach(function (ordine) {
-						ordine.selected = true;
-						$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
-						success(function (data, status, headers, config) {
-							if (data.length==0) {
-								$('#loadingDiv').hide();
-							};
-							tasksNumber += data.length;
-							data.forEach(function (task, index, array) {
-								task.ids = task.ids.split(',');
-								task.ids.sort(function compare (firstIds, secondIds) {
-									if (firstIds < secondIds) {
-										return -1;
-									}
-									else if (firstIds > secondIds) {
-										return 1;
-									}
-									else {
-										return 0;
-									}
-								})
-								var ordineStart = new Date(ordine.datainizioprev);
-								var ordineEnd = new Date(ordine.datafineprev);
-								var taskStarts = task.dateinizioprev.split(',');
-								var taskEnds = task.datefineprev.split(',');
-								ordineStart = new Date(ordineStart.getFullYear(), ordineStart.getMonth(), ordineStart.getDate());
-								ordineEnd = new Date(ordineEnd.getFullYear(), ordineEnd.getMonth(), ordineEnd.getDate());
-								taskStarts.forEach(function (datainizioprev, index) {
-									datainizioprev = new Date(datainizioprev);
-									taskStarts[index] = new Date(datainizioprev.getFullYear(),datainizioprev.getMonth(), datainizioprev.getDate()); 
-								});
-								taskEnds.forEach(function (datafineprev, index) {
-									datafineprev = new Date(datafineprev);
-									taskEnds[index] = new Date(datafineprev.getFullYear(),datafineprev.getMonth(), datafineprev.getDate());
-								});
-								task.show = true;
-								task.order = ordine;
-								task.mese = new Array($scope.month.length);
-								for (var i = 0; i < (task.mese).length; i++) {
-									var dayOfTask = new Date($scope.selectedYear, $scope.selectedMonth, i+1);
-									var isPlanned = false;
-									var loop = true;
-									taskStarts.forEach(function (taskStart, index) {
-										if (loop) {
-											if (taskStart <= dayOfTask && taskEnds[index] > dayOfTask) {
-												isPlanned = true;
-												loop = false;
-											};
-										};
-									});
-									task.mese[i] = {
-										planned: isPlanned,
-										editable : ordineStart > dayOfTask || ordineEnd <= dayOfTask ? false : true,
-										isWeekend : $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? true: false
-									}
+			indexMoment.add(1,'d');
+			monthIndex++;
+		};
+		if ($rootScope.user) {
+			$scope.tasks = new Array();
+			var tasksNoDom = new Array();
+			var tasksNumber = 0;
+			$scope.totalTask = new Array($scope.month.length);
+			$http.get('/ordini/'+$rootScope.user.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
+			success(function (data, status, headers, config) {
+				if (data.length==0) {
+					$('#loadingDiv').hide();
+				};
+				$scope.errors = [];
+				$scope.ordini = data;
+				$scope.ordini.forEach(function (ordine) {
+					ordine.selected = true;
+					$http.get('/attivita/'+$rootScope.user.id+'/'+ordine.id+'/'+firstOfMomentISO+'/'+lastOfMomentISO).
+					success(function (data, status, headers, config) {
+						if (data.length==0) {
+							$('#loadingDiv').hide();
+						};
+						tasksNumber += data.length;
+						data.forEach(function (task, index, array) {
+							task.ids = task.ids.split(',');
+							task.ids.sort(function compare (firstIds, secondIds) {
+								if (firstIds < secondIds) {
+									return -1;
 								}
-$http.get('/storico/'+$rootScope.user.id+'/'+firstOfMomentISO+
-	'/'+lastOfMomentISO+'/'+ordine.id+'/'+task.ids).
-success(function (data, status, headers, config) {
-	data.forEach(function (storico) {
+								else if (firstIds > secondIds) {
+									return 1;
+								}
+								else {
+									return 0;
+								}
+							})
+							var ordineStart = new Date(ordine.datainizioprev);
+							var ordineEnd = new Date(ordine.datafineprev);
+							var taskStarts = task.dateinizioprev.split(',');
+							var taskEnds = task.datefineprev.split(',');
+							ordineStart = new Date(ordineStart.getFullYear(), ordineStart.getMonth(), ordineStart.getDate());
+							ordineEnd = new Date(ordineEnd.getFullYear(), ordineEnd.getMonth(), ordineEnd.getDate());
+							taskStarts.forEach(function (datainizioprev, index) {
+								datainizioprev = new Date(datainizioprev);
+								taskStarts[index] = new Date(datainizioprev.getFullYear(),datainizioprev.getMonth(), datainizioprev.getDate()); 
+							});
+							taskEnds.forEach(function (datafineprev, index) {
+								datafineprev = new Date(datafineprev);
+								taskEnds[index] = new Date(datafineprev.getFullYear(),datafineprev.getMonth(), datafineprev.getDate());
+							});
+							task.show = true;
+							task.order = ordine;
+							task.mese = new Array($scope.month.length);
+							for (var i = 0; i < (task.mese).length; i++) {
+								var dayOfTask = new Date(moment($scope.firstOfMoment).add(i,'d'));//new Date($scope.selectedYear, $scope.selectedMonth, i+1);
+								var isPlanned = false;
+								var loop = true;
+								taskStarts.forEach(function (taskStart, index) {
+									if (loop) {
+										if (taskStart <= dayOfTask && taskEnds[index] > dayOfTask) {
+											isPlanned = true;
+											loop = false;
+										};
+									};
+								});
+								task.mese[i] = {
+									planned: isPlanned,
+									editable : ordineStart > dayOfTask || ordineEnd <= dayOfTask ? false : true,
+									isWeekend : $scope.month[i].day=="Sab" || $scope.month[i].day=="Dom" ? true: false
+								}
+							}
+							$http.get('/storico/'+$rootScope.user.id+'/'+firstOfMomentISO+
+								'/'+lastOfMomentISO+'/'+ordine.id+'/'+task.ids).
+							success(function (data, status, headers, config) {
+								data.forEach(function (storico) {
 										var index = (moment(storico.giorno).diff(moment($scope.firstOfMoment), 'days'));//.getDate())-1
-	storico.ore = storico.secondi/3600;
-	storico.unimis = "h";
-	storico.editable = true;
-	storico.planned = task.mese[index].planned;
-	storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
-	task.mese[index] = storico;
-});
-	tasksNoDom.push(task);
-	$scope.calculateRowTotal(task);
-	$scope.calculateColTotal(task);
-	if (tasksNoDom.length == tasksNumber) {
-		$scope.tasks = tasksNoDom;
-		$('#loadingDiv').hide();
-	};
-}).
-error(function ()/*(data, status, headers, config)*/ {
-	$scope.errors = [{
-		subject: "Errore del server:",
-		description: "Riprovare, se l'errore persiste contattare l'amministratore."
-	}];
-	$('#loadingDiv').hide();
-	$('#loadedErrorDiv').show();
-});
-});
+								storico.ferie = storico.ferie===0 ? false : true;
+								storico.ore = storico.secondi ? storico.secondi/3600 : undefined;
+								storico.unimis = storico.secondi ? "h" : undefined;
+								storico.editable = storico.ferie === true ? false : true;
+								storico.planned = task.mese[index].planned;
+								storico.isWeekend = $scope.month[index].day=="Sab" || $scope.month[index].day=="Dom" ? true: false
+								task.mese[index] = storico;
+								$scope.month[index].ferie = storico.ferie;
+							});
+								tasksNoDom.push(task);
+								$scope.calculateRowTotal(task);
+								$scope.calculateColTotal(task);
+								if (tasksNoDom.length == tasksNumber) {
+									$scope.tasks = tasksNoDom;
+									$('#loadingDiv').hide();
+								};
+							}).
+							error(function ()/*(data, status, headers, config)*/ {
+								$scope.errors = [{
+									subject: "Errore del server:",
+									description: "Riprovare, se l'errore persiste contattare l'amministratore."
+								}];
+								$('#loadingDiv').hide();
+								$('#loadedErrorDiv').show();
+							});
+						});
 }).
 error(function ()/*(data, status, headers, config)*/ {
 	$scope.errors = [{
@@ -206,6 +208,61 @@ $scope.save = function ($index, day, task, editore, editnote, scope) {
 	} else {
 		document.getElementById("ore-"+task.ids[0]+"-"+$index).focus();
 		$scope.tempScope.editnote = undefined;
+	}
+}
+$scope.setFerie = function ($index, day, task, isFerie, scope) {
+	if (day.id) {
+		if (isFerie) {
+			var dati = {
+				id : day.id,
+				idordine : task.order.id,
+				idattivita : task.ids,
+				idrisorsa : $rootScope.user.id,
+				giorno : day.giorno,
+				secondi : null,
+				note : null,
+				ferie : true
+			}; 
+			$http.put('/editstorico', dati)
+			.success(function (argument) {
+				day.ore = undefined;
+				day.note = undefined;
+				day.unimis = undefined;
+				day.secondi = undefined;
+				$scope.calculateRowTotal(task);
+				$scope.calculateColTotal(task, $index);
+				scope.editore = undefined;
+				scope.editnote = undefined;
+				console.log("Edit Successo!!");
+			})
+			.error(function (argument) {
+				console.log("Errore edit!! " + argument);
+			});
+		} else {
+			$scope.delete(day, task, $index, scope);
+		}
+	} else {
+		var dati = {
+			idordine : task.order.id,
+			idattivita : task.ids,
+			idrisorsa : $rootScope.user.id,
+			giorno : moment($scope.firstOfMoment).add($index, 'd'),
+			secondi : undefined,
+			note : undefined,
+			ferie : true
+		};
+		$http.post('/insertstorico', dati)
+		.success(function (argument) {
+			$scope.calculateRowTotal(task);
+			$scope.calculateColTotal(task, $index);
+			day.id = argument.insertId;
+			scope.editore = undefined;
+			scope.editnote = undefined;
+			console.log("Inserimento effettuato con successo.\n");
+		})
+		.error(function (argument) {
+			console.log("Errore!! " + argument);
+		});
 	}
 }
 $scope.edit = function ($index, day, task, editore, editnote, scope) {
@@ -365,7 +422,7 @@ $scope.tdClick = function ($event, $index, task) {
 			self.focused = true;
 			self.$parent.rowSelected = true;
 			$scope.openAndFocusedCell = self;
-})
+		})
 	}
 }
 $scope.removeFocus = function ($event) {
