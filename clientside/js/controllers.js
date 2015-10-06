@@ -459,9 +459,11 @@ $scope.validate = function (editore) {
 }
 $scope.dinamicHide = true;
 $scope.dinamicSpan = 14;
+$scope.dinamicSpanSm = 14;
 $scope.dinamicLabelBtn = "Visualizza Filtri ▲"
 $scope.dinamicMenuFilter = function () {
 	$scope.dinamicSpan = $scope.dinamicSpan===14 ? $scope.dinamicSpan=10 : 14;
+	$scope.dinamicSpanSm = $scope.dinamicSpanSm===14 ? $scope.dinamicSpanSm=9 : 14;
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 	$scope.filtersview = $scope.filtersview === $scope.emptyForm ? $scope.filtersViewing : $scope.emptyForm
