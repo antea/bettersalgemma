@@ -35,6 +35,8 @@ html{
 	background-color: #f5f5f5;
 	padding: 8%;
 	border-radius: 25px;
+	float: left;
+	width: 100%;
 }
 .control-label[name="authForm"]{
 	float: left;
