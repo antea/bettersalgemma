@@ -61,8 +61,8 @@
 		<div class="col-xs-3 col-sm-3 col-md-3 col-lg-2" ng-hide="dinamicHide" id="outerFilters" changeform template="{{filtersview}}">
 		</div>
 		<div class="col-xs-{{dinamicSpanSm}} col-sm-{{dinamicSpanSm}} col-md-{{dinamicSpanSm}} col-lg-{{dinamicSpan}}" name="table" id="loadedDiv" ng-cloak>
-			<div class="panel panel-default">
-				<table class="table table-bordered" ng-cloak>
+			<div class="panel panel-default" id="tablePanel" style="{{panelHeight}}">
+				<table class="table table-bordered" ng-cloak id="innerTable">
 					<thead ng-cloak>
 						<tr>
 							<th id="headers" name="headers">Ordine</th>

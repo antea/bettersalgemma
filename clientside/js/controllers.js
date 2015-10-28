@@ -139,17 +139,22 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 								if (tasksNoDom.length == tasksNumber) {
 									$scope.tasks = tasksNoDom;
 									$('#loadingDiv').hide();
+									$timeout(function () {
+										if ($('#innerTable').height() > $('#loadedDiv').height()) {
+											$scope.panelHeight = "height: 100%";
+										}
+									});
 								};
 							}).
-							error(function ()/*(data, status, headers, config)*/ {
-								$scope.errors = [{
-									subject: "Errore del server:",
-									description: "Riprovare, se l'errore persiste contattare l'amministratore."
-								}];
-								$('#loadingDiv').hide();
-								$('#loadedErrorDiv').show();
-							});
-						});
+error(function ()/*(data, status, headers, config)*/ {
+	$scope.errors = [{
+		subject: "Errore del server:",
+		description: "Riprovare, se l'errore persiste contattare l'amministratore."
+	}];
+	$('#loadingDiv').hide();
+	$('#loadedErrorDiv').show();
+});
+});
 }).
 error(function ()/*(data, status, headers, config)*/ {
 	$scope.errors = [{
