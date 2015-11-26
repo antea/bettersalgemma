@@ -224,8 +224,8 @@ $scope.setFerie = function ($index, day, task, isFerie, scope) {
 				idattivita : task.ids,
 				idrisorsa : $rootScope.user.id,
 				giorno : day.giorno,
-				secondi : null,
-				note : null,
+				secondi : 0,
+				note : undefined,
 				ferie : true
 			}; 
 			$http.put('/editstorico', dati)
@@ -252,7 +252,7 @@ $scope.setFerie = function ($index, day, task, isFerie, scope) {
 			idattivita : task.ids,
 			idrisorsa : $rootScope.user.id,
 			giorno : moment($scope.firstOfMoment).add($index, 'd'),
-			secondi : undefined,
+			secondi : 0,
 			note : undefined,
 			ferie : true
 		};
