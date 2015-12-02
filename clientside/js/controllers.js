@@ -479,6 +479,43 @@ $scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editabl
 $scope.emptyForm = '';
 $scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><span class="glyphicon glyphicon-th-list"></span> Ordini visualizzati:</h5><ul style="list-style-type:none; padding-left:0px;"><li><input type="checkbox" ng-click="selectOrDeselectAll()" checked><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
 $scope.filtersview = $scope.emptyForm;
+var checkDatePicker = function () {
+	var monthPicker = $('#inputMonth')[0];
+	var weekPicker = $('#inputWeek')[0];
+	if (monthPicker.type === 'text' || weekPicker.type === 'text') {
+		$('#inputMonth').datepicker({
+			dateFormat: "yy-mm",
+			changeMonth: true,
+			changeYear: true,
+			constrainInput: true,
+			minDate: new Date($scope.calendarMin),
+			maxDate: new Date($scope.calendarMax),
+			onChangeMonthYear: function(y, m, inst) { 
+				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+				$(this).datepicker('setDate', new Date(year, month, 1));
+				$(this).datepicker('option', 'defaultDate', new Date(year, month, 1));
+				$scope.selectedDate = new Date(year, month, 1);
+				$scope.calculateCalendar();
+				$(this).datepicker("hide");
+			},
+			onClose: function (input, inst) {
+				$(this).datepicker('setDate', moment($scope.selectedMoment).toDate());
+				$('#inputMonth').blur();
+			},
+			beforeShow: function (input,inst) {
+				$(".ui-datepicker-prev, .ui-datepicker-next").remove();
+			}
+		}).focus(function() {
+			$(".ui-datepicker-prev, .ui-datepicker-next").remove();
+		});
+		$('#inputWeek').datepicker({
+			dateFormat: "yy-W##"
+			//calculateWeek: myWeekCalc
+		});
+	};
+}
+checkDatePicker();
 retrieveInfo();
 /*----------------- Profile Controller ---------------------------------*/
 $scope.editpw = false;
