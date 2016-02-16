@@ -579,11 +579,24 @@ $scope.logout = function () {
 	delete $rootScope.user;
 }
 $scope.makeReport = function () {
-	var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
-	lastOfMonth = lastOfMonth + "-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear;
-	firstOfMonth = "01-" + ($scope.selectedMonth+1) + "-" + $scope.selectedYear;
+	var reportFormat = "DD-MM-YYYY";
+	var firstVisualizedMoment = moment($scope.firstOfMoment);
+	var lastVisualizedMoment = moment($scope.lastOfMoment);
 	$window.open("http://salgemma.anteash.com:8080/salgemma/report/generate?format=pdf&dagiorno="
-		+firstOfMonth+"&agiorno="+lastOfMonth+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
+		+firstVisualizedMoment.format(reportFormat)+"&agiorno="+lastVisualizedMoment.format(reportFormat)
+		+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
+}
+$scope.initializeReportDate = function () {
+	$scope.editFromDate = moment($scope.firstOfMoment).toDate();
+	$scope.editToDate = moment($scope.lastOfMoment).toDate();
+}
+$scope.makePersonalizedReport = function (editFromDate, editToDate) {
+	var reportFormat = "DD-MM-YYYY";
+	var fromMomentReport = moment(editFromDate);
+	var toMomentReport = moment(editToDate);
+	$window.open("http://salgemma.anteash.com:8080/salgemma/report/generate?format=pdf&dagiorno="
+		+fromMomentReport.format(reportFormat)+"&agiorno="+toMomentReport.format(reportFormat)
+		+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
 }
 $scope.calculateCalendar = function() {
 	$scope.selectedMoment = moment($scope.selectedDate);

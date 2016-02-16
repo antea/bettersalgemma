@@ -42,6 +42,7 @@
 							<a role="menuitem" tabindex="-1" href="" data-target="#infoModal" data-toggle="modal"><span class="glyphicon glyphicon-info-sign"></span> Info</a>
 							<a role="menuitem" tabindex="-1" href="" data-target="#modalProfilo" data-toggle="modal" ng-click="instantiatesProfileField()"><span class="glyphicon glyphicon-user"></span> Profilo</a>
 							<a role="menuitem" tabindex="-1" href="" ng-click="makeReport()"><span class="glyphicon glyphicon-print"></span> Stampa report</a>
+							<a role="menuitem" tabindex="-1" href="" data-target="#modalReport" data-toggle="modal" ng-click="initializeReportDate()"><span class="glyphicon glyphicon-print"></span> Stampa report(Personalizzato)</a>
 						</li>
 						<li role="separator" class="divider"></li>
 						<li role="presentation">
@@ -55,6 +56,7 @@
 </nav>
 <div ng-include src="'/pages/profileModal.html'"></div>
 <div ng-include src="'/pages/infoModal.html'"></div>
+<div ng-include src="'/pages/reportModal.html'"></div>
 <div name="mainDiv" id="bigDiv" class="container-fluid" ng-click="removeFocus($event)">
 	<div class="row-fluid" name="notMainDiv">
 		<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" ng-show="dinamicHide" name="rotatedButton"><button class="btn btn-info" ng-click="dinamicMenuFilter()" name="filterBtn"><p class="verticaltext">{{dinamicLabelBtn}}</p></button></div>
