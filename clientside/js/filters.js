@@ -226,6 +226,31 @@ angular.module('salgemmainterfaceFilters', [])
 		})
 .mouseleave(hidePopover);
 }
+})
+.directive('fixedHeader', function ($timeout, $window) {
+	return {
+		restrict: 'A',
+		link: function ($scope, $elem, $attrs, $ctrl) {
+			var elem = $elem[0];
+			angular.element($window).bind('resize', function(){
+				$scope.redrawTable();
+			});
+
+			/* wait for data to load and then transform the table*/
+			$scope.$watch(tableDataLoaded, function(isTableDataLoaded) {
+				if (isTableDataLoaded) {
+					$scope.redrawTable();
+				}
+			});
+
+			function tableDataLoaded() {
+				/* First cell in the tbody exists when data is loaded but doesn't have a width
+				until after the table is transformed*/
+				var firstCell = elem.querySelector('tbody tr:first-child td:first-child');
+				return firstCell && !firstCell.style.width;
+			}
+		}
+	}
 });
 
 var clickSimulation = function (thisCell, scope) {

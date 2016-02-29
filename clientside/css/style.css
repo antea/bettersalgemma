@@ -67,10 +67,12 @@ input[name="inputAuth"]{
 	border-color: #f5f5f5;
 }
 .panel {
+	max-height: 100%;
 	border: 20px solid;
 	border-radius: 5px;
 	border-color: #f5f5f5;
-	overflow: auto;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th{
 	margin: 4px;
@@ -139,8 +141,8 @@ textarea[name="formInput"][type="text"]{
 	margin-right: 5%;
 }
 .form-horizontal .form-group {
-    margin-right: 1px;
-    margin-left: 1px;
+	margin-right: 1px;
+	margin-left: 1px;
 }
 
 #headers{
@@ -243,15 +245,15 @@ button[name="filterBtn"]{
     margin-top: -75px;
     margin-left: -4px;
     transform:rotate(90deg);
-	transform-origin: left bottom;
-	-webkit-transform:rotate(90deg);
-	-webkit-transform-origin: left bottom;
-	-moz-transform:rotate(90deg);
-	-moz-transform-origin: left bottom;
-	-o-transform: rotate(90deg);
-	-o-transform-origin: left bottom;
-	-ms-transform: rotate(90deg);
-	-ms-transform-origin: left bottom;
+    transform-origin: left bottom;
+    -webkit-transform:rotate(90deg);
+    -webkit-transform-origin: left bottom;
+    -moz-transform:rotate(90deg);
+    -moz-transform-origin: left bottom;
+    -o-transform: rotate(90deg);
+    -o-transform-origin: left bottom;
+    -ms-transform: rotate(90deg);
+    -ms-transform-origin: left bottom;
 }
 div[name="rotatedButton"] {
 	width: 3.5%;
@@ -312,15 +314,29 @@ textarea {
 }
 a[name="popoverLink"] {
 	display: block;
-    padding: 3px 20px;
-    clear: both;
-    font-weight: 400;
-    line-height: 1.42857143;
-    color: #333;
-    white-space: nowrap;
-    cursor: pointer;
-    text-decoration: none;
+	padding: 3px 20px;
+	clear: both;
+	font-weight: 400;
+	line-height: 1.42857143;
+	color: #333;
+	white-space: nowrap;
+	cursor: pointer;
+	text-decoration: none;
 }
 a[name="popoverLink"]:hover {
 	background-color: #f5f5f5;
 }
+#innerTable {
+	max-height: 100%;
+	height: 100%;
+}
+.panel>.table-bordered>tbody>tr:last-child>td {
+	border-bottom: 1px solid black;
+}
+/*tbody {
+	height: 100%;
+	max-height: 100%;
+	display: block;
+	overflow-y: auto;
+	overflow-x: hidden;
+}*/
