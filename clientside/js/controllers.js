@@ -422,6 +422,7 @@ $scope.tdClick = function ($event, $index, task) {
 			self.focused = true;
 			self.$parent.rowSelected = true;
 			$scope.openAndFocusedCell = self;
+			$scope.redrawTable();
 		})
 	}
 }
@@ -468,7 +469,7 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicHide = !$scope.dinamicHide;
 	$scope.filtersview = $scope.filtersview === $scope.emptyForm ? $scope.filtersViewing : $scope.emptyForm
 }
-$scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:100%"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:100%"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
+$scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:150px"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:150px"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
 $scope.emptyForm = '';
 $scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><span class="glyphicon glyphicon-th-list"></span> Ordini visualizzati:</h5><ul style="list-style-type:none; padding-left:0px;"><li><input type="checkbox" ng-click="selectOrDeselectAll()" checked><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
 $scope.filtersview = $scope.emptyForm;

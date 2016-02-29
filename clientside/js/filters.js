@@ -150,6 +150,7 @@ angular.module('salgemmainterfaceFilters', [])
 						scope.$parent.$parent.discard(scope.$index, scope.day, scope.$parent.task, scope.editore, scope.editnote, scope);
 					});
 				};
+				scope.redrawTable();
 			};
 		});
 }
