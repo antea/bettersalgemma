@@ -237,6 +237,14 @@ button[name="filterBtn"]{
 	padding-left: 15px;
 	float:left;
 }
+.col-lg-10 {
+	max-height: 92%;
+	height: 100%;
+	margin-bottom: 1%;
+	padding-right: 15px;
+	padding-left: 15px;
+	float:left;
+}
 .verticaltext{
     /*width:1px;
     word-wrap: break-word;

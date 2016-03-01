@@ -468,6 +468,7 @@ $scope.dinamicMenuFilter = function () {
 	$scope.dinamicLabelBtn = $scope.dinamicLabelBtn==="Visualizza Filtri ▲" ? $scope.dinamicLabelBtn="Nascondi Filtri ◄" : "Visualizza Filtri ▲";
 	$scope.dinamicHide = !$scope.dinamicHide;
 	$scope.filtersview = $scope.filtersview === $scope.emptyForm ? $scope.filtersViewing : $scope.emptyForm
+	$scope.redrawTable();
 }
 $scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:150px"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:150px"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
 $scope.emptyForm = '';
@@ -637,8 +638,8 @@ $scope.redrawTable = function () {
 		}
 		if (isTableTooHeight) {
 			/* set widths of columns*/
-			var bandHeight = angular.element(table.querySelector('thead'))[0].clientHeight;
-			var bandWidth = angular.element(table.querySelector('thead'))[0].offsetWidth + 1;
+			var headerHeight = angular.element(table.querySelector('thead'))[0].clientHeight;
+			var headerWidth = angular.element(table.querySelector('thead'))[0].offsetWidth + 1;
 			angular.forEach(table.querySelectorAll('tr:first-child th'), function (thElem, i) {
 
 				var tdElems = table.querySelector('tbody tr:first-child td:nth-child(' + (i + 1) + ')');
@@ -650,7 +651,7 @@ $scope.redrawTable = function () {
 				}
 				if (thElem) {
 					thElem.style.width = columnWidth + 'px';
-					thElem.style.height = bandHeight + 'px';
+					thElem.style.height = headerHeight + 'px';
 				}
 				if (tfElems) {
 					tfElems.style.width = columnWidth + 'px';
@@ -660,7 +661,7 @@ $scope.redrawTable = function () {
 			/* set css styles on thead and tbody*/
 			angular.element(table.querySelectorAll('thead, tfoot')).css({
 				'display': 'block',
-				'width' : bandWidth + 'px'
+				'width' : headerWidth + 'px'
 			});
 			var fixedHeight = table.querySelector('thead').offsetHeight + table.querySelector('tfoot').offsetHeight;
 			var heightPanel = angular.element(table).parent()[0].clientHeight;
@@ -668,7 +669,7 @@ $scope.redrawTable = function () {
 			angular.element(table.querySelectorAll('tbody')).css({
 				'display': 'block',
 				'height': heightPanel - fixedHeight + 'px',
-				'width' : bandWidth + 'px',
+				'width' : headerWidth + 'px',
 				'overflow': 'auto'
 			});
 
