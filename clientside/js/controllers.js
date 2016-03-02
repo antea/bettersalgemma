@@ -437,6 +437,7 @@ $scope.removeFocus = function ($event) {
 			$scope.openAndFocusedCell.editmode = false;
 			$scope.openAndFocusedCell.focused = false;
 			$scope.openAndFocusedCell.$parent.rowSelected = false;
+			$scope.redrawTable();
 		};
 	}
 }
