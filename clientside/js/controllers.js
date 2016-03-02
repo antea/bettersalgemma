@@ -182,6 +182,7 @@ $scope.discard = function ($index, day, task, editore, editnote, scope) {
 	$scope.tempScope.focused = false;
 	$scope.tempScope.$parent.rowSelected = false;
 	$scope.tempScope.innerform = $scope.emptyForm;
+	$scope.redrawTable();
 }
 
 $scope.save = function ($index, day, task, editore, editnote, scope) {
@@ -204,6 +205,7 @@ $scope.save = function ($index, day, task, editore, editnote, scope) {
 			if (!scope) {
 				$scope.tempScope.$parent.rowSelected = false;
 			};
+			$scope.redrawTable();
 		});
 		$scope.refreshPopover($index, task, day);
 	} else {
