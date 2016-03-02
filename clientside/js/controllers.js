@@ -19,6 +19,7 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location, $cookies) {
 
 function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 	$scope.selectedDate = new Date();
+	$scope.isXOverflow = false;
 	$scope.isMonthSelected = true;
 	$scope.selectedMoment = moment($scope.selectedDate);
 	$scope.selectedMonth = $scope.selectedMoment.get('month');
@@ -630,6 +631,13 @@ $scope.redrawTable = function () {
 	angular.element(table.querySelectorAll('thead th')).css('display', '');
 	angular.element(table.querySelectorAll('thead, tbody, tfoot')).css('box-sizing', 'boreder-box');
 	angular.element(document.querySelectorAll('#tablePanel')).css('height', '100%');
+	$scope.isXOverflow = false;
+
+	$timeout(function() {
+		if ($('#innerTable').width() > $('#loadedDiv').width()) {
+			$scope.isXOverflow = true;
+		}
+	});
 
 	/* wrap in $timeout to give table a chance to finish rendering*/
 	$timeout(function () {
