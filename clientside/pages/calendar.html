@@ -7,9 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand">
-				<img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" alt"Brand" class="navbar-brand">
-			</a>
+			<a class="navbar-brand"><img id="logoAnteaCalendar" src="img/Antea_logo_colore_def.png" alt"Brand" class="img-responsive"></a>
 		</div>
 		<div class="collapse navbar-collapse" id="calendarNavCollapse">
 			<form class="navbar-form navbar-left">
@@ -72,8 +70,8 @@
 							<th ng-repeat="day in month" id="headers" name="headers"><form day-off-popover>
 								<label class="we-{{day.isWeekend}} ferie-{{day.ferie}}">{{day.date}}</label>
 							</form></th>
-							<th id="headers" name="headers" ng-show="isXOverflow">Attività</th>
-							<th id="headers" name="headers" ng-show="isXOverflow">Ordine</th>
+							<th id="headers" name="headers" ng-if="isXOverflow">Attività</th>
+							<th id="headers" name="headers" ng-if="isXOverflow">Ordine</th>
 							<th id="headers" name="headers">Totale</th>
 						</tr>
 					</thead>
@@ -89,19 +87,19 @@
 								</form>
 								<form class="form-horizontal" ng-show="editmode && day.editable" changeform template="{{innerform}}"></form>
 							</td>
-							<td id="headers" ng-show="isXOverflow"><h5>{{task.descrizione}}</h5></td>
-							<td id="headers" ng-show="isXOverflow"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
+							<td id="headers" ng-if="isXOverflow"><h5>{{task.descrizione}}</h5></td>
+							<td id="headers" ng-if="isXOverflow"><h5 ng-show="task.show">{{task.order.descrizione}}</h5></td>
 							<td id="headers" name="headers"><h5>{{task.total}}</h5></td>
 						</tr>
 					</tbody>
 					<tfoot ng-cloak>
 						<tr>
-							<td id="headers" name="headers">Totale</td>
-							<td id="headers" name="headers"><h5>Totale</h5></td>
-							<td ng-repeat="taskDay in totalTask track by $index" id="headers" name="headers"><h5>{{taskDay.ore}}</h5></td>
-							<td id="headers" name="headers" ng-show="isXOverflow">Totale</td>
-							<td id="headers" name="headers" ng-show="isXOverflow"><h5>Totale</h5></td>
-							<td id="headers" name="headers">{{totalMonth}}</td>
+							<th id="headers" name="headers"><h5>Totale</h5></td>
+							<th id="headers" name="headers"><h5>Totale</h5></td>
+							<th ng-repeat="taskDay in totalTask track by $index" id="headers" name="headers"><h5>{{taskDay.ore}}</h5></td>
+							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Totale</h5></td>
+							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Totale</h5></td>
+							<th id="headers" name="headers"><h5>{{totalMonth}}</h5></td>
 						</tr>
 					</tfoot>
 				</table>

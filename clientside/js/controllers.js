@@ -474,7 +474,7 @@ $scope.dinamicMenuFilter = function () {
 	$scope.filtersview = $scope.filtersview === $scope.emptyForm ? $scope.filtersViewing : $scope.emptyForm
 	$scope.redrawTable();
 }
-$scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:150px"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:150px"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
+$scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:250px"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:250px"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
 $scope.emptyForm = '';
 $scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><span class="glyphicon glyphicon-th-list"></span> Ordini visualizzati:</h5><ul style="list-style-type:none; padding-left:0px;"><li><input type="checkbox" ng-click="selectOrDeselectAll()" checked><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
 $scope.filtersview = $scope.emptyForm;
@@ -624,6 +624,7 @@ $scope.modalExit = function () {
 	};
 };
 $scope.redrawTable = function () {
+	$scope.isXOverflow = false;
 	var table = angular.element(document.querySelector('table:first-child'))[0];
 	/* reset display styles so column widths are correct when measured below*/
 	angular.element(table.querySelectorAll('thead, tbody, tfoot')).css({
@@ -631,30 +632,29 @@ $scope.redrawTable = function () {
 		'width':'',
 		'height':''
 	});
-	angular.element(table.querySelectorAll('thead th')).css('display', '');
+	angular.element(table.querySelectorAll('thead th, tfoot th, tbody td')).css({'display': '', 'width': '', 'height':''});
 	angular.element(table.querySelectorAll('thead, tbody, tfoot')).css('box-sizing', 'boreder-box');
-	angular.element(document.querySelectorAll('#tablePanel')).css('height', '100%');
-	$scope.isXOverflow = false;
+	angular.element(document.querySelectorAll('#tablePanel')).css({'height': '100%'});
 
 	$timeout(function() {
-		if ($('#innerTable').width() > $('#loadedDiv').width()) {
+		if (table.scrollWidth > $('#tablePanel').width()) {
 			$scope.isXOverflow = true;
 		}
 	});
 
 	/* wrap in $timeout to give table a chance to finish rendering*/
 	$timeout(function () {
-		if ($('#innerTable').height() > $('#loadedDiv').height()) {
+		if (table.scrollHeight > $('#tablePanel').height()) {
 			var isTableTooHeight = true;
 		}
 		if (isTableTooHeight) {
 			/* set widths of columns*/
 			var headerHeight = angular.element(table.querySelector('thead'))[0].clientHeight;
-			var headerWidth = angular.element(table.querySelector('thead'))[0].offsetWidth + 1;
+			var headerWidth = angular.element(table.querySelector('thead'))[0].scrollWidth + 1;
 			angular.forEach(table.querySelectorAll('tr:first-child th'), function (thElem, i) {
 
 				var tdElems = table.querySelector('tbody tr:first-child td:nth-child(' + (i + 1) + ')');
-				var tfElems = table.querySelector('tfoot tr:first-child td:nth-child(' + (i + 1) + ')');
+				var tfElems = table.querySelector('tfoot tr:first-child th:nth-child(' + (i + 1) + ')');
 
 				var columnWidth = tdElems ? tdElems.offsetWidth : thElem.offsetWidth;
 				if (tdElems) {
@@ -676,7 +676,6 @@ $scope.redrawTable = function () {
 			});
 			var fixedHeight = table.querySelector('thead').offsetHeight + table.querySelector('tfoot').offsetHeight;
 			var heightPanel = angular.element(table).parent()[0].clientHeight;
-
 			angular.element(table.querySelectorAll('tbody')).css({
 				'display': 'block',
 				'height': heightPanel - fixedHeight + 'px',

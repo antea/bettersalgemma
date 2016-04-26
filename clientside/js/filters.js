@@ -74,6 +74,7 @@ angular.module('salgemmainterfaceFilters', [])
 								}
 							};
 						};
+						scope.redrawTable();
 					});
 				} //down
 				else if (e.keyCode == 40) { 
@@ -99,6 +100,7 @@ angular.module('salgemmainterfaceFilters', [])
 								}
 							};
 						};
+						scope.redrawTable();
 					});
 				} //right
 				else if (e.keyCode == 39) {
@@ -120,6 +122,7 @@ angular.module('salgemmainterfaceFilters', [])
 								};
 							};
 						};
+						scope.redrawTable();
 					});
 				} //left
 				else if (e.keyCode == 37){ 
@@ -141,6 +144,7 @@ angular.module('salgemmainterfaceFilters', [])
 								};
 							};
 						};
+						scope.redrawTable();
 					});
 				} else if (e.keyCode == 27) {
 					$timeout(function () {
@@ -148,9 +152,9 @@ angular.module('salgemmainterfaceFilters', [])
 						scope.focused = !scope.focused;
 						scope.$parent.rowSelected = false;
 						scope.$parent.$parent.discard(scope.$index, scope.day, scope.$parent.task, scope.editore, scope.editnote, scope);
+						scope.redrawTable();
 					});
 				};
-				scope.redrawTable();
 			};
 		});
 }
