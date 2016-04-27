@@ -238,12 +238,14 @@ angular.module('salgemmainterfaceFilters', [])
 		link: function ($scope, $elem, $attrs, $ctrl) {
 			var elem = $elem[0];
 			angular.element($window).bind('resize', function(){
-				$scope.redrawTable();
+				if (!$scope.isJustRedrawing) {
+					$scope.redrawTable();
+				};
 			});
 
 			/* wait for data to load and then transform the table*/
 			$scope.$watch(tableDataLoaded, function(isTableDataLoaded) {
-				if (isTableDataLoaded) {
+				if (isTableDataLoaded && !$scope.isJustRedrawing) {
 					$scope.redrawTable();
 				}
 			});

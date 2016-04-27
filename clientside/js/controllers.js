@@ -20,6 +20,7 @@ function AutenticazioneCtrl ($rootScope, $scope, $http, $location, $cookies) {
 function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 	$scope.selectedDate = new Date();
 	$scope.isXOverflow = false;
+	$scope.isJustRedrawing = false;
 	$scope.isMonthSelected = true;
 	$scope.selectedMoment = moment($scope.selectedDate);
 	$scope.selectedMonth = $scope.selectedMoment.get('month');
@@ -624,6 +625,7 @@ $scope.modalExit = function () {
 	};
 };
 $scope.redrawTable = function () {
+	$scope.isJustRedrawing = true;
 	$scope.isXOverflow = false;
 	var table = angular.element(document.querySelector('table:first-child'))[0];
 	/* reset display styles so column widths are correct when measured below*/
@@ -636,62 +638,62 @@ $scope.redrawTable = function () {
 	angular.element(table.querySelectorAll('thead, tbody, tfoot')).css('box-sizing', 'boreder-box');
 	angular.element(document.querySelectorAll('#tablePanel')).css({'height': '100%'});
 
-	$timeout(function() {
+	/* wrap in $timeout to give table a chance to finish rendering*/
+	$timeout(function () {
 		if (table.scrollWidth > $('#tablePanel').width()) {
 			$scope.isXOverflow = true;
 		}
-	});
-
-	/* wrap in $timeout to give table a chance to finish rendering*/
-	$timeout(function () {
-		if (table.scrollHeight > $('#tablePanel').height()) {
-			var isTableTooHeight = true;
-		}
-		if (isTableTooHeight) {
-			/* set widths of columns*/
-			var headerHeight = angular.element(table.querySelector('thead'))[0].clientHeight;
-			var headerWidth = angular.element(table.querySelector('thead'))[0].scrollWidth + 1;
-			angular.forEach(table.querySelectorAll('tr:first-child th'), function (thElem, i) {
-
-				var tdElems = table.querySelector('tbody tr:first-child td:nth-child(' + (i + 1) + ')');
-				var tfElems = table.querySelector('tfoot tr:first-child th:nth-child(' + (i + 1) + ')');
-
-				var columnWidth = tdElems ? tdElems.offsetWidth : thElem.offsetWidth;
-				if (tdElems) {
-					tdElems.style.width = columnWidth + 'px';
-				}
-				if (thElem) {
-					thElem.style.width = columnWidth + 'px';
-					thElem.style.height = headerHeight + 'px';
-				}
-				if (tfElems) {
-					tfElems.style.width = columnWidth + 'px';
-				}
-			});
-
-			/* set css styles on thead and tbody*/
-			angular.element(table.querySelectorAll('thead, tfoot')).css({
-				'display': 'block',
-				'width' : headerWidth + 'px'
-			});
-			var fixedHeight = table.querySelector('thead').offsetHeight + table.querySelector('tfoot').offsetHeight;
-			var heightPanel = angular.element(table).parent()[0].clientHeight;
-			angular.element(table.querySelectorAll('tbody')).css({
-				'display': 'block',
-				'height': heightPanel - fixedHeight + 'px',
-				'width' : headerWidth + 'px',
-				'overflow': 'auto'
-			});
-
-			/* reduce width of last column by width of scrollbar*/
-			var tbody = table.querySelector('tbody');
-			var scrollBarWidth = tbody.offsetWidth - tbody.clientWidth;
-			if (scrollBarWidth > 0) {
-				var lastColumn = table.querySelector('tbody tr:first-child td:last-child');
-				lastColumn.style.width = (lastColumn.offsetWidth - scrollBarWidth) + 'px';
+		$timeout(function () {
+			if (table.scrollHeight > $('#tablePanel').height()) {
+				var isTableTooHeight = true;
 			}
-		}
-		angular.element(document.querySelectorAll('#tablePanel')).css('height', '');
-	});
+			if (isTableTooHeight) {
+				/* set widths of columns*/
+				var headerHeight = angular.element(table.querySelector('thead'))[0].clientHeight;
+				var headerWidth = angular.element(table.querySelector('thead'))[0].scrollWidth + 1;
+				angular.forEach(table.querySelectorAll('tr:first-child th'), function (thElem, i) {
+
+					var tdElems = table.querySelector('tbody tr:first-child td:nth-child(' + (i + 1) + ')');
+					var tfElems = table.querySelector('tfoot tr:first-child th:nth-child(' + (i + 1) + ')');
+
+					var columnWidth = tdElems ? tdElems.offsetWidth : thElem.offsetWidth;
+					if (tdElems) {
+						tdElems.style.width = columnWidth + 'px';
+					}
+					if (thElem) {
+						thElem.style.width = columnWidth + 'px';
+						thElem.style.height = headerHeight + 'px';
+					}
+					if (tfElems) {
+						tfElems.style.width = columnWidth + 'px';
+					}
+				});
+
+				/* set css styles on thead and tbody*/
+				angular.element(table.querySelectorAll('thead, tfoot')).css({
+					'display': 'block',
+					'width' : headerWidth + 'px'
+				});
+				var fixedHeight = table.querySelector('thead').offsetHeight + table.querySelector('tfoot').offsetHeight;
+				var heightPanel = angular.element(table).parent()[0].clientHeight;
+				angular.element(table.querySelectorAll('tbody')).css({
+					'display': 'block',
+					'height': heightPanel - fixedHeight + 'px',
+					'width' : headerWidth + 'px',
+					'overflow': 'auto'
+				});
+
+				/* reduce width of last column by width of scrollbar*/
+				var tbody = table.querySelector('tbody');
+				var scrollBarWidth = tbody.offsetWidth - tbody.clientWidth;
+				if (scrollBarWidth > 0) {
+					var lastColumn = table.querySelector('tbody tr:first-child td:last-child');
+					lastColumn.style.width = (lastColumn.offsetWidth - scrollBarWidth) + 'px';
+				}
+			}
+			angular.element(document.querySelectorAll('#tablePanel')).css('height', '');
+			$scope.isJustRedrawing = false;
+		});
+});
 };
 }
