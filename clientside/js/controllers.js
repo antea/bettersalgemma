@@ -673,7 +673,7 @@ $scope.redrawTable = function () {
 	});
 	angular.element(table.querySelectorAll('thead th, tfoot th, tbody td')).css({'display': '', 'width': '', 'height':''});
 	angular.element(table.querySelectorAll('thead, tbody, tfoot')).css('box-sizing', 'boreder-box');
-	angular.element(document.querySelectorAll('#tablePanel')).css({'height': '100%'});
+	angular.element(document.querySelectorAll('#tablePanel')).css({'height': ''});
 
 	/* wrap in $timeout to give table a chance to finish rendering*/
 	$timeout(function () {
