@@ -26,7 +26,7 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 	$scope.selectedMonth = $scope.selectedMoment.get('month');
 	$scope.selectedYear = $scope.selectedMoment.get('year');
 	$scope.ordini = [];
-	var week = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+	$scope.weekName = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 	$scope.calendarType="month";
 	$scope.calendarPlaceholder = "yyyy-MM";
 	$scope.calendarMin = ($scope.selectedYear - 2) + "-01";
@@ -46,9 +46,9 @@ function CalendarCtrl ($rootScope, $scope, $http, $timeout, $cookies, $window) {
 		var indexMoment = moment($scope.firstOfMoment);
 		while(moment(indexMoment).isBefore(moment($scope.lastOfMoment))) {
 			$scope.month[monthIndex] = {number: indexMoment.date(),
-				day: week[indexMoment.day()],
+				day: $scope.weekName[indexMoment.day()],
 				date: ($scope.calendarType!='month') ? indexMoment.format('ddd ll') : indexMoment.format('ddd D'),
-				isWeekend: week[indexMoment.day()]==="Sab" || week[indexMoment.day()]==="Dom" ? true : false
+				isWeekend: $scope.weekName[indexMoment.day()]==="Sab" || $scope.weekName[indexMoment.day()]==="Dom" ? true : false
 			};
 			indexMoment.add(1,'d');
 			monthIndex++;
@@ -484,10 +484,15 @@ var checkDatePicker = function () {
 	var weekPicker = $('#inputWeek')[0];
 	var colorPicker = $('#inputColor')[0];
 	var datePicker = $('#inputDate')[0];
+	var monthNamesArray = [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre" ];
 	$timeout(function () {
 		if (monthPicker.type === 'text') {
 			$('#inputMonth').datepicker({
 				dateFormat: "yy-mm",
+				firstDay: 1,
+				showOtherMonths: true,
+				dayNamesMin: $scope.weekName,
+				monthNames: monthNamesArray,
 				minDate: new Date($scope.calendarMin),
 				maxDate: new Date($scope.calendarMax),
 				onSelect: function(dateText, instance) {
@@ -499,8 +504,18 @@ var checkDatePicker = function () {
 					};
 					$scope.selectedDate = new Date(dateText);
 					$scope.calculateCalendar();
+				},
+				beforeShowDay: function(date) {
+					var cssClass = '';
+					if(date >= moment($scope.selectedDate).startOf("month") && date <= moment($scope.selectedDate).endOf("month"))
+						cssClass = 'ui-state-active';
+					return [true, cssClass];
 				}
 			}).focus(function() {
+				$timeout(function() {
+					$('.ui-datepicker-calendar tbody').on('mousemove', function() { $(this).find('tr td a').addClass('ui-state-hover'); });
+					$('.ui-datepicker-calendar tbody').on('mouseleave', function() { $(this).find('tr td a').removeClass('ui-state-hover'); });
+				});
 				$(this).blur();
 			});
 		}
@@ -508,6 +523,11 @@ var checkDatePicker = function () {
 			datePicker.remove();
 			colorPicker.remove();
 			$('#inputWeek').datepicker({
+				showWeek: true,
+				firstDay: 1,
+				showOtherMonths: true,
+				dayNamesMin: $scope.weekName,
+				monthNames: monthNamesArray,
 				minDate: new Date($scope.calendarMin),
 				maxDate: new Date($scope.calendarMax),
 				onSelect: function(dateText, instance) {
@@ -521,8 +541,18 @@ var checkDatePicker = function () {
 					};
 					$scope.selectedDate = new Date(dateText);
 					$scope.calculateCalendar();
+				},
+				beforeShowDay: function(date) {
+					var cssClass = '';
+					if(date >= moment($scope.selectedDate).startOf("week") && date <= moment($scope.selectedDate).endOf("week"))
+						cssClass = 'ui-state-active';
+					return [true, cssClass];
 				}
 			}).focus(function() {
+				$timeout(function (){
+					$('.ui-datepicker-calendar tr').on('mousemove', function() { $(this).find('td a').addClass('ui-state-hover'); });
+					$('.ui-datepicker-calendar tr').on('mouseleave', function() { $(this).find('td a').removeClass('ui-state-hover'); });
+				});
 				$(this).blur();
 			});;
 		} else if(colorPicker.type === 'text') {
