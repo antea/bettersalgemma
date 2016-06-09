@@ -21,8 +21,10 @@
 							<input type="radio" name="options" id="radioweek" autocomplete="off"> Settimana
 						</label>
 					</div>
-					<input type="month" id="inputMonth" name="inputMonth" ng-model="selectedDate" ng-change="calculateCalendar()" placeholder="yyyy-MM" min="{{selectedYear-2}}-01" max="{{selectedYear+2}}-12" required ng-show="isMonthSelected" jqdatepicker>
+					<input type="month" id="inputMonth" name="inputMonth" ng-model="selectedDate" ng-change="calculateCalendar()" placeholder="yyyy-MM" min="{{selectedYear-2}}-01" max="{{selectedYear+2}}-12" required ng-show="isMonthSelected">
 					<input type="week" id="inputWeek" name="inputWeek" ng-model="selectedDate" ng-change="calculateCalendar()" placeholder="yyyy-W##" min="{{selectedYear-2}}-01" max="{{selectedYear+2}}-53" required ng-hide="isMonthSelected">
+					<input type="date" id="inputDate" name="inputDate" ng-model="selectedDate" ng-change="calculateCalendar()" placeholder="yyyy-W##" min="{{selectedYear-2}}-01" max="{{selectedYear+2}}-53" required ng-hide="isMonthSelected">
+					<input id="inputColor" type="color" ng-hide="true">
 					<span name="inline" id="loadingDiv"><img id="loadingAntea" src="img/Antea_loading.png">Caricamento...</span>
 					<span ng-hide="true" name="inline" id="loadedErrorDiv"><img id="errorAntea" src="img/stop.png">Operazione fallita</span>
 				</h4>

@@ -482,38 +482,56 @@ $scope.filtersview = $scope.emptyForm;
 var checkDatePicker = function () {
 	var monthPicker = $('#inputMonth')[0];
 	var weekPicker = $('#inputWeek')[0];
-	if (monthPicker.type === 'text' || weekPicker.type === 'text') {
-		$('#inputMonth').datepicker({
-			dateFormat: "yy-mm",
-			changeMonth: true,
-			changeYear: true,
-			constrainInput: true,
-			minDate: new Date($scope.calendarMin),
-			maxDate: new Date($scope.calendarMax),
-			onChangeMonthYear: function(y, m, inst) { 
-				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-				$(this).datepicker('setDate', new Date(year, month, 1));
-				$(this).datepicker('option', 'defaultDate', new Date(year, month, 1));
-				$scope.selectedDate = new Date(year, month, 1);
-				$scope.calculateCalendar();
-				$(this).datepicker("hide");
-			},
-			onClose: function (input, inst) {
-				$(this).datepicker('setDate', moment($scope.selectedMoment).toDate());
-				$('#inputMonth').blur();
-			},
-			beforeShow: function (input,inst) {
-				$(".ui-datepicker-prev, .ui-datepicker-next").remove();
-			}
-		}).focus(function() {
-			$(".ui-datepicker-prev, .ui-datepicker-next").remove();
-		});
-		$('#inputWeek').datepicker({
-			dateFormat: "yy-W##"
-			//calculateWeek: myWeekCalc
-		});
-	};
+	var colorPicker = $('#inputColor')[0];
+	var datePicker = $('#inputDate')[0];
+	$timeout(function () {
+		if (monthPicker.type === 'text') {
+			$('#inputMonth').datepicker({
+				dateFormat: "yy-mm",
+				minDate: new Date($scope.calendarMin),
+				maxDate: new Date($scope.calendarMax),
+				onSelect: function(dateText, instance) {
+					$(this).datepicker('setDate', new Date(dateText));
+					$(this).datepicker('option', 'defaultDate', new Date(dateText));
+					if (weekPicker.type === 'text') {
+						$("#inputWeek").datepicker('setDate', new Date(dateText));
+						$("#inputWeek").datepicker('option', 'defaultDate', new Date(dateText));
+					};
+					$scope.selectedDate = new Date(dateText);
+					$scope.calculateCalendar();
+				}
+			}).focus(function() {
+				$(this).blur();
+			});
+		}
+		if (weekPicker.type === 'text') {
+			datePicker.remove();
+			colorPicker.remove();
+			$('#inputWeek').datepicker({
+				minDate: new Date($scope.calendarMin),
+				maxDate: new Date($scope.calendarMax),
+				onSelect: function(dateText, instance) {
+					var week = $.datepicker.iso8601Week(new Date(dateText));
+					$(this).val($.datepicker.formatDate('yy-' + week));
+					$(this).datepicker('setDate', new Date(dateText));
+					$(this).datepicker('option', 'defaultDate', new Date(dateText));
+					if (monthPicker.type === 'text') {
+						$("#inputMonth").datepicker('setDate', new Date(dateText));
+						$("#inputMonth").datepicker('option', 'defaultDate', new Date(dateText));
+					};
+					$scope.selectedDate = new Date(dateText);
+					$scope.calculateCalendar();
+				}
+			}).focus(function() {
+				$(this).blur();
+			});;
+		} else if(colorPicker.type === 'text') {
+			weekPicker.remove();
+		} else {
+			datePicker.remove();
+		};
+		colorPicker.remove();
+	});
 }
 checkDatePicker();
 retrieveInfo();
