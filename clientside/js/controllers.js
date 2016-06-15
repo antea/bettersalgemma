@@ -669,9 +669,13 @@ $scope.makeReport = function () {
 	var reportFormat = "DD-MM-YYYY";
 	var firstVisualizedMoment = moment($scope.firstOfMoment);
 	var lastVisualizedMoment = moment($scope.lastOfMoment);
-	$window.open("http://salgemma.anteash.com:8080/salgemma/report/generate?format=pdf&dagiorno="
-		+firstVisualizedMoment.format(reportFormat)+"&agiorno="+lastVisualizedMoment.format(reportFormat)
-		+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
+	if(window.location.hostname.split('.')[2] == 'com' || window.location.hostname.split('.')[2] == 'bogus'){
+		$window.open("http://salgemma."+ window.location.hostname.split('.')[1] + "." + window.location.hostname.split('.')[2] + ":8080/salgemma/report/generate?format=pdf&dagiorno="
+			+firstVisualizedMoment.format(reportFormat)+"&agiorno="+lastVisualizedMoment.format(reportFormat)
+			+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
+	} else {
+		alert("Non conosco il nome del dominio, forse è stato modificato: contatta l'amministratore di sistema.");
+	}
 }
 $scope.initializeReportDate = function () {
 	$scope.editFromDate = moment($scope.firstOfMoment).toDate();
@@ -681,9 +685,13 @@ $scope.makePersonalizedReport = function (editFromDate, editToDate) {
 	var reportFormat = "DD-MM-YYYY";
 	var fromMomentReport = moment(editFromDate);
 	var toMomentReport = moment(editToDate);
-	$window.open("http://salgemma.anteash.com:8080/salgemma/report/generate?format=pdf&dagiorno="
-		+fromMomentReport.format(reportFormat)+"&agiorno="+toMomentReport.format(reportFormat)
-		+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
+	if(window.location.hostname.split('.')[2] == 'com' || window.location.hostname.split('.')[2] == 'bogus') {
+		$window.open("http://salgemma."+ window.location.hostname.split('.')[1] + "." + window.location.hostname.split('.')[2] + ":8080/salgemma/report/generate?format=pdf&dagiorno="
+			+fromMomentReport.format(reportFormat)+"&agiorno="+toMomentReport.format(reportFormat)
+			+"&idrisorsa="+$rootScope.user.id+"&prz=FALSE");
+	} else {
+		alert("Non conosco il nome del dominio, forse è stato modificato: contatta l'amministratore di sistema.");
+	}
 }
 $scope.calculateCalendar = function() {
 	$scope.selectedMoment = moment($scope.selectedDate);
