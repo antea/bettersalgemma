@@ -12,20 +12,20 @@ server.configure(function () {
 	server.set('port', 8585);
 	server.use(express.bodyParser());
 	server.use(express.cookieParser());
-	server.use(express.static(path.join(__dirname,"/clientside")));
+	server.use(express.static(path.join(__dirname, "/clientside")));
 });
 
-server.listen(server.get('port'), function(){
+server.listen(server.get('port'), function () {
 	console.log('Server avviato e in ascolto alla porta:' + server.get('port'));
 });
 
 var pool = mysql.createPool({
-	host:'mysql.antea.bogus',
-	database:'matteos2',
-	user:'matteos',
-	password:'matteos',
-	waitForConnections:false,
-	connectionLimit:10
+	host: 'mysql.antea.bogus',
+	database: 'matteos2',
+	user: 'matteos',
+	password: 'matteos',
+	waitForConnections: true,
+	connectionLimit: 10
 });
 
 //  <--------------------------> RICHIESTE GET <-------------------------->
@@ -34,152 +34,152 @@ var pool = mysql.createPool({
 	La get seguente richiede come parametri dell' URL username e password e ritorna l'id e il nome della risorsa.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 401 errore di autenticazione.
 	*/
-	server.get('/login/:login/:pw', function (req, res) {
-		pool.getConnection( function (err, connection){
-			if (err) {
-				res.send(503, err);
-			} else{
-				connection.query('SELECT id, nome, partitaiva, codicefiscale, indirizzo, cap, citta, provincia, nazione, telefono, cellulare, email, password ' +
-					'FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
-					function (err, results) {
-						if (err) {
-							res.send(503, err);
-						} else{
-							if (results.length===0) {
-								res.send(401, "Autenticazione fallita: username e/o password errati");
-							} else{
-								var user = encodeURIComponent(JSON.stringify(results[0]));
-								//cookies non possono contenere caratteri speciali se non sono codificati
-								res.cookie('user', user, {maxAge : 60*60*1000}).send(200, results[0]);
-							};
+server.get('/login/:login/:pw', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else {
+			connection.query('SELECT id, ta_userid, orecontrattuali, nome, partitaiva, codicefiscale, indirizzo, cap, citta, provincia, nazione, telefono, cellulare, email, password ' +
+				'FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
+				function (err, results) {
+					if (err) {
+						res.send(503, err);
+					} else {
+						if (results.length === 0) {
+							res.send(401, "Autenticazione fallita: username e/o password errati");
+						} else {
+							var user = encodeURIComponent(JSON.stringify(results[0]));
+							//cookies non possono contenere caratteri speciali se non sono codificati
+							res.cookie('user', user, { maxAge: 60 * 60 * 1000 }).send(200, results[0]);
 						};
-						connection.release();
-					});
-			};
-		});
+					};
+					connection.release();
+				});
+		};
 	});
+});
 
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e l'anno su cui effettuare la richiesta.
 	Se ha successo ritorna id e descrizione di tutti gli ordini associati alla risorsa con quel particolare id nell'anno specificato.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	/*server.get('/ordini/:userId/:year/:month', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(503, err);
-			} else{
-				var start = new Date(req.params.year,req.params.month,1);
-				start.setHours(2,start.getTimezoneOffset(),0,0);
-				start = start.toISOString();
-				var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
-				end.setHours(2,end.getTimezoneOffset(),0,0);
-				end= end.toISOString();
-				connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
-					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-					'order by o.descrizione',
-					[req.params.userId,start,end,end,end],
-					function (err, results) {
-						if (err) {
-							res.send(503, err);
-						} else{
-							res.send(201, results);
-						};
-						connection.release();
-					});
-			};
-		});
-	});*/
+/*server.get('/ordini/:userId/:year/:month', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else{
+			var start = new Date(req.params.year,req.params.month,1);
+			start.setHours(2,start.getTimezoneOffset(),0,0);
+			start = start.toISOString();
+			var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
+			end.setHours(2,end.getTimezoneOffset(),0,0);
+			end= end.toISOString();
+			connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+				'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+				'order by o.descrizione',
+				[req.params.userId,start,end,end,end],
+				function (err, results) {
+					if (err) {
+						res.send(503, err);
+					} else{
+						res.send(201, results);
+					};
+					connection.release();
+				});
+		};
+	});
+});*/
 
 server.get('/ordini/:userId/:start/:end', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(503, err);
-			} else{
-				var start = moment(req.params.start).toDate();
-				//start.setHours(2,start.getTimezoneOffset(),0,0);
-				//start = start.toISOString();
-				var end = moment(req.params.end).toDate();
-				//end.setHours(2,end.getTimezoneOffset(),0,0);
-				//end= end.toISOString();
-				connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
-					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-					'order by o.descrizione',
-					[req.params.userId,start,end,end,end],
-					function (err, results) {
-						if (err) {
-							res.send(503, err);
-						} else{
-							res.send(201, results);
-						};
-						connection.release();
-					});
-			};
-		});
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else {
+			var start = moment(req.params.start).toDate();
+			//start.setHours(2,start.getTimezoneOffset(),0,0);
+			//start = start.toISOString();
+			var end = moment(req.params.end).toDate();
+			//end.setHours(2,end.getTimezoneOffset(),0,0);
+			//end= end.toISOString();
+			connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+				'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+				'order by o.descrizione',
+				[req.params.userId, start, end, end, end],
+				function (err, results) {
+					if (err) {
+						res.send(503, err);
+					} else {
+						res.send(201, results);
+					};
+					connection.release();
+				});
+		};
 	});
+});
 
 /*
 	La get seguente richiede come parametri dell'URL l'id dell'utente e quello dell'ordine.
 	Se ha successo ritorna id e descrizione di tutte le attività collegate a quel particolare orine per quel particolare utente.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	/*server.get('/attivita/:userId/:idordine/:year/:month', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(503, err);
-			} else{
-				var start = new Date(req.params.year,req.params.month,1);
-				start.setHours(2,start.getTimezoneOffset(),0,0);
-				start = start.toISOString();
-				var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
-				end.setHours(2,end.getTimezoneOffset(),0,0);
-				end= end.toISOString();
-				connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
-					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND r.idtabella=? AND '+
-					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) '+
-					'group by r.descrizione order by r.descrizione ',
-					[req.params.userId,req.params.idordine,start,end,end,end],
-					function (err, results) {
-						if (err) {
-							res.send(503, err);
-						} else{
-							res.send(201, results);
-						};
-						connection.release();
-					});
-			};
-		});
+/*server.get('/attivita/:userId/:idordine/:year/:month', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else{
+			var start = new Date(req.params.year,req.params.month,1);
+			start.setHours(2,start.getTimezoneOffset(),0,0);
+			start = start.toISOString();
+			var end = new Date(req.params.year,parseInt(req.params.month)+1,0);
+			end.setHours(2,end.getTimezoneOffset(),0,0);
+			end= end.toISOString();
+			connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+				'WHERE p.idrisorsa=? AND r.idtabella=? AND '+
+				'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) '+
+				'group by r.descrizione order by r.descrizione ',
+				[req.params.userId,req.params.idordine,start,end,end,end],
+				function (err, results) {
+					if (err) {
+						res.send(503, err);
+					} else{
+						res.send(201, results);
+					};
+					connection.release();
+				});
+		};
+	});
 });*/
 server.get('/attivita/:userId/:idordine/:start/:end', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(503, err);
-			} else{
-				var start = moment(req.params.start).toDate();
-				//start.setHours(2,start.getTimezoneOffset(),0,0);
-				//start = start.toISOString();
-				var end = moment(req.params.end).toDate();
-				//end.setHours(2,end.getTimezoneOffset(),0,0);
-				//end= end.toISOString();
-				connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
-					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND r.idtabella=? AND '+
-					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) '+
-					'group by r.descrizione order by r.descrizione ',
-					[req.params.userId,req.params.idordine,start,end,end,end],
-					function (err, results) {
-						if (err) {
-							res.send(503, err);
-						} else{
-							res.send(201, results);
-						};
-						connection.release();
-					});
-			};
-		});
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else {
+			var start = moment(req.params.start).toDate();
+			//start.setHours(2,start.getTimezoneOffset(),0,0);
+			//start = start.toISOString();
+			var end = moment(req.params.end).toDate();
+			//end.setHours(2,end.getTimezoneOffset(),0,0);
+			//end= end.toISOString();
+			connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+				'WHERE p.idrisorsa=? AND r.idtabella=? AND ' +
+				'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+				'group by r.descrizione order by r.descrizione ',
+				[req.params.userId, req.params.idordine, start, end, end, end],
+				function (err, results) {
+					if (err) {
+						res.send(503, err);
+					} else {
+						res.send(201, results);
+					};
+					connection.release();
+				});
+		};
+	});
 });
 
 /*
@@ -187,64 +187,64 @@ server.get('/attivita/:userId/:idordine/:start/:end', function (req, res) {
 	Se ha successo ritorna l'insieme di tutte le tuple dello storico del mese scelto, con ordine e attività collegate.
 	Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 	*/
-	/*server.get('/storico/:userId/:monthOfYear/:idordine/:idsattivita', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(503, err);
-			} else{
-				trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
-					if (err) {
-						connection.release();
-						res.send(503, err);
-					} else{
-						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
-							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
-							'JOIN ordine AS o ON r.idtabella=o.id '+
-							'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione IN (?)',
-							[req.params.userId, req.params.monthOfYear, idsPianificazione],
-							function (err, results) {
-								if (err) {
-									res.send(503, err);
-								} else{
-									res.send(201, results);
-								};
-								connection.release();
-							});
-					};
-				})
-			};
-		});
-	});*/
-server.get('/storico/:userId/:start/:end/:idordine/:idsattivita', function (req, res) {
-		pool.getConnection(function (err, connection) {
-			if (err) {
-				res.send(503, err);
-			} else{
-				trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
-					if (err) {
-						connection.release();
-						res.send(503, err);
-					} else{
-						var start = moment(req.params.start).toDate();
-						var end = moment(req.params.end).toDate();
-						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie '+
-							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
-							'JOIN ordine AS o ON r.idtabella=o.id '+
-							'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
-							[req.params.userId, start, end, idsPianificazione],
-							function (err, results) {
-								if (err) {
-									res.send(503, err);
-								} else{
-									res.send(201, results);
-								};
-								connection.release();
-							});
-					};
-				})
-			};
-		});
+/*server.get('/storico/:userId/:monthOfYear/:idordine/:idsattivita', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else{
+			trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
+				if (err) {
+					connection.release();
+					res.send(503, err);
+				} else{
+					connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo '+
+						'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) '+
+						'JOIN ordine AS o ON r.idtabella=o.id '+
+						'WHERE s.idrisorsa=? AND DATE_FORMAT(s.giorno, "%c-%Y")=? AND s.idpianificazione IN (?)',
+						[req.params.userId, req.params.monthOfYear, idsPianificazione],
+						function (err, results) {
+							if (err) {
+								res.send(503, err);
+							} else{
+								res.send(201, results);
+							};
+							connection.release();
+						});
+				};
+			})
+		};
 	});
+});*/
+server.get('/storico/:userId/:start/:end/:idordine/:idsattivita', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else {
+			trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
+				if (err) {
+					connection.release();
+					res.send(503, err);
+				} else {
+					var start = moment(req.params.start).toDate();
+					var end = moment(req.params.end).toDate();
+					connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie ' +
+						'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) ' +
+						'JOIN ordine AS o ON r.idtabella=o.id ' +
+						'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
+						[req.params.userId, start, end, idsPianificazione],
+						function (err, results) {
+							if (err) {
+								res.send(503, err);
+							} else {
+								res.send(201, results);
+							};
+							connection.release();
+						});
+				};
+			})
+		};
+	});
+});
 
 //  <--------------------------> RICHIESTE POST <-------------------------->
 
@@ -258,35 +258,37 @@ server.post('/insertstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			res.send(503, err);
-		} else{
-			trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
+		} else {
+			trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
 				var idPianificazione = idsPianificazione.split(',');
 				idPianificazione = idPianificazione[0];
-				if(err){
+				if (err) {
 					res.send(500, err);
-				}else {
-					calcolaCostiRicavi(idPianificazione, req.body.secondi, function(err, tupla){
+				} else {
+					calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, tupla) {
 						if (err) {
 							res.send(500, err);
-						} else{
+						} else {
 							tupla.idrisorsa = req.body.idrisorsa,
-							tupla.idpianificazione = idPianificazione,
-							tupla.quantita= 0;
-							tupla.giorno= new Date(req.body.giorno);
-							tupla.secondi= req.body.secondi;
-							tupla.note= req.body.note;
+								tupla.idpianificazione = idPianificazione,
+								tupla.quantita = 0;
+							tupla.giorno = new Date(req.body.giorno);
+							tupla.secondi = req.body.secondi;
+							tupla.note = req.body.note;
 							tupla.ferie = req.body.ferie ? req.body.ferie : false;
 							connection.query('INSERT INTO storico SET ?',
 								tupla, function (err, results) {
 									if (err) {
 										res.send(503, err);
-									} else{
+									} else {
 										res.send(201, results);
 									};
 									connection.release();
-								});}
-						});}
-				});
+								});
+						}
+					});
+				}
+			});
 		};
 	});
 });
@@ -302,22 +304,22 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 server.put('/editstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(503,err);
-		} else{
-			connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results){
+			res.send(503, err);
+		} else {
+			connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results) {
 				if (err) {
 					res.send(503, err);
-				} else{
-					trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function(err, idsPianificazione){
+				} else {
+					trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
 						var idPianificazione = idsPianificazione.split(',');
 						idPianificazione = idPianificazione[0];
 						if (err) {
 							res.send(503, err);
-						} else{
-							calcolaCostiRicavi(idPianificazione, req.body.secondi, function(err, nuovaTupla){
+						} else {
+							calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, nuovaTupla) {
 								if (err) {
 									res.send(503, err);
-								} else{
+								} else {
 									nuovaTupla.id = req.body.id;
 									nuovaTupla.idrisorsa = req.body.idrisorsa;
 									nuovaTupla.idpianificazione = idPianificazione;
@@ -330,42 +332,42 @@ server.put('/editstorico', function (req, res) {
 										nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
 										nuovaTupla.secondi == results[0].secondi &&
 										nuovaTupla.note == results[0].note &&
-										nuovaTupla.ferie == results[0].ferie){
+										nuovaTupla.ferie == results[0].ferie) {
 										res.send(201, 'Nessuna modifica apportata, riga identica.');
-								} else{
-									connection.query('UPDATE storico SET ? WHERE id=?',
-										[nuovaTupla, req.body.id], function (err, results){
-											if (err) {
-												res.send(503, err);
-											} else{
-												res.send(201, results);
-											}
-										});
+									} else {
+										connection.query('UPDATE storico SET ? WHERE id=?',
+											[nuovaTupla, req.body.id], function (err, results) {
+												if (err) {
+													res.send(503, err);
+												} else {
+													res.send(201, results);
+												}
+											});
+									}
 								}
-							}
-						});
-}
-});
-}
-connection.release();
-});
-}
-});
+							});
+						}
+					});
+				}
+				connection.release();
+			});
+		}
+	});
 });
 
-server.put("/edituser" , function (req, res) {
+server.put("/edituser", function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			res.send(503, err);
-		} else{
+		} else {
 			connection.query('UPDATE risorsa SET ? WHERE id=? ', [req.body, req.body.id], function (err, results) {
 				if (err) {
 					res.send(503, err);
-				} else{
+				} else {
 					res.send(201, results);
 				};
 			})
-			
+
 		};
 	})
 });
@@ -377,16 +379,16 @@ La delete seguente permette di cancellare una tupla dalla tabella storico. Nel b
 tupla da cancellare.
 Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 */
-server.delete('/deletestorico/:idstorico', function (req,res) {
+server.delete('/deletestorico/:idstorico', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			res.send(503, err);
-		} else{
-			connection.query('DELETE FROM storico WHERE id=?',[req.params.idstorico],
+		} else {
+			connection.query('DELETE FROM storico WHERE id=?', [req.params.idstorico],
 				function (err, results) {
 					if (err) {
 						res.send(503, err);
-					} else{
+					} else {
 						res.send(201, results)
 					};
 					connection.release();
@@ -403,21 +405,22 @@ Calcola i costi e i ricavi, affidandosi alle funzioni calcolaCosto e caloclaRica
 i parametri costo e ricavo utilizzabile attraverso callback.
 */
 function calcolaCostiRicavi(pianificazione, secondi, callback) {
-	calcolaCosto(pianificazione, secondi, function(err, costi){
-		if(err){
+	calcolaCosto(pianificazione, secondi, function (err, costi) {
+		if (err) {
 			callback(err)
-		} else {calcolaRicavo(pianificazione, secondi, function(err, ricavi){
-			if (err) {
-				callback(err);
-			} else{
-				var tupla = new Object();
-				tupla.costo = costi;
-				tupla.ricavo = ricavi;
-				callback(err, tupla);
-			}
-		});
-	}
-});
+		} else {
+			calcolaRicavo(pianificazione, secondi, function (err, ricavi) {
+				if (err) {
+					callback(err);
+				} else {
+					var tupla = new Object();
+					tupla.costo = costi;
+					tupla.ricavo = ricavi;
+					callback(err, tupla);
+				}
+			});
+		}
+	});
 };
 
 /*
@@ -426,20 +429,20 @@ per sapere cosa fare del valore di costo che calcola.
 Per utilizzi successivi il calcolo del costo dovrà essere integrato con l'unita di misura con cui viene pagato l'articolo
 (reperibile attraverso la colonna unimisura della tabella articololistino).
 */
-function calcolaCosto (pianificazione, secondi, callback) {
+function calcolaCosto(pianificazione, secondi, callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			callback(err);
-		} else{
-			connection.query('SELECT al.prezzo AS costo '+
-				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) '+
-				'JOIN articololistino AS al ON p.idlistinorisorsa=al.idlistino AND r.idarticolo=al.idarticolo '+
+		} else {
+			connection.query('SELECT al.prezzo AS costo ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) ' +
+				'JOIN articololistino AS al ON p.idlistinorisorsa=al.idlistino AND r.idarticolo=al.idarticolo ' +
 				'WHERE p.id=?', [pianificazione],
 				function (err, results) {
 					if (err || results.length === 0) {
 						callback(err, 0);
-					} else{
-						var costo = results[0].costo*(secondi/3600);
+					} else {
+						var costo = results[0].costo * (secondi / 3600);
 						callback(err, costo);
 					};
 					connection.release();
@@ -454,25 +457,25 @@ per sapere cosa fare del valore di ricavo che calcola.
 Per utilizzi successivi il calcolo del ricavo dovrà essere integrato con l'unita di misura con cui viene pagato l'articolo
 (reperibile attraverso la colonna unimisura della tabella articololistino).
 */
-function calcolaRicavo (pianificazione, secondi, callback) {
+function calcolaRicavo(pianificazione, secondi, callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			callback(err, ricavo);
-		} else{
-			connection.query('SELECT al.prezzo AS ricavo '+
-				'FROM (((pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS ord ON ord.id=r.idtabella) '+
-					'JOIN offerta AS offe ON offe.id=ord.idofferta) ' +
-			'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo '+
-			'WHERE p.id=?', [pianificazione],
-			function (err, results) {
-				if (err || results.length === 0) {
-					callback(err, 0);
-				} else{
-					var ricavo = results[0].ricavo*(secondi/3600);
-					callback(err, ricavo);
-				};
-				connection.release();
-			});
+			callback(err);
+		} else {
+			connection.query('SELECT al.prezzo AS ricavo ' +
+				'FROM (((pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS ord ON ord.id=r.idtabella) ' +
+				'JOIN offerta AS offe ON offe.id=ord.idofferta) ' +
+				'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo ' +
+				'WHERE p.id=?', [pianificazione],
+				function (err, results) {
+					if (err || results.length === 0) {
+						callback(err, 0);
+					} else {
+						var ricavo = results[0].ricavo * (secondi / 3600);
+						callback(err, ricavo);
+					};
+					connection.release();
+				});
 		};
 	});
 };
@@ -489,9 +492,46 @@ function trovaPianificazione(connection, userId, idOrdine, idsAttivita, callback
 		function (err, results) {
 			if (err) {
 				callback(err);
-			} else{
+			} else {
 				var idPianificazione = results[0].ids;
 				callback(null, idPianificazione);
 			};
 		});
 };
+
+//  <--------------------------> RICHIESTE GET TIMBRATORE <-------------------------->
+
+server.get('/timbratore/:ta_userid/:start/:end', function (req, res) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else {
+			var start = moment(req.params.start).toDate();
+			var end = moment(req.params.end).toDate();
+			connection.query('SELECT a.CLOCKING FROM ta_ATTENDANT AS a WHERE a.USERID=? AND (a.CLOCKING>=? AND a.CLOCKING<=?) ORDER BY a.CLOCKING',
+				[req.params.ta_userid, start, end], function (err, results) {
+					if (err) {
+						res.send(503, err)
+					} else {
+						var inspectedResults = [];
+						var prevDay;
+						results.forEach(function (result) {
+							if (!moment(result.CLOCKING).isSame(moment(prevDay), 'day')) {
+								prevDay = moment(result.CLOCKING);
+								var clockingsTime = [];
+								clockingsTime.push(moment(result.CLOCKING));
+								inspectedResults.push({
+									day: prevDay,
+									clockings: clockingsTime
+								});
+							} else {
+								inspectedResults[inspectedResults.length - 1].clockings.push(moment(result.CLOCKING));
+							}
+						});
+						res.send(200, inspectedResults);
+					};
+					connection.release();
+				});
+		};
+	});
+});
