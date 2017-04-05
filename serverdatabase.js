@@ -720,6 +720,17 @@ server.get('/getexcel/:start/:end', function (req, res) {
 server.get('/gettotalexcel/:start/:end', function (req, res) {
 	var start = moment(req.params.start);
 	var end = moment(req.params.end);
+	createAndSendTotalExcel(res, start, end);
+});
+
+server.get('/gettotalexcelpreviousmonth', function (req, res) {
+	var previousMonth = moment().subtract(1, 'months');
+	var start = moment(previousMonth).startOf('month');
+	var end = moment(previousMonth).endOf('month');
+	createAndSendTotalExcel(res, start, end);
+});
+
+function createAndSendTotalExcel(res, start, end) {
 	getAllClockingInPeriod(start, end, function (err, results) {
 		if (err) {
 			res.send(503, err);
@@ -738,4 +749,4 @@ server.get('/gettotalexcel/:start/:end', function (req, res) {
 				});
 		}
 	});
-});
+}
