@@ -51,7 +51,7 @@ angular.module('salgemmainterfaceFilters', [])
 			var titleString = "";
 			if (scope.taskDay && scope.taskDay.clockings.length > 0) {
 				if (scope.taskDay.calculatedWorkedTime == -1) {
-					titleString = "<strong>Hai scordato di timbrare!</strong>";
+					titleString = "<strong>Ci sono errori nelle timbrature!</strong>";
 					contentString = "<p>Rivolgiti al responsabile del personale.</p>"
 				} else {
 					var description = scope.taskDay.clockings.length > 2 ? descriptionFullTime : descriptionPartTime;
@@ -67,7 +67,7 @@ angular.module('salgemmainterfaceFilters', [])
 					content: contentString,
 					title: titleString,
 					trigger: "hover",
-					placement: "bottom"
+					placement: "auto bottom"
 				});
 			}
 		}

@@ -1,6 +1,7 @@
 function AutenticazioneCtrl($rootScope, $scope, $http, $location, $cookies) {
-	$scope.errors = [];
 	$scope.submitLogin = function () {
+		$scope.errors = [];
+		delete $rootScope.errors;
 		$http.get('/login/' + $scope.userName + '/' + CryptoJS.MD5($scope.pw)).
 			success(function (data, status, headers, config) {
 				$scope.errors = [];
@@ -17,7 +18,7 @@ function AutenticazioneCtrl($rootScope, $scope, $http, $location, $cookies) {
 	};
 }
 
-function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
+function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, $window) {
 	$scope.selectedDate = new Date();
 	$scope.isXOverflow = false;
 	$scope.hasClockings = false;
@@ -64,7 +65,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 				$scope.hasClockings = true;
 				$scope.calculateClockings(firstOfMomentISO, lastOfMomentISO);
 			};
-			$http.get('/ordini/' + $rootScope.user.id + '/' + firstOfMomentISO + '/' + lastOfMomentISO).
+			$http.get('/ordini/' + firstOfMomentISO + '/' + lastOfMomentISO).
 				success(function (data, status, headers, config) {
 					if (data.length == 0) {
 						$('#loadingDiv').hide();
@@ -73,7 +74,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					$scope.ordini = data;
 					$scope.ordini.forEach(function (ordine) {
 						ordine.selected = true;
-						$http.get('/attivita/' + $rootScope.user.id + '/' + ordine.id + '/' + firstOfMomentISO + '/' + lastOfMomentISO).
+						$http.get('/attivita/' + ordine.id + '/' + firstOfMomentISO + '/' + lastOfMomentISO).
 							success(function (data, status, headers, config) {
 								if (data.length == 0) {
 									$('#loadingDiv').hide();
@@ -127,7 +128,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 											isWeekend: $scope.month[i].day == "Sab" || $scope.month[i].day == "Dom" ? true : false
 										}
 									}
-									$http.get('/storico/' + $rootScope.user.id + '/' + firstOfMomentISO +
+									$http.get('/storico/' + firstOfMomentISO +
 										'/' + lastOfMomentISO + '/' + ordine.id + '/' + task.ids).
 										success(function (data, status, headers, config) {
 											data.forEach(function (storico) {
@@ -149,38 +150,65 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 												$('#loadingDiv').hide();
 											};
 										}).
-										error(function ()/*(data, status, headers, config)*/ {
-											$scope.errors = [{
-												subject: "Errore del server:",
-												description: "Riprovare, se l'errore persiste contattare l'amministratore."
-											}];
-											$('#loadingDiv').hide();
-											$('#loadedErrorDiv').show();
+										error(function (data, status, headers, config) {
+											if (status === 401) {
+												$rootScope.errors = [{
+													subject: "Sessione scaduta:",
+													description: "La sessione è scaduta, riautenticarsi per continuare."
+												}];
+												delete $rootScope.user;
+												$location.path("/salgemmainterface/login");
+											} else {
+												$scope.errors = [{
+													subject: "Errore del server:",
+													description: "Riprovare, se l'errore persiste contattare l'amministratore."
+												}];
+												$('#loadingDiv').hide();
+												$('#loadedErrorDiv').show();
+											}
 										});
 								});
 							}).
-							error(function ()/*(data, status, headers, config)*/ {
-								$scope.errors = [{
-									subject: "Errore del server:",
-									description: "Riprovare, se l'errore persiste contattare l'amministratore."
-								}];
-								$('#loadingDiv').hide();
-								$('#loadedErrorDiv').show();
+							error(function (data, status, headers, config) {
+								if (status === 401) {
+									$rootScope.errors = [{
+										subject: "Sessione scaduta:",
+										description: "La sessione è scaduta, riautenticarsi per continuare."
+									}];
+									delete $rootScope.user;
+									$location.path("/salgemmainterface/login");
+								} else {
+									$scope.errors = [{
+										subject: "Errore del server:",
+										description: "Riprovare, se l'errore persiste contattare l'amministratore."
+									}];
+									$('#loadingDiv').hide();
+									$('#loadedErrorDiv').show();
+								}
 							});
 					});
 				}).
-				error(function ()/*(data, status, headers, config)*/ {
-					$scope.errors = [{
-						subject: "Errore del server:",
-						description: "Riprovare, se l'errore persiste contattare l'amministratore."
-					}];
-					$('#loadingDiv').hide();
-					$('#loadedErrorDiv').show();
+				error(function (data, status, headers, config) {
+					if (status === 401) {
+						$rootScope.errors = [{
+							subject: "Sessione scaduta:",
+							description: "La sessione è scaduta, riautenticarsi per continuare."
+						}];
+						delete $rootScope.user;
+						$location.path("/salgemmainterface/login");
+					} else {
+						$scope.errors = [{
+							subject: "Errore del server:",
+							description: "Riprovare, se l'errore persiste contattare l'amministratore."
+						}];
+						$('#loadingDiv').hide();
+						$('#loadedErrorDiv').show();
+					}
 				});
 		}
 	};
 
-	$scope.calculateClockings = function (firstOfMomentISO, lastOfMomentISO) {
+	/*$scope.calculateClockings = function (firstOfMomentISO, lastOfMomentISO) {
 		$scope.clockingTask = {};
 		$http.get('/timbratore/' + $rootScope.user.ta_userid + '/' + firstOfMomentISO + '/' + lastOfMomentISO).
 			success(function (data, status, headers, config) {
@@ -208,6 +236,30 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					description: "Riprovare, se l'errore persiste contattare l'amministratore."
 				}];
 				$scope.hasClockings = false;
+			});
+	}*/
+	$scope.calculateClockings = function (firstOfMomentISO, lastOfMomentISO) {
+		$scope.clockingTask = {};
+		$http.get('/timbratore/' + firstOfMomentISO + '/' + lastOfMomentISO).
+			success(function (data, status, headers, config) {
+				//if (data.length != 0) {
+					$scope.clockingTask = data;
+				//}
+			}).error(function (data, status, headers, config) {
+				if (status === 401) {
+					$rootScope.errors = [{
+						subject: "Sessione scaduta:",
+						description: "La sessione è scaduta, riautenticarsi per continuare."
+					}];
+					delete $rootScope.user;
+					$location.path("/salgemmainterface/login");
+				} else {
+					$scope.errors = [{
+						subject: "Errore del server:",
+						description: "Riprovare, se l'errore persiste contattare l'amministratore."
+					}];
+					$scope.hasClockings = false;
+				}
 			});
 	}
 
@@ -237,15 +289,17 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					$scope.newInsert($index, day, task, editore, editnote, $scope.tempScope);
 				};
 			};
-			$timeout(function () {
-				$scope.tempScope.editmode = false;
-				$scope.tempScope.focused = false;
-				if (!scope) {
-					$scope.tempScope.$parent.rowSelected = false;
-				};
-				$scope.redrawTable();
-			});
-			$scope.refreshPopover($index, task, day);
+			if (!$scope.errors || $scope.errors.length === 0) {
+				$timeout(function () {
+					$scope.tempScope.editmode = false;
+					$scope.tempScope.focused = false;
+					if (!scope) {
+						$scope.tempScope.$parent.rowSelected = false;
+					};
+					$scope.redrawTable();
+				});
+				$scope.refreshPopover($index, task, day);
+			}
 		} else {
 			document.getElementById("ore-" + task.ids[0] + "-" + $index).focus();
 			$scope.tempScope.editnote = undefined;
@@ -276,8 +330,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 						scope.editnote = undefined;
 						console.log("Edit Successo!!");
 					})
-					.error(function (argument) {
-						console.log("Errore edit!! " + argument);
+					.error(function (data, status, headers, config) {
+						if (status === 401) {
+							$rootScope.errors = [{
+								subject: "Sessione scaduta:",
+								description: "La sessione è scaduta, riautenticarsi per continuare."
+							}];
+							delete $rootScope.user;
+							$location.path("/salgemmainterface/login");
+						} else {
+							console.log("Errore edit!! " + data);
+							$('#loadedErrorDiv').show();
+						}
 					});
 			} else {
 				$scope.delete(day, task, $index, scope);
@@ -301,8 +365,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					scope.editnote = undefined;
 					console.log("Inserimento effettuato con successo.\n");
 				})
-				.error(function (argument) {
-					console.log("Errore!! " + argument);
+				.error(function (data, status, headers, config) {
+					if (status === 401) {
+						$rootScope.errors = [{
+							subject: "Sessione scaduta:",
+							description: "La sessione è scaduta, riautenticarsi per continuare."
+						}];
+						delete $rootScope.user;
+						$location.path("/salgemmainterface/login");
+					} else {
+						console.log("Errore!! " + data);
+						$('#loadedErrorDiv').show();
+					}
 				});
 		}
 	}
@@ -329,8 +403,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 				scope.editnote = undefined;
 				console.log("Edit Successo!!");
 			})
-			.error(function (argument) {
-				console.log("Errore edit!! " + argument);
+			.error(function (data, status, headers, config) {
+				if (status === 401) {
+					$rootScope.errors = [{
+						subject: "Sessione scaduta:",
+						description: "La sessione è scaduta, riautenticarsi per continuare."
+					}];
+					delete $rootScope.user;
+					$location.path("/salgemmainterface/login");
+				} else {
+					console.log("Errore edit!! " + data);
+					$('#loadedErrorDiv').show();
+				}
 			});
 	}
 	$scope.newInsert = function ($index, day, task, editore, editnote, scope) {
@@ -356,8 +440,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 				scope.editnote = undefined;
 				console.log("Inserimento effettuato con successo.\n");
 			})
-			.error(function (argument) {
-				console.log("Errore!! " + argument);
+			.error(function (data, status, headers, config) {
+				if (status === 401) {
+					$rootScope.errors = [{
+						subject: "Sessione scaduta:",
+						description: "La sessione è scaduta, riautenticarsi per continuare."
+					}];
+					delete $rootScope.user;
+					$location.path("/salgemmainterface/login");
+				} else {
+					console.log("Errore!! " + data);
+					$('#loadedErrorDiv').show();
+				}
 			});
 	}
 	$scope.delete = function (day, task, $index, scope) {
@@ -374,8 +468,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 				scope.editore = undefined;
 				scope.editnote = undefined;
 			})
-			.error(function (argument) {
-				console.log("Errore cancellazione!! " + argument);
+			.error(function (data, status, headers, config) {
+				if (status === 401) {
+					$rootScope.errors = [{
+						subject: "Sessione scaduta:",
+						description: "La sessione è scaduta, riautenticarsi per continuare."
+					}];
+					delete $rootScope.user;
+					$location.path("/salgemmainterface/login");
+				} else {
+					console.log("Errore cancellazione!! " + data);
+					$('#loadedErrorDiv').show();
+				}
 			});
 	}
 	$scope.selectedAll = true;
@@ -640,8 +744,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 				$scope.isUserEditing = false;
 				console.log("Edit Successo!!");
 			})
-			.error(function (argument) {
-				console.log("Errore edit!! " + argument);
+			.error(function (data, status, headers, config) {
+				if (status === 401) {
+					$rootScope.errors = [{
+						subject: "Sessione scaduta:",
+						description: "La sessione è scaduta, riautenticarsi per continuare."
+					}];
+					delete $rootScope.user;
+					$location.path("/salgemmainterface/login");
+				} else {
+					console.log("Errore edit!! " + data);
+					$('#loadedErrorDiv').show();
+				}
 			});
 		//});
 	}
@@ -675,8 +789,18 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 					console.log("Password Modificata!!");
 					$scope.editpw = false;
 				})
-				.error(function (argument) {
-					console.log("Errore cambio password!! " + argument);
+				.error(function (data, status, headers, config) {
+					if (status === 401) {
+						$rootScope.errors = [{
+							subject: "Sessione scaduta:",
+							description: "La sessione è scaduta, riautenticarsi per continuare."
+						}];
+						delete $rootScope.user;
+						$location.path("/salgemmainterface/login");
+					} else {
+						console.log("Errore cambio password!! " + data);
+						$('#loadedErrorDiv').show();
+					}
 				});
 		} else {
 			if (CryptoJS.MD5(editoldpw) != $rootScope.user.password) {
@@ -713,6 +837,37 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $cookies, $window) {
 		} else {
 			alert("Non conosco il nome del dominio, forse è stato modificato: contatta l'amministratore di sistema.");
 		}
+	}
+	$scope.makeExcel = function () {
+		var firstMomentISO = moment($scope.firstOfMoment).toISOString();
+		var lastMomentISO = moment($scope.lastOfMoment).toISOString();
+		//$window.open(window.location.origin + '/getexcel/' + firstMomentISO + '/' + lastMomentISO);
+		$http.get('/getexcel/' + firstMomentISO + '/' + lastMomentISO, { responseType: "arraybuffer" })
+			.success(function (data, status, headers, config) {
+				if (headers("content-type") === 'application/vnd.ms-excel'
+					&& headers("x-filename").split(".")[0] === $rootScope.user.nome) {
+					var excelFile = new Blob([data], { type: headers("content-type") });
+					saveAs(excelFile, headers("x-filename"));
+					/*var tempLink = document.createElement('a');
+					tempLink.setAttribute('href', window.URL.createObjectURL(excelFile));
+					tempLink.setAttribute('download', headers("x-filename"));
+					document.body.appendChild(tempLink);
+					tempLink.click();
+					document.body.removeChild(tempLink);*/
+				}
+			})
+			.error(function (data, status, headers, config) {
+				if (status === 401) {
+					$rootScope.errors = [{
+						subject: "Sessione scaduta:",
+						description: "La sessione è scaduta, riautenticarsi per continuare."
+					}];
+					delete $rootScope.user;
+					$location.path("/salgemmainterface/login");
+				} else {
+					alert("Qualcosa è andato storto!: contatta l'amministratore di sistema.");
+				}
+			});
 	}
 	$scope.initializeReportDate = function () {
 		$scope.editFromDate = moment($scope.firstOfMoment).toDate();

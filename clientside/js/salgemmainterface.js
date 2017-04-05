@@ -10,12 +10,12 @@ config(['$routeProvider', function ($routeProvider) {
 run( function ($rootScope, $location, $cookies) {
 	$rootScope.$on( "$routeChangeStart", function (event, next, current) {
 		if(!$rootScope.user){
-			if(!$cookies.user){
+			if(!$cookies.get('user')){
 				if (next.templateUrl !== "pages/autenticazione.html") {
-					$location.path("/salgemmainterface/login")
+					$location.path("/salgemmainterface/login");
 				};
 			} else{
-				$rootScope.user = JSON.parse(decodeURIComponent($cookies.user));
+				$rootScope.user = JSON.parse(decodeURIComponent($cookies.get('user')));
 			};
 		}
 	})

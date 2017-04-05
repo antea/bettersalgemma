@@ -9,7 +9,8 @@
 	"dependencies": {
 		"express": "3.2.1",
 		"mysql": "2.13.0",
-		"moment": "2.10.6"
+		"moment": "2.10.6",
+		"exceljs": "0.4.2"
 	},
 	"devDependencies": {
 		"nodemon": "*"

@@ -6,7 +6,10 @@ var mysql = require('mysql');
 var server = express();
 var path = require('path');
 var moment = require('moment');
-moment().locale('it');
+var excel = require("exceljs");
+var clockingTaskCreator = require("./clockingTaskCreator.js");
+var excelClockingCreator = require("./excelClockingCreator.js");
+moment.locale('it');
 
 server.configure(function () {
 	server.set('port', 8585);
@@ -25,7 +28,7 @@ var pool = mysql.createPool({
 	user: 'matteos',
 	password: 'matteos',
 	waitForConnections: true,
-	connectionLimit: 10
+	connectionLimit: 20
 });
 
 //  <--------------------------> RICHIESTE GET <-------------------------->
@@ -42,6 +45,7 @@ server.get('/login/:login/:pw', function (req, res) {
 			connection.query('SELECT id, ta_userid, orecontrattuali, nome, partitaiva, codicefiscale, indirizzo, cap, citta, provincia, nazione, telefono, cellulare, email, password ' +
 				'FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
 				function (err, results) {
+					connection.release();
 					if (err) {
 						res.send(503, err);
 					} else {
@@ -53,7 +57,6 @@ server.get('/login/:login/:pw', function (req, res) {
 							res.cookie('user', user, { maxAge: 60 * 60 * 1000 }).send(200, results[0]);
 						};
 					};
-					connection.release();
 				});
 		};
 	});
@@ -92,32 +95,37 @@ server.get('/login/:login/:pw', function (req, res) {
 	});
 });*/
 
-server.get('/ordini/:userId/:start/:end', function (req, res) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			res.send(503, err);
-		} else {
-			var start = moment(req.params.start).toDate();
-			//start.setHours(2,start.getTimezoneOffset(),0,0);
-			//start = start.toISOString();
-			var end = moment(req.params.end).toDate();
-			//end.setHours(2,end.getTimezoneOffset(),0,0);
-			//end= end.toISOString();
-			connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
-				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-				'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-				'order by o.descrizione',
-				[req.params.userId, start, end, end, end],
-				function (err, results) {
-					if (err) {
-						res.send(503, err);
-					} else {
-						res.send(201, results);
-					};
-					connection.release();
-				});
-		};
-	});
+server.get('/ordini/:start/:end', function (req, res) {
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else {
+				var start = moment(req.params.start).toDate();
+				//start.setHours(2,start.getTimezoneOffset(),0,0);
+				//start = start.toISOString();
+				var end = moment(req.params.end).toDate();
+				//end.setHours(2,end.getTimezoneOffset(),0,0);
+				//end= end.toISOString();
+				connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+					'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+					'order by o.descrizione',
+					[user.id, start, end, end, end],
+					function (err, results) {
+						connection.release();
+						if (err) {
+							res.send(503, err);
+						} else {
+							res.send(201, results);
+						};
+					});
+			};
+		});
+	}
 });
 
 /*
@@ -153,33 +161,38 @@ server.get('/ordini/:userId/:start/:end', function (req, res) {
 		};
 	});
 });*/
-server.get('/attivita/:userId/:idordine/:start/:end', function (req, res) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			res.send(503, err);
-		} else {
-			var start = moment(req.params.start).toDate();
-			//start.setHours(2,start.getTimezoneOffset(),0,0);
-			//start = start.toISOString();
-			var end = moment(req.params.end).toDate();
-			//end.setHours(2,end.getTimezoneOffset(),0,0);
-			//end= end.toISOString();
-			connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
-				'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-				'WHERE p.idrisorsa=? AND r.idtabella=? AND ' +
-				'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-				'group by r.descrizione order by r.descrizione ',
-				[req.params.userId, req.params.idordine, start, end, end, end],
-				function (err, results) {
-					if (err) {
-						res.send(503, err);
-					} else {
-						res.send(201, results);
-					};
-					connection.release();
-				});
-		};
-	});
+server.get('/attivita/:idordine/:start/:end', function (req, res) {
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else {
+				var start = moment(req.params.start).toDate();
+				//start.setHours(2,start.getTimezoneOffset(),0,0);
+				//start = start.toISOString();
+				var end = moment(req.params.end).toDate();
+				//end.setHours(2,end.getTimezoneOffset(),0,0);
+				//end= end.toISOString();
+				connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
+					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
+					'WHERE p.idrisorsa=? AND r.idtabella=? AND ' +
+					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
+					'group by r.descrizione order by r.descrizione ',
+					[user.id, req.params.idordine, start, end, end, end],
+					function (err, results) {
+						connection.release();
+						if (err) {
+							res.send(503, err);
+						} else {
+							res.send(201, results);
+						};
+					});
+			};
+		});
+	}
 });
 
 /*
@@ -215,36 +228,175 @@ server.get('/attivita/:userId/:idordine/:start/:end', function (req, res) {
 		};
 	});
 });*/
-server.get('/storico/:userId/:start/:end/:idordine/:idsattivita', function (req, res) {
+server.get('/storico/:start/:end/:idordine/:idsattivita', function (req, res) {
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		trovaPianificazione(user.id, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
+			if (err) {
+				res.send(503, err);
+			} else {
+				pool.getConnection(function (err, connection) {
+					if (err) {
+						res.send(503, err);
+					} else {
+						var start = moment(req.params.start).toDate();
+						var end = moment(req.params.end).toDate();
+						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie ' +
+							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) ' +
+							'JOIN ordine AS o ON r.idtabella=o.id ' +
+							'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
+							[user.id, start, end, idsPianificazione],
+							function (err, results) {
+								connection.release();
+								if (err) {
+									res.send(503, err);
+								} else {
+									res.send(201, results);
+								};
+							});
+					};
+				})
+			};
+		});
+	}
+});
+
+//  <--------------------------> RICHIESTE GET TIMBRATORE <-------------------------->
+
+server.get('/timbratore/:start/:end', function (req, res) {
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		var start = moment(req.params.start);
+		var end = moment(req.params.end);
+		getClockingForUser(user, start, end, function (errors, results) {
+			if (errors) {
+				res.send(503, errors);
+			} else {
+				res.send(200, results);
+			}
+		});
+	};
+});
+
+function getClockingForUser(user, start, end, callback) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			callback(err, clockingTask);
+		} else {
+			connection.query('SELECT a.CLOCKING FROM ta_ATTENDANT AS a WHERE a.USERID=? AND (a.CLOCKING>=? AND a.CLOCKING<=?) AND' +
+				'(a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) ORDER BY a.CLOCKING',
+				[user.ta_userid, moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
+					connection.release();
+					if (err) {
+						callback(err, queryResults);
+					} else {
+						var inspectedResults = [];
+						var prevDay;
+						queryResults.forEach(function (result) {
+							if (!moment(result.CLOCKING).isSame(moment(prevDay), 'day')) {
+								prevDay = moment(result.CLOCKING);
+								var clockingsTime = [];
+								clockingsTime.push(moment(result.CLOCKING));
+								inspectedResults.push({
+									day: prevDay,
+									clockings: clockingsTime
+								});
+							} else {
+								inspectedResults[inspectedResults.length - 1].clockings.push(moment(result.CLOCKING));
+							}
+						});
+						var clockingTask = clockingTaskCreator.createClockings(inspectedResults, start, end, user);
+						callback(err, clockingTask);
+					};
+				});
+		}
+	});
+}
+
+function getAllClockingInPeriod(start, end, callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
 			res.send(503, err);
 		} else {
-			trovaPianificazione(connection, req.params.userId, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
-				if (err) {
+			connection.query('SELECT a.USERID, GROUP_CONCAT(a.CLOCKING order by a.CLOCKING) AS CLOCKINGS FROM ta_ATTENDANT AS a ' +
+				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) AND a.USERID!=38 group by a.USERID',
+				[moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
 					connection.release();
-					res.send(503, err);
-				} else {
-					var start = moment(req.params.start).toDate();
-					var end = moment(req.params.end).toDate();
-					connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie ' +
-						'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) ' +
-						'JOIN ordine AS o ON r.idtabella=o.id ' +
-						'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
-						[req.params.userId, start, end, idsPianificazione],
-						function (err, results) {
-							if (err) {
-								res.send(503, err);
-							} else {
-								res.send(201, results);
-							};
-							connection.release();
+					if (err) {
+						callback(err, queryResults);
+					} else {
+						var inspectedResults = [];
+						var prevDay;
+						queryResults.forEach(function (result) {
+							var userResults = [];
+							result.CLOCKINGS = result.CLOCKINGS.split(',');
+							result.CLOCKINGS.forEach(function (clocking) {
+								if (!moment(clocking).isSame(moment(prevDay), 'day')) {
+									prevDay = moment(clocking);
+									var clockingsTime = [];
+									clockingsTime.push(moment(clocking));
+									userResults.push({
+										day: prevDay,
+										clockings: clockingsTime
+									});
+								} else {
+									userResults[userResults.length - 1].clockings.push(moment(clocking));
+								}
+							});
+							inspectedResults.push({
+								userId: result.USERID,
+								userClokings: userResults
+							});
 						});
-				};
-			})
-		};
+						getAllUsersWithClockings(function (error, users) {
+							if (error) {
+								callback(error, null);
+							} else {
+								inspectedResults.forEach(function (inspectedResult) {
+									var inspectedUser = users.filter(function (user) {
+										return user.ta_userid == inspectedResult.userId;
+									})[0];
+									if (inspectedUser) {
+										var clockingTask = clockingTaskCreator.createClockings(inspectedResult.userClokings, start, end, inspectedUser);
+										inspectedResult.clockingTask = clockingTask;
+										inspectedResult.user = inspectedUser;
+										delete inspectedResult.userId;
+										delete inspectedResult.userClokings;
+									} else {
+										err.message = "Un utente non correttamente registrato ha timbrato. Controllare il database."
+										callback(err, null);
+									}
+								});
+								callback(err, inspectedResults);
+							}
+						});
+					};
+				});
+		}
 	});
-});
+}
+
+function getAllUsersWithClockings(callback) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			res.send(503, err);
+		} else {
+			connection.query('SELECT id, ta_userid, orecontrattuali, nome FROM risorsa WHERE ta_userid IS NOT NULL',
+				function (err, queryResults) {
+					connection.release();
+					if (err) {
+						callback(err, queryResults);
+					} else {
+						callback(err, queryResults);
+					};
+				});
+		}
+	});
+}
 
 //  <--------------------------> RICHIESTE POST <-------------------------->
 
@@ -255,42 +407,47 @@ alla funzione calcolaCostiRicavi.
 Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 */
 server.post('/insertstorico', function (req, res) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			res.send(503, err);
-		} else {
-			trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
-				var idPianificazione = idsPianificazione.split(',');
-				idPianificazione = idPianificazione[0];
-				if (err) {
-					res.send(500, err);
-				} else {
-					calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, tupla) {
-						if (err) {
-							res.send(500, err);
-						} else {
-							tupla.idrisorsa = req.body.idrisorsa,
-								tupla.idpianificazione = idPianificazione,
-								tupla.quantita = 0;
-							tupla.giorno = new Date(req.body.giorno);
-							tupla.secondi = req.body.secondi;
-							tupla.note = req.body.note;
-							tupla.ferie = req.body.ferie ? req.body.ferie : false;
-							connection.query('INSERT INTO storico SET ?',
-								tupla, function (err, results) {
-									if (err) {
-										res.send(503, err);
-									} else {
-										res.send(201, results);
-									};
-									connection.release();
-								});
-						}
-					});
-				}
-			});
-		};
-	});
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
+			var idPianificazione = idsPianificazione.split(',');
+			idPianificazione = idPianificazione[0];
+			if (err) {
+				res.send(500, err);
+			} else {
+				calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, tupla) {
+					if (err) {
+						res.send(500, err);
+					} else {
+						tupla.idrisorsa = req.body.idrisorsa,
+							tupla.idpianificazione = idPianificazione,
+							tupla.quantita = 0;
+						tupla.giorno = new Date(req.body.giorno);
+						tupla.secondi = req.body.secondi;
+						tupla.note = req.body.note;
+						tupla.ferie = req.body.ferie ? req.body.ferie : false;
+						pool.getConnection(function (errors, connection) {
+							if (errors) {
+								res.send(503, errors);
+							} else {
+								connection.query('INSERT INTO storico SET ?',
+									tupla, function (err, results) {
+										connection.release();
+										if (err) {
+											res.send(503, err);
+										} else {
+											res.send(201, results);
+										};
+									});
+							}
+						});
+					}
+				});
+			}
+		});
+	}
 });
 
 //  <--------------------------> RICHIESTE PUT <-------------------------->
@@ -302,74 +459,92 @@ e demandato alla funzione calcolaCostiRicavi.
 Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 */
 server.put('/editstorico', function (req, res) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			res.send(503, err);
-		} else {
-			connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results) {
-				if (err) {
-					res.send(503, err);
-				} else {
-					trovaPianificazione(connection, req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
-						var idPianificazione = idsPianificazione.split(',');
-						idPianificazione = idPianificazione[0];
-						if (err) {
-							res.send(503, err);
-						} else {
-							calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, nuovaTupla) {
-								if (err) {
-									res.send(503, err);
-								} else {
-									nuovaTupla.id = req.body.id;
-									nuovaTupla.idrisorsa = req.body.idrisorsa;
-									nuovaTupla.idpianificazione = idPianificazione;
-									nuovaTupla.quantita = 0;
-									nuovaTupla.giorno = new Date(req.body.giorno);
-									nuovaTupla.secondi = req.body.secondi;
-									nuovaTupla.note = req.body.note;
-									nuovaTupla.ferie = req.body.ferie ? req.body.ferie : false;
-									if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
-										nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
-										nuovaTupla.secondi == results[0].secondi &&
-										nuovaTupla.note == results[0].note &&
-										nuovaTupla.ferie == results[0].ferie) {
-										res.send(201, 'Nessuna modifica apportata, riga identica.');
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else {
+				connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results) {
+					connection.release();
+					if (err) {
+						res.send(503, err);
+					} else {
+						trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
+							var idPianificazione = idsPianificazione.split(',');
+							idPianificazione = idPianificazione[0];
+							if (err) {
+								res.send(503, err);
+							} else {
+								calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, nuovaTupla) {
+									if (err) {
+										res.send(503, err);
 									} else {
-										connection.query('UPDATE storico SET ? WHERE id=?',
-											[nuovaTupla, req.body.id], function (err, results) {
-												if (err) {
-													res.send(503, err);
+										nuovaTupla.id = req.body.id;
+										nuovaTupla.idrisorsa = req.body.idrisorsa;
+										nuovaTupla.idpianificazione = idPianificazione;
+										nuovaTupla.quantita = 0;
+										nuovaTupla.giorno = new Date(req.body.giorno);
+										nuovaTupla.secondi = req.body.secondi;
+										nuovaTupla.note = req.body.note;
+										nuovaTupla.ferie = req.body.ferie ? req.body.ferie : false;
+										if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
+											nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
+											nuovaTupla.secondi == results[0].secondi &&
+											nuovaTupla.note == results[0].note &&
+											nuovaTupla.ferie == results[0].ferie) {
+											res.send(201, 'Nessuna modifica apportata, riga identica.');
+										} else {
+											pool.getConnection(function (errors, connection) {
+												if (errors) {
+													res.send(503, errors);
 												} else {
-													res.send(201, results);
+													connection.query('UPDATE storico SET ? WHERE id=?',
+														[nuovaTupla, req.body.id], function (err, results) {
+															connection.release();
+															if (err) {
+																res.send(503, err);
+															} else {
+																res.send(201, results);
+															}
+														});
 												}
 											});
+										}
 									}
-								}
-							});
-						}
-					});
-				}
-				connection.release();
-			});
-		}
-	});
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+	}
 });
 
 server.put("/edituser", function (req, res) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			res.send(503, err);
-		} else {
-			connection.query('UPDATE risorsa SET ? WHERE id=? ', [req.body, req.body.id], function (err, results) {
-				if (err) {
-					res.send(503, err);
-				} else {
-					res.send(201, results);
-				};
-			})
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else {
+				connection.query('UPDATE risorsa SET ? WHERE id=? ', [req.body, req.body.id], function (err, results) {
+					connection.release();
+					if (err) {
+						res.send(503, err);
+					} else {
+						res.send(201, results);
+					};
+				})
 
-		};
-	})
+			};
+		});
+	}
 });
 
 //  <--------------------------> RICHIESTE DELETE <-------------------------->
@@ -380,21 +555,26 @@ tupla da cancellare.
 Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 errore dell'utente.
 */
 server.delete('/deletestorico/:idstorico', function (req, res) {
-	pool.getConnection(function (err, connection) {
-		if (err) {
-			res.send(503, err);
-		} else {
-			connection.query('DELETE FROM storico WHERE id=?', [req.params.idstorico],
-				function (err, results) {
-					if (err) {
-						res.send(503, err);
-					} else {
-						res.send(201, results)
-					};
-					connection.release();
-				})
-		};
-	});
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		pool.getConnection(function (err, connection) {
+			if (err) {
+				res.send(503, err);
+			} else {
+				connection.query('DELETE FROM storico WHERE id=?', [req.params.idstorico],
+					function (err, results) {
+						connection.release();
+						if (err) {
+							res.send(503, err);
+						} else {
+							res.send(201, results)
+						};
+					})
+			};
+		});
+	}
 });
 
 //  <--------------------------> FUNZIONI AGGIUNTIVE <-------------------------->
@@ -439,13 +619,13 @@ function calcolaCosto(pianificazione, secondi, callback) {
 				'JOIN articololistino AS al ON p.idlistinorisorsa=al.idlistino AND r.idarticolo=al.idarticolo ' +
 				'WHERE p.id=?', [pianificazione],
 				function (err, results) {
+					connection.release();
 					if (err || results.length === 0) {
 						callback(err, 0);
 					} else {
 						var costo = results[0].costo * (secondi / 3600);
 						callback(err, costo);
 					};
-					connection.release();
 				});
 		};
 	});
@@ -468,13 +648,13 @@ function calcolaRicavo(pianificazione, secondi, callback) {
 				'JOIN articololistino AS al ON offe.idlistino=al.idlistino AND r.idarticolo=al.idarticolo ' +
 				'WHERE p.id=?', [pianificazione],
 				function (err, results) {
+					connection.release();
 					if (err || results.length === 0) {
 						callback(err, 0);
 					} else {
 						var ricavo = results[0].ricavo * (secondi / 3600);
 						callback(err, ricavo);
 					};
-					connection.release();
 				});
 		};
 	});
@@ -485,53 +665,77 @@ La funzione seguente riceve come parametri lo userId, l'id dell'ordine e quello 
 Trova l'id della pianificazione associata a questi parametri e applica la funzione di callback passatagli come ultimo
 parametro all'id della pianificazione appena trovato.
 */
-function trovaPianificazione(connection, userId, idOrdine, idsAttivita, callback) {
-	connection.query('SELECT GROUP_CONCAT(p.id) AS ids ' +
-		'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
-		'WHERE p.idrisorsa=? AND ord.id=? AND r.id IN (?)', [userId, idOrdine, idsAttivita],
-		function (err, results) {
-			if (err) {
-				callback(err);
-			} else {
-				var idPianificazione = results[0].ids;
-				callback(null, idPianificazione);
-			};
-		});
+function trovaPianificazione(userId, idOrdine, idsAttivita, callback) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			callback(err);
+		} else {
+			connection.query('SELECT GROUP_CONCAT(p.id) AS ids ' +
+				'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
+				'WHERE p.idrisorsa=? AND ord.id=? AND r.id IN (?)', [userId, idOrdine, idsAttivita],
+				function (errors, results) {
+					connection.release();
+					if (errors) {
+						callback(errors);
+					} else {
+						var idPianificazione = results[0].ids;
+						callback(null, idPianificazione);
+					};
+				});
+		}
+	});
 };
 
-//  <--------------------------> RICHIESTE GET TIMBRATORE <-------------------------->
+//  <--------------------------> FUNZIONI EXCEL <-------------------------->
 
-server.get('/timbratore/:ta_userid/:start/:end', function (req, res) {
-	pool.getConnection(function (err, connection) {
+server.get('/getexcel/:start/:end', function (req, res) {
+	if (!req.cookies.user) {
+		res.send(401);
+	} else {
+		var user = JSON.parse(decodeURIComponent(req.cookies.user));
+		var start = moment(req.params.start);
+		var end = moment(req.params.end);
+		getClockingForUser(user, start, end, function (errors, results) {
+			if (errors) {
+				res.send(503, errors);
+			} else {
+				var userClockingsArray = [{ user: user, clockingTask: results }];
+				var workbook = new excel.Workbook();
+				workbook.creator = "BetterSalgemma";
+				workbook.created = moment().toDate();
+				var sheet = workbook.addWorksheet(user.nome);
+				excelClockingCreator.createClockingTableExcel(sheet, userClockingsArray, start);
+				res.setHeader("Content-Type", "application/vnd.ms-excel");
+				res.setHeader("Content-disposition", "attachment");
+				res.setHeader("x-filename", user.nome + ".xlsx");
+				workbook.xlsx.write(res)
+					.then(function () {
+						res.end();
+					});
+			}
+		});
+	}
+});
+
+server.get('/gettotalexcel/:start/:end', function (req, res) {
+	var start = moment(req.params.start);
+	var end = moment(req.params.end);
+	getAllClockingInPeriod(start, end, function (err, results) {
 		if (err) {
 			res.send(503, err);
 		} else {
-			var start = moment(req.params.start).toDate();
-			var end = moment(req.params.end).toDate();
-			connection.query('SELECT a.CLOCKING FROM ta_ATTENDANT AS a WHERE a.USERID=? AND (a.CLOCKING>=? AND a.CLOCKING<=?) ORDER BY a.CLOCKING',
-				[req.params.ta_userid, start, end], function (err, results) {
-					if (err) {
-						res.send(503, err)
-					} else {
-						var inspectedResults = [];
-						var prevDay;
-						results.forEach(function (result) {
-							if (!moment(result.CLOCKING).isSame(moment(prevDay), 'day')) {
-								prevDay = moment(result.CLOCKING);
-								var clockingsTime = [];
-								clockingsTime.push(moment(result.CLOCKING));
-								inspectedResults.push({
-									day: prevDay,
-									clockings: clockingsTime
-								});
-							} else {
-								inspectedResults[inspectedResults.length - 1].clockings.push(moment(result.CLOCKING));
-							}
-						});
-						res.send(200, inspectedResults);
-					};
-					connection.release();
+			var workbook = new excel.Workbook();
+			workbook.creator = "BetterSalgemma";
+			workbook.created = moment();
+			var monthString = moment(end).format("MMMM-YYYY");
+			var sheet = workbook.addWorksheet(monthString);
+			excelClockingCreator.createClockingTableExcel(sheet, results, start);
+			res.setHeader("Content-Type", "application/vnd.ms-excel");
+			res.setHeader("Content-disposition", "attachment;filename=" + monthString + ".xlsx");
+			workbook.xlsx.write(res)
+				.then(function () {
+					res.end();
 				});
-		};
+		}
 	});
 });
