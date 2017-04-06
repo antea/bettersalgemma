@@ -11,12 +11,12 @@ moment().locale('it');
  * @param {moment} firstOfMoment 
  */
 function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment) {
-	//var sheet = workbook.addWorksheet(userName);
 	usersClockingsTaskArray.forEach(function (userClockingsTask, userIndex) {
 		var user = userClockingsTask.user;
 		var clockingTask = userClockingsTask.clockingTask;
+		var monthLength = clockingTask.mese.length;
 		if (!excelColumn) {
-			var excelColumn = new Array(clockingTask.mese.length);
+			var excelColumn = new Array(monthLength);
 			excelColumn.fill({ header: "", width: 5 });
 			excelColumn = [{ header: "", key: 'name', width: 20 }].concat(excelColumn).concat([{ header: "", key: "total", width: 7 }]);
 		}
@@ -39,16 +39,23 @@ function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment)
 		sheet.addRow(clockingRow).commit();
 		var emptyRow = new Array(clockingRow.length - 1);
 		emptyRow.fill("");
-		sheet.addRow(["Ore ordinarie"].concat(emptyRow)).commit();
-		sheet.addRow(["Ore viaggio"].concat(emptyRow)).commit();
-		sheet.addRow(["Ore straordinarie"].concat(emptyRow)).commit();
-		sheet.addRow(["Ore ferie"].concat(emptyRow)).commit();
-		sheet.addRow(["Ore permessi"].concat(emptyRow)).commit();
-		sheet.addRow(["Ore malattia"].concat(emptyRow)).commit();
-		sheet.addRow(["Altro(Specificare nelle note)"].concat(emptyRow)).commit();
-		sheet.addRow(["Giorno trasferta"].concat(emptyRow)).commit();
+		sheet.addRow(["Ore ordinarie"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Ore viaggio"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Ore straordinarie"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Ore ferie"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Ore permessi"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Ore malattia"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Altro(Specificare nelle note)"].concat(emptyRow));
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
+		sheet.addRow(["Giorno trasferta"].concat(emptyRow));
 		var lastRowWithoutNote = sheet.lastRow;
-		lastRowWithoutNote.commit();
+		addTotalFormulaAndCommitLastEditableRow(sheet, monthLength);
 		setStyleToTable(sheet, firstRowTable, lastRowWithoutNote, firstOfMoment);
 		sheet.addRow(["Note"].concat(emptyRow));
 		var noteRow = sheet.lastRow;
@@ -59,13 +66,23 @@ function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment)
 				cell.style = getDefaultStyle();
 			}
 		});
-		sheet.mergeCells(noteRow.getCell(2).address, noteRow.getCell(clockingTask.mese.length + 2).address);
+		sheet.mergeCells(noteRow.getCell(2).address, noteRow.getCell(monthLength + 2).address);
 		noteRow.commit();
 		firstRowTable.getCell(1).style = getNameStyle();
 		firstRowTable.commit();
 		sheet.addRow([""].concat(emptyRow)).commit();
 		sheet.addRow([""].concat(emptyRow)).commit();
 	});
+}
+
+/**
+ * Aggiunge la formula di somma sulla riga passata, dalla seconda cella a quella numero monthLength + 1.
+ */
+function addTotalFormulaAndCommitLastEditableRow(sheet, monthLength) {
+	var editableRow = sheet.lastRow;
+	var resultFormula = 'SUM(' + editableRow.getCell(2).address + ':' + editableRow.getCell(monthLength + 1).address + ')';
+	editableRow.getCell(monthLength + 2).value = {formula: resultFormula};
+	editableRow.commit();
 }
 
 /**
