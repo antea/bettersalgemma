@@ -17,26 +17,26 @@ function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment)
 		var clockingTask = userClockingsTask.clockingTask;
 		if (!excelColumn) {
 			var excelColumn = new Array(clockingTask.mese.length);
-			excelColumn.fill({ header: "", width: 4.5 });
+			excelColumn.fill({ header: "", width: 5 });
 			excelColumn = [{ header: "", key: 'name', width: 20 }].concat(excelColumn).concat([{ header: "", key: "total", width: 7 }]);
 		}
 		var headersRow = [user.nome];
-		var clockingRow = ["Marcatempo arrotondato"];
-		var actualClockingRow = ["Marcatempo effettivo"];
+		var actualClockingRow = ["Ore effettive scalate"];
+		var clockingRow = ["Ore Pagate"];
 		clockingTask.mese.forEach(function (day, index) {
 			var dayOfMonth = moment(firstOfMoment).add(index, 'days').date();
 			headersRow.push(dayOfMonth);
-			clockingRow.push(day.calculatedWorkedTime);
 			actualClockingRow.push(day.actualWorkedTime);
+			clockingRow.push(day.calculatedWorkedTime);
 		});
 		headersRow.push("Totali");
-		clockingRow.push(clockingTask.totalWorkedTime);
 		actualClockingRow.push(clockingTask.totalActualTime);
+		clockingRow.push(clockingTask.totalWorkedTime);
 		sheet.columns = excelColumn;
 		sheet.addRow(headersRow);
 		var firstRowTable = sheet.lastRow;
-		sheet.addRow(clockingRow).commit();
 		sheet.addRow(actualClockingRow).commit();
+		sheet.addRow(clockingRow).commit();
 		var emptyRow = new Array(clockingRow.length - 1);
 		emptyRow.fill("");
 		sheet.addRow(["Ore ordinarie"].concat(emptyRow)).commit();

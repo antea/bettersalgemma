@@ -59,7 +59,7 @@ angular.module('salgemmainterfaceFilters', [])
 						titleString = "<strong>Marcature:</strong>";
 						contentString += "<p><em>" + description[index] + "</em>" + moment(clocking).format("HH:mm") + "</p>";
 					});
-					contentString += "<p><strong>Ore effettive: </strong>" + scope.taskDay.actualWorkedTime + "</p>";
+					//contentString += "<p><strong>Ore effettive: </strong>" + scope.taskDay.actualWorkedTime + "</p>";
 					
 				}
 				$(element).popover({

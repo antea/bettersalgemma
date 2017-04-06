@@ -106,13 +106,24 @@
 						</tr>
 						<tr ng-if="hasClockings">
 							<th id="headers" name="headers"><h5>Timbratore</h5></th>
-							<th id="headers" name="headers"><h5>Timbratore</h5></th>
+							<th id="headers" name="headers"><h5>Ore Effettive</h5></th>
+							<th ng-repeat="taskDay in clockingTask.mese track by $index" id="headers" name="headers">
+								<h5 clockingspopover ng-if="taskDay.areClockingsOk">{{taskDay.actualWorkedTime}}</h5>
+								<span clockingspopover ng-if="!taskDay.areClockingsOk" class="glyphicon glyphicon-alert"></span>
+							</th>
+							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Ore Effettive</h5></th>
+							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Timbratore</h5></th>
+							<th id="headers" name="headers"><h5>{{clockingTask.totalActualTime}}</h5></th>
+						</tr>
+						<tr ng-if="hasClockings">
+							<th id="headers" name="headers"><h5></h5></th>
+							<th id="headers" name="headers"><h5>Ore Pagate</h5></th>
 							<th ng-repeat="taskDay in clockingTask.mese track by $index" id="headers" name="headers">
 								<h5 clockingspopover ng-if="taskDay.areClockingsOk">{{taskDay.calculatedWorkedTime}}</h5>
 								<span clockingspopover ng-if="!taskDay.areClockingsOk" class="glyphicon glyphicon-alert"></span>
 							</th>
-							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Timbratore</h5></th>
-							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Timbratore</h5></th>
+							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Ore Pagate</h5></th>
+							<th id="headers" name="headers" ng-if="isXOverflow"><h5></h5></th>
 							<th id="headers" name="headers"><h5>{{clockingTask.totalWorkedTime}}</h5></th>
 						</tr>
 					</tfoot>
