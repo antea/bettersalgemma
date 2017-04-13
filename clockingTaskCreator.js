@@ -29,8 +29,6 @@ function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 		var lastClockingMoment = moment(momentArray[3]).second(0);
 		var minStartMoment = moment(firstClockingMoment).set(MIN_START_TIME);
 		var maxStartMoment = moment(firstClockingMoment).set(MAX_START_TIME);
-		var maxEndMoment = moment(maxStartMoment).add(fullTimeHours + 1, 'h');
-		var minEndMoment = moment(minStartMoment).add(fullTimeHours + 1, 'h');
 		if (!fullTimeHours) {
 			workedPayedTime = calculateActualClockedTime(momentArray);
 		} else if (fullTimeHours < 0) {
@@ -40,6 +38,8 @@ function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 			var roundedArray = [firstClockingMoment].concat(momentArray.slice(1));
 			workedPayedTime = calculateActualClockedTime(roundedArray);
 		} else {
+			var maxEndMoment = moment(maxStartMoment).add(fullTimeHours + 1, 'h');
+			var minEndMoment = moment(minStartMoment).add(fullTimeHours + 1, 'h');
 			var startDelay = 0;
 			var endAdvance = 0;
 			if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
@@ -67,7 +67,7 @@ function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 			var totalWorkedTime = totalTimeInOffice - calculateLunchbreak(momentArray[1], momentArray[2], lunchErrors);
 
 			var totalWorkedPayedTime = totalWorkedTime - (totalWorkedTime % TOTAL_ROUND_MINUTES);
-			workedPayedTime = totalWorkedPayedTime >= fullTimeHours ? fullTimeHours : totalWorkedPayedTime;
+			workedPayedTime = totalWorkedPayedTime >= moment.duration(fullTimeHours, 'h').asMinutes() ? moment.duration(fullTimeHours, 'h').asMinutes() : totalWorkedPayedTime;
 			workedPayedTime = moment.duration((workedPayedTime - startDelay - endAdvance - lunchErrors.advance - lunchErrors.delay), 'm');
 		}
 	} else if (momentArray.length == 2) {//secondClockingMoment && !thirdClockingMoment && !lastClockingMoment) {
@@ -104,7 +104,7 @@ function calculateLunchbreak(startLunch, endLunch, lunchErrors) {
 			maxRoundedEndLunch = moment(maxRoundedEndLunch).add(TOTAL_ROUND_MINUTES, 'm');
 		}
 		endLunch = moment(maxRoundedEndLunch);
-		lunchErrors.delay = moment(endLunch).diff(maxEndLunch);
+		lunchErrors.delay = moment(endLunch).diff(maxEndLunch, 'minutes');
 	};
 	var lunchPeriod = moment(endLunch).diff(moment(startLunch), 'minutes');
 	if (lunchPeriod < MIN_LUNCH_MINUTES) {
