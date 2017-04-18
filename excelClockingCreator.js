@@ -23,20 +23,26 @@ function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment)
 		var headersRow = [user.nome];
 		var actualClockingRow = ["Ore effettive scalate"];
 		var clockingRow = ["Ore Pagate"];
+		var differenceRow = ["Differenza"];
 		clockingTask.mese.forEach(function (day, index) {
 			var dayOfMonth = moment(firstOfMoment).add(index, 'days').date();
 			headersRow.push(dayOfMonth);
 			actualClockingRow.push(day.actualWorkedTime);
 			clockingRow.push(day.calculatedWorkedTime);
+			var difference = day.actualWorkedTime - day.calculatedWorkedTime;
+			differenceRow.push(difference != 0 ? difference : "");
 		});
 		headersRow.push("Totali");
 		actualClockingRow.push(clockingTask.totalActualTime);
 		clockingRow.push(clockingTask.totalWorkedTime);
+		var totalDifference = clockingTask.totalActualTime - clockingTask.totalWorkedTime;
+		differenceRow.push(totalDifference != 0 ? totalDifference : "");
 		sheet.columns = excelColumn;
 		sheet.addRow(headersRow);
 		var firstRowTable = sheet.lastRow;
 		sheet.addRow(actualClockingRow).commit();
 		sheet.addRow(clockingRow).commit();
+		sheet.addRow(differenceRow).commit();
 		var emptyRow = new Array(clockingRow.length - 1);
 		emptyRow.fill("");
 		sheet.addRow(["Ore ordinarie"].concat(emptyRow));
@@ -81,7 +87,7 @@ function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment)
 function addTotalFormulaAndCommitLastEditableRow(sheet, monthLength) {
 	var editableRow = sheet.lastRow;
 	var resultFormula = 'SUM(' + editableRow.getCell(2).address + ':' + editableRow.getCell(monthLength + 1).address + ')';
-	editableRow.getCell(monthLength + 2).value = {formula: resultFormula};
+	editableRow.getCell(monthLength + 2).value = { formula: resultFormula };
 	editableRow.commit();
 }
 

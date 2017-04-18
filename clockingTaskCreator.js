@@ -7,6 +7,7 @@ const MIN_LUNCH_MINUTES = 30;
 const MIN_START_TIME = { hour: 8, minute: 0 };
 const MAX_START_TIME = { hour: 9, minute: 0 };
 const MAX_END_TIME = { hour: 18, minute: 0 };
+const MIN_END_TIME = { hour: 17, minute: 0 };
 const MIN_START_LUNCH = { hour: 12, minute: 0 };
 const MAX_END_LUNCH = { hour: 14, minute: 0 };
 
@@ -24,54 +25,46 @@ const MAX_END_LUNCH = { hour: 14, minute: 0 };
  */
 function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 	var workedPayedTime = moment.duration(-1, 'h');
-	if (momentArray.length == 4) {//firstClockingMoment && secondClockingMoment && thirdClockingMoment && lastClockingMoment) {
+	if (momentArray.length == 4 || momentArray.length == 2) {
 		var firstClockingMoment = moment(momentArray[0]).second(0);
-		var lastClockingMoment = moment(momentArray[3]).second(0);
+		var lastClockingMoment = momentArray.length == 4 ? moment(momentArray[3]).second(0) : moment(momentArray[1]).second(0);
 		var minStartMoment = moment(firstClockingMoment).set(MIN_START_TIME);
 		var maxStartMoment = moment(firstClockingMoment).set(MAX_START_TIME);
-		if (!fullTimeHours) {
-			workedPayedTime = calculateActualClockedTime(momentArray);
-		} else if (fullTimeHours < 0) {
-			if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
-				firstClockingMoment = moment(minStartMoment);
+		var maxEndMoment = moment(maxStartMoment).add(fullTimeHours + 1, 'h');
+		var minEndMoment = moment(minStartMoment).add(fullTimeHours + 1, 'h');
+		var startDelay = 0;
+		var endAdvance = 0;
+		if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
+			firstClockingMoment = moment(minStartMoment);
+		} else if (firstClockingMoment.isAfter(maxStartMoment, 'minute')) {
+			var maxRoundedStartMoment = moment(maxStartMoment);
+			while (firstClockingMoment.isAfter(moment(maxRoundedStartMoment).add(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
+				maxRoundedStartMoment = moment(maxRoundedStartMoment).add(TOTAL_ROUND_MINUTES, 'm');
 			}
-			var roundedArray = [firstClockingMoment].concat(momentArray.slice(1));
-			workedPayedTime = calculateActualClockedTime(roundedArray);
-		} else {
-			var maxEndMoment = moment(maxStartMoment).add(fullTimeHours + 1, 'h');
-			var minEndMoment = moment(minStartMoment).add(fullTimeHours + 1, 'h');
-			var startDelay = 0;
-			var endAdvance = 0;
-			if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
-				firstClockingMoment = moment(minStartMoment);
-			} else if (firstClockingMoment.isAfter(maxStartMoment, 'minute')) {
-				var maxRoundedStartMoment = moment(maxStartMoment);
-				while (firstClockingMoment.isAfter(moment(maxRoundedStartMoment).add(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
-					maxRoundedStartMoment = moment(maxRoundedStartMoment).add(TOTAL_ROUND_MINUTES, 'm');
-				}
-				firstClockingMoment = moment(maxRoundedStartMoment);
-				startDelay = moment(firstClockingMoment).diff(maxStartMoment, 'minutes');
-			};
-			if (lastClockingMoment.isAfter(maxEndMoment, 'minute')) {
-				lastClockingMoment = moment(maxEndMoment);
-			} else if (lastClockingMoment.isBefore(minEndMoment, 'minute')) {
-				var minRoundedEndMoment = moment(minEndMoment);
-				while (lastClockingMoment.isBefore(moment(minRoundedEndMoment).subtract(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
-					minRoundedEndMoment = moment(minRoundedEndMoment).subtract(TOTAL_ROUND_MINUTES, 'm');
-				}
-				lastClockingMoment = moment(minRoundedEndMoment);
-				endAdvance = moment(maxEndMoment).diff(lastClockingMoment, 'minutes');
-			};
-			var totalTimeInOffice = moment(lastClockingMoment).diff(moment(firstClockingMoment), 'minutes');
-			var lunchErrors = { advance: 0, delay: 0 };
-			var totalWorkedTime = totalTimeInOffice - calculateLunchbreak(momentArray[1], momentArray[2], lunchErrors);
+			firstClockingMoment = moment(maxRoundedStartMoment);
+			startDelay = moment(firstClockingMoment).diff(maxStartMoment, 'minutes');
+		};
+		if (lastClockingMoment.isAfter(maxEndMoment, 'minute')) {
+			lastClockingMoment = moment(maxEndMoment);
+		} else if (lastClockingMoment.isBefore(minEndMoment, 'minute')) {
+			var minRoundedEndMoment = moment(minEndMoment);
+			while (lastClockingMoment.isBefore(moment(minRoundedEndMoment).subtract(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
+				minRoundedEndMoment = moment(minRoundedEndMoment).subtract(TOTAL_ROUND_MINUTES, 'm');
+			}
+			lastClockingMoment = moment(minRoundedEndMoment);
+			endAdvance = moment(maxEndMoment).diff(lastClockingMoment, 'minutes');
+		};
+		var totalTimeInOffice = moment(lastClockingMoment).diff(moment(firstClockingMoment), 'minutes');
+		var lunchErrors = { advance: 0, delay: 0 };
+		var totalWorkedTime = momentArray.length == 4 ? totalTimeInOffice - calculateLunchbreak(momentArray[1], momentArray[2], lunchErrors) : totalTimeInOffice;
 
-			var totalWorkedPayedTime = totalWorkedTime - (totalWorkedTime % TOTAL_ROUND_MINUTES);
-			workedPayedTime = totalWorkedPayedTime >= moment.duration(fullTimeHours, 'h').asMinutes() ? moment.duration(fullTimeHours, 'h').asMinutes() : totalWorkedPayedTime;
+		var totalWorkedPayedTime = totalWorkedTime - (totalWorkedTime % TOTAL_ROUND_MINUTES);
+		if (totalWorkedPayedTime >= moment.duration(fullTimeHours, 'h').asMinutes()) {
+			workedPayedTime = moment.duration(fullTimeHours, 'h').asMinutes();
 			workedPayedTime = moment.duration((workedPayedTime - startDelay - endAdvance - lunchErrors.advance - lunchErrors.delay), 'm');
+		} else {
+			workedPayedTime = totalWorkedPayedTime;
 		}
-	} else if (momentArray.length == 2) {//secondClockingMoment && !thirdClockingMoment && !lastClockingMoment) {
-		workedPayedTime = calculateClockingsForPartTimeEmployee(momentArray[0], momentArray[1]);
 	}
 	return workedPayedTime;
 };
@@ -122,21 +115,57 @@ function calculateLunchbreak(startLunch, endLunch, lunchErrors) {
  * @param {moment} endClockingMoment 
  * @return {moment} workedTime
  */
-function calculateClockingsForPartTimeEmployee(startClockingMoment, endClockingMoment) {
-	var minStartMoment = moment(startClockingMoment).set(MIN_START_TIME);
-	var maxEndMoment = moment(startClockingMoment).set(MAX_END_TIME);
+function calculateClockingsForPartTimeEmployee(momentArray) {
 	var workedTime = moment.duration(-1, 'h');
-	if (startClockingMoment && endClockingMoment) {
-		if (moment(startClockingMoment).isBefore(moment(minStartMoment))) {
-			startClockingMoment = moment(minStartMoment);
+	if (momentArray.length == 4) {
+		workedTime = calculateClockingsForFullTimeEmployee(8, momentArray);
+	} else if (momentArray.length == 2) {
+		var firstClockingMoment = moment(momentArray[0]);
+		var lastClockingMoment = moment(momentArray[1]);
+		firstClockingMoment = moment(firstClockingMoment).second(0);
+		lastClockingMoment = moment(lastClockingMoment).second(0);
+		if (moment(firstClockingMoment).isBefore(moment(firstClockingMoment).set(MIN_START_LUNCH))) {
+			var minStartMoment = moment(firstClockingMoment).set(MIN_START_TIME);
+			var maxStartMoment = moment(firstClockingMoment).set(MAX_START_TIME);
+			if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
+				firstClockingMoment = moment(minStartMoment);
+			} else if (firstClockingMoment.isAfter(maxStartMoment, 'minute')) {
+				var maxRoundedStartMoment = moment(maxStartMoment);
+				while (firstClockingMoment.isAfter(moment(maxRoundedStartMoment).add(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
+					maxRoundedStartMoment = moment(maxRoundedStartMoment).add(TOTAL_ROUND_MINUTES, 'm');
+				}
+				firstClockingMoment = moment(maxRoundedStartMoment);
+			}
+			var minEndMoment = moment(lastClockingMoment).set(MIN_START_LUNCH);
+			if (lastClockingMoment.isBefore(minEndMoment, 'minute')) {
+				var minRoundedLastMoment = moment(minEndMoment);
+				while (lastClockingMoment.isBefore(moment(minRoundedLastMoment).subtract(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
+					minRoundedLastMoment = moment(minRoundedLastMoment).subtract(TOTAL_ROUND_MINUTES, 'm');
+				}
+				lastClockingMoment = moment(minRoundedLastMoment);
+			};
+		} else {
+			var maxStartMoment = moment(firstClockingMoment).set(MAX_END_LUNCH);
+			if (firstClockingMoment.isAfter(maxStartMoment, 'minute')) {
+				var maxRoundedStartMoment = moment(maxStartMoment);
+				while (firstClockingMoment.isAfter(moment(maxRoundedStartMoment).add(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
+					maxRoundedStartMoment = moment(maxRoundedStartMoment).add(TOTAL_ROUND_MINUTES, 'm');
+				}
+				firstClockingMoment = moment(maxRoundedStartMoment);
+			};
+			var minEndMoment = moment(firstClockingMoment).set(MIN_END_TIME);
+			var maxEndMoment = moment(firstClockingMoment).set(MAX_END_TIME);
+			if (lastClockingMoment.isAfter(maxEndMoment, 'minute')) {
+				lastClockingMoment = moment(maxEndMoment);
+			} else if (lastClockingMoment.isBefore(minEndMoment, 'minute')) {
+				var minRoundedEndMoment = moment(minEndMoment);
+				while (lastClockingMoment.isBefore(moment(minRoundedEndMoment).subtract(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
+					minRoundedEndMoment = moment(minRoundedEndMoment).subtract(TOTAL_ROUND_MINUTES, 'm');
+				}
+				lastClockingMoment = moment(minRoundedEndMoment);
+			};
 		}
-		startClockingMoment = moment(startClockingMoment).second(0);
-		endClockingMoment = moment(endClockingMoment).second(0);
-		var totalWorkedTime = moment(endClockingMoment).diff(moment(startClockingMoment), 'minutes');
-		/*var actualTolerance = totalWorkedTime % TOTAL_ROUND_MINUTES;					//Tolleranza per lavoratori part time.
-		if (actualTolerance >= (TOTAL_ROUND_MINUTES - MAX_TOLERANCE_IN_MINUTES)) {		//Rimossa secondo specifiche documento
-			totalWorkedTime += MAX_TOLERANCE_IN_MINUTES;								//Interfaccia timbratore.
-		}*/																				//END TODO;
+		var totalWorkedTime = moment(lastClockingMoment).diff(moment(firstClockingMoment), 'minutes');
 		workedTime = moment.duration(totalWorkedTime - (totalWorkedTime % TOTAL_ROUND_MINUTES), 'm');
 	}
 	return workedTime;
@@ -173,16 +202,28 @@ function createClockings(clockingsFromDB, firstOfMoment, lastOfMoment, user) {
 	var clockingTask = {};
 	clockingTask = { mese: new Array(monthLength), totalWorkedTime: 0, totalActualTime: 0 };
 	for (var d = 0; d < monthLength; d++) {
-		clockingTask.mese[d] = { clockings: [], calculatedWorkedTime: 0, actualWorkedTime: 0, areClockingsOk: true };
+		clockingTask.mese[d] = { clockings: [], calculatedWorkedTime: 0, actualWorkedTime: 0, areClockingsValid: true, warning: false };
 	}
 	if (clockingsFromDB.length != 0) {
 		clockingsFromDB.forEach(function (singleDayWithClocking, index, array) {
 			var dayPosition = (moment(singleDayWithClocking.day)).diff(moment(firstOfMoment), 'days');
 			clockingTask.mese[dayPosition].clockings = singleDayWithClocking.clockings;
-			clockingTask.mese[dayPosition].calculatedWorkedTime =
-				calculateClockingsForFullTimeEmployee(user.orecontrattuali, singleDayWithClocking.clockings).asHours();
-			clockingTask.mese[dayPosition].actualWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
-			clockingTask.mese[dayPosition].areClockingsOk = clockingTask.mese[dayPosition].calculatedWorkedTime != -1 ? true : false;
+			if (!user.orecontrattuali) {
+				clockingTask.mese[dayPosition].calculatedWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].actualWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].areClockingsValid = clockingTask.mese[dayPosition].calculatedWorkedTime != -1 ? true : false;
+				clockingTask.mese[dayPosition].warning = singleDayWithClocking.clockings.length == 2 ? true : false;
+			} else if (user.orecontrattuali <= 5) {
+				clockingTask.mese[dayPosition].calculatedWorkedTime = calculateClockingsForPartTimeEmployee(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].actualWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].areClockingsValid = clockingTask.mese[dayPosition].calculatedWorkedTime != -1 ? true : false;
+				clockingTask.mese[dayPosition].warning = singleDayWithClocking.clockings.length == 4 ? true : false;
+			} else {
+				clockingTask.mese[dayPosition].calculatedWorkedTime = calculateClockingsForFullTimeEmployee(user.orecontrattuali, singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].actualWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].areClockingsValid = clockingTask.mese[dayPosition].calculatedWorkedTime != -1 ? true : false;
+				clockingTask.mese[dayPosition].warning = singleDayWithClocking.clockings.length == 2 ? true : false;
+			}
 			if (clockingTask.mese[dayPosition].calculatedWorkedTime != -1 && clockingTask.mese[dayPosition].actualWorkedTime != -1) {
 				clockingTask.totalWorkedTime += clockingTask.mese[dayPosition].calculatedWorkedTime;
 				clockingTask.totalActualTime += clockingTask.mese[dayPosition].actualWorkedTime;
