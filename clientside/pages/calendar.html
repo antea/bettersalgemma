@@ -108,8 +108,9 @@
 							<th id="headers" name="headers"><h5>Timbratore</h5></th>
 							<th id="headers" name="headers"><h5>Ore Effettive</h5></th>
 							<th ng-repeat="taskDay in clockingTask.mese track by $index" id="headers" name="headers">
-								<h5 clockingspopover ng-if="taskDay.areClockingsValid">{{taskDay.actualWorkedTime}}</h5>
-								<span clockingspopover ng-if="taskDay.warning" class="glyphicon glyphicon-question-sign"></span>
+								<h5 clockingspopover ng-if="taskDay.areClockingsValid">{{taskDay.actualWorkedTime}}
+									<span ng-if="taskDay.warning" class="glyphicon glyphicon-question-sign"></span>
+								</h5>
 								<span clockingspopover ng-if="!taskDay.areClockingsValid" class="glyphicon glyphicon-alert"></span>
 							</th>
 							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Ore Effettive</h5></th>
@@ -120,8 +121,9 @@
 							<th id="headers" name="headers"><h5></h5></th>
 							<th id="headers" name="headers"><h5>Ore Pagate</h5></th>
 							<th ng-repeat="taskDay in clockingTask.mese track by $index" id="headers" name="headers">
-								<h5 clockingspopover ng-if="taskDay.areClockingsValid">{{taskDay.calculatedWorkedTime}}</h5>
-								<span clockingspopover ng-if="taskDay.warning" class="glyphicon glyphicon-question-sign"></span>
+								<h5 clockingspopover ng-if="taskDay.areClockingsValid">{{taskDay.calculatedWorkedTime}}
+									<span ng-if="taskDay.warning" class="glyphicon glyphicon-question-sign"></span>
+								</h5>
 								<span clockingspopover ng-if="!taskDay.areClockingsValid" class="glyphicon glyphicon-alert"></span>
 							</th>
 							<th id="headers" name="headers" ng-if="isXOverflow"><h5>Ore Pagate</h5></th>

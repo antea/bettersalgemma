@@ -52,7 +52,7 @@ angular.module('salgemmainterfaceFilters', [])
 			if (scope.taskDay && scope.taskDay.clockings.length > 0) {
 				if (scope.taskDay.calculatedWorkedTime == -1) {
 					titleString = "<strong>Ci sono errori nelle timbrature!</strong>";
-					contentString = "<p>Rivolgiti al responsabile del personale.</p>"
+					contentString = "<p>Rivolgiti al responsabile del personale.</p>";
 				} else {
 					var description = scope.taskDay.clockings.length > 2 ? descriptionFullTime : descriptionPartTime;
 					scope.taskDay.clockings.forEach(function (clocking, index) {
@@ -60,7 +60,9 @@ angular.module('salgemmainterfaceFilters', [])
 						contentString += "<p><em>" + description[index] + "</em>" + moment(clocking).format("HH:mm") + "</p>";
 					});
 					//contentString += "<p><strong>Ore effettive: </strong>" + scope.taskDay.actualWorkedTime + "</p>";
-					
+					if (scope.taskDay.warning) {
+						contentString += "<p><strong>Attenzione:</strong></br>Il numero di timrature non è coerente con quello del tuo contratto.</p>";
+					}
 				}
 				$(element).popover({
 					html: true,

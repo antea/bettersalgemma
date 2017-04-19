@@ -323,7 +323,7 @@ function getAllClockingInPeriod(start, end, callback) {
 			res.send(503, err);
 		} else {
 			connection.query('SELECT a.USERID, GROUP_CONCAT(a.CLOCKING order by a.CLOCKING) AS CLOCKINGS FROM ta_ATTENDANT AS a ' +
-				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) AND a.USERID!=38 group by a.USERID',
+				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) group by a.USERID',
 				[moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
 					connection.release();
 					if (err) {

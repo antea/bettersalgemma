@@ -63,7 +63,7 @@ function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 			workedPayedTime = moment.duration(fullTimeHours, 'h').asMinutes();
 			workedPayedTime = moment.duration((workedPayedTime - startDelay - endAdvance - lunchErrors.advance - lunchErrors.delay), 'm');
 		} else {
-			workedPayedTime = totalWorkedPayedTime;
+			workedPayedTime = moment.duration(totalWorkedPayedTime, 'm');
 		}
 	}
 	return workedPayedTime;
