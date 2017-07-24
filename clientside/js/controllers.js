@@ -81,7 +81,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 								};
 								tasksNumber += data.length;
 								data.forEach(function (task, index, array) {
-									task.ids = task.ids.split(',');
+									//task.ids = task.ids.split(',');
 									task.ids.sort(function compare(firstIds, secondIds) {
 										if (firstIds < secondIds) {
 											return -1;
@@ -95,8 +95,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 									})
 									var ordineStart = new Date(ordine.datainizioprev);
 									var ordineEnd = new Date(ordine.datafineprev);
-									var taskStarts = task.dateinizioprev.split(',');
-									var taskEnds = task.datefineprev.split(',');
+									var taskStarts = task.dateinizioprev;//.split(',');
+									var taskEnds = task.datefineprev;//.split(',');
 									ordineStart = new Date(ordineStart.getFullYear(), ordineStart.getMonth(), ordineStart.getDate());
 									ordineEnd = new Date(ordineEnd.getFullYear(), ordineEnd.getMonth(), ordineEnd.getDate());
 									taskStarts.forEach(function (datainizioprev, index) {

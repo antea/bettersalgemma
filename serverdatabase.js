@@ -176,18 +176,40 @@ server.get('/attivita/:idordine/:start/:end', function (req, res) {
 				var end = moment(req.params.end).toDate();
 				//end.setHours(2,end.getTimezoneOffset(),0,0);
 				//end= end.toISOString();
-				connection.query('SELECT GROUP_CONCAT(r.id) AS ids, r.descrizione, GROUP_CONCAT(p.datainizioprev) AS dateinizioprev, GROUP_CONCAT(p.datafineprev) AS datefineprev ' +
+				connection.query('SELECT r.id, r.descrizione, p.datainizioprev, p.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
 					'WHERE p.idrisorsa=? AND r.idtabella=? AND ' +
 					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-					'group by r.descrizione order by r.descrizione ',
+					'order by r.descrizione ',
 					[user.id, req.params.idordine, start, end, end, end],
 					function (err, results) {
 						connection.release();
 						if (err) {
 							res.send(503, err);
 						} else {
-							res.send(201, results);
+							var inspectedResults = [];
+							var ids = [];
+							var dateinizioprev = [];
+							var datefineprev = [];
+							var lastDescription = results[0].descrizione;
+							results.forEach(function (result, index) {
+								if (lastDescription !== result.descrizione) {
+									var partialResult = { "descrizione": lastDescription, "ids": ids, "dateinizioprev": dateinizioprev, "datefineprev": datefineprev };
+									inspectedResults.push(partialResult);
+									ids = [];
+									dateinizioprev = [];
+									datefineprev = [];
+									lastDescription = result.descrizione;
+								}
+								ids.push(result.id);
+								dateinizioprev.push(result.datainizioprev);
+								datefineprev.push(result.datafineprev);
+								if (index === results.length - 1) {
+									var partialResult = { "descrizione": lastDescription, "ids": ids, "dateinizioprev": dateinizioprev, "datefineprev": datefineprev };
+									inspectedResults.push(partialResult);
+								}
+							});
+							res.send(201, inspectedResults);
 						};
 					});
 			};
@@ -241,13 +263,14 @@ server.get('/storico/:start/:end/:idordine/:idsattivita', function (req, res) {
 					if (err) {
 						res.send(503, err);
 					} else {
+						var idsString = idsPianificazione.join();
 						var start = moment(req.params.start).toDate();
 						var end = moment(req.params.end).toDate();
 						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie ' +
 							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) ' +
 							'JOIN ordine AS o ON r.idtabella=o.id ' +
 							'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
-							[user.id, start, end, idsPianificazione],
+							[user.id, start, end, idsString],
 							function (err, results) {
 								connection.release();
 								if (err) {
@@ -419,8 +442,8 @@ server.post('/insertstorico', function (req, res) {
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
-			var idPianificazione = idsPianificazione.split(',');
-			idPianificazione = idPianificazione[0];
+			//var idPianificazione = idsPianificazione.split(',');
+			var idPianificazione = idsPianificazione[0];
 			if (err) {
 				res.send(500, err);
 			} else {
@@ -480,8 +503,8 @@ server.put('/editstorico', function (req, res) {
 						res.send(503, err);
 					} else {
 						trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
-							var idPianificazione = idsPianificazione.split(',');
-							idPianificazione = idPianificazione[0];
+							//var idPianificazione = idsPianificazione.split(',');
+							var idPianificazione = idsPianificazione[0];
 							if (err) {
 								res.send(503, err);
 							} else {
@@ -677,7 +700,7 @@ function trovaPianificazione(userId, idOrdine, idsAttivita, callback) {
 		if (err) {
 			callback(err);
 		} else {
-			connection.query('SELECT GROUP_CONCAT(p.id) AS ids ' +
+			connection.query('SELECT p.id ' +
 				'FROM (pianificazione AS p JOIN riga AS r ON r.id=p.idrigaordine) JOIN ordine as ord ON ord.id=r.idtabella ' +
 				'WHERE p.idrisorsa=? AND ord.id=? AND r.id IN (?)', [userId, idOrdine, idsAttivita],
 				function (errors, results) {
@@ -685,7 +708,11 @@ function trovaPianificazione(userId, idOrdine, idsAttivita, callback) {
 					if (errors) {
 						callback(errors);
 					} else {
-						var idPianificazione = results[0].ids;
+						var idPianificazione = [];
+						results.forEach(function(result) {
+							idPianificazione.push(result.id);
+						});
+						//var idPianificazione = results[0].ids;
 						callback(null, idPianificazione);
 					};
 				});
