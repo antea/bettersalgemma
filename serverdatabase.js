@@ -322,8 +322,8 @@ function getAllClockingInPeriod(start, end, callback) {
 		if (err) {
 			res.send(503, err);
 		} else {
-			connection.query('SELECT a.USERID, GROUP_CONCAT(a.CLOCKING order by a.CLOCKING) AS CLOCKINGS FROM ta_ATTENDANT AS a ' +
-				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) group by a.USERID',
+			connection.query('SELECT a.USERID, a.CLOCKING FROM ta_ATTENDANT AS a ' +
+				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) order by a.USERID, a.CLOCKING',
 				[moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
 					connection.release();
 					if (err) {
@@ -331,26 +331,33 @@ function getAllClockingInPeriod(start, end, callback) {
 					} else {
 						var inspectedResults = [];
 						var prevDay;
+						var userResults = [];
+						var lastUserId = queryResults[0].USERID;
 						queryResults.forEach(function (result) {
-							var userResults = [];
-							result.CLOCKINGS = result.CLOCKINGS.split(',');
-							result.CLOCKINGS.forEach(function (clocking) {
-								if (!moment(clocking).isSame(moment(prevDay), 'day')) {
-									prevDay = moment(clocking);
-									var clockingsTime = [];
-									clockingsTime.push(moment(clocking));
-									userResults.push({
-										day: prevDay,
-										clockings: clockingsTime
-									});
-								} else {
-									userResults[userResults.length - 1].clockings.push(moment(clocking));
-								}
-							});
-							inspectedResults.push({
-								userId: result.USERID,
-								userClokings: userResults
-							});
+							if (result.USERID != lastUserId) {
+								inspectedResults.push({
+									userId: lastUserId,
+									userClokings: userResults
+								});
+								userResults = [];
+								prevDay = undefined;
+								lastUserId = result.USERID;
+							}
+							if (!moment(result.CLOCKING).isSame(moment(prevDay), 'day')) {
+								prevDay = moment(result.CLOCKING);
+								var clockingsTime = [];
+								clockingsTime.push(moment(result.CLOCKING));
+								userResults.push({
+									day: prevDay,
+									clockings: clockingsTime
+								});
+							} else {
+								userResults[userResults.length - 1].clockings.push(moment(result.CLOCKING));
+							}
+						});
+						inspectedResults.push({
+							userId: lastUserId,
+							userClokings: userResults
 						});
 						getAllUsersWithClockings(function (error, users) {
 							if (error) {
