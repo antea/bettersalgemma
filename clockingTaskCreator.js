@@ -197,6 +197,21 @@ function calculateActualClockedTime(momentArray) {
 	return actualClockedTime;
 }
 
+function calculateClockingsForPivaEmployee(momentArray) {
+	var actualClockedTime = moment.duration(-1, 'h');
+	if (momentArray.length % 2 == 0) {
+		actualClockedTime = 0;
+		for (i = momentArray.length - 1; i > 0; i -= 2) {
+			secondClockingMoment = moment(momentArray[i]).second(0);
+			firstClockingMoment = moment(momentArray[i - 1]).second(0);
+			var tempActualClockedTime = moment(secondClockingMoment).diff(moment(firstClockingMoment), 'minutes');
+			actualClockedTime += tempActualClockedTime;
+		}
+		actualClockedTime = moment.duration(actualClockedTime - (actualClockedTime % TOTAL_ROUND_MINUTES), 'm');
+	}
+	return actualClockedTime;
+}
+
 function createClockings(clockingsFromDB, firstOfMoment, lastOfMoment, user) {
 	var monthLength = (moment(lastOfMoment).diff(moment(firstOfMoment), 'days')) + 1;
 	var clockingTask = {};
@@ -209,8 +224,8 @@ function createClockings(clockingsFromDB, firstOfMoment, lastOfMoment, user) {
 			var dayPosition = (moment(singleDayWithClocking.day)).diff(moment(firstOfMoment), 'days');
 			clockingTask.mese[dayPosition].clockings = singleDayWithClocking.clockings;
 			if (!user.orecontrattuali) {
-				clockingTask.mese[dayPosition].calculatedWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
-				clockingTask.mese[dayPosition].actualWorkedTime = calculateActualClockedTime(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].calculatedWorkedTime = calculateClockingsForPivaEmployee(singleDayWithClocking.clockings).asHours();
+				clockingTask.mese[dayPosition].actualWorkedTime = calculateClockingsForPivaEmployee(singleDayWithClocking.clockings).asHours();
 				clockingTask.mese[dayPosition].areClockingsValid = clockingTask.mese[dayPosition].calculatedWorkedTime != -1 ? true : false;
 				clockingTask.mese[dayPosition].warning = singleDayWithClocking.clockings.length == 2 ? true : false;
 			} else if (user.orecontrattuali <= 5) {
