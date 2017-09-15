@@ -54,6 +54,10 @@ angular.module('salgemmainterfaceFilters', [])
 				if (scope.taskDay.calculatedWorkedTime == -1) {
 					titleString = "<strong>Ci sono errori nelle timbrature!</strong>";
 					contentString = "<p>Rivolgiti al responsabile del personale.</p>";
+					scope.taskDay.clockings.forEach(function (clocking, index) {
+						description = index == 0 ? "Ingresso: " : index == scope.taskDay.clockings.length - 1 ? "Uscita: " : index % 2 == 0 ? "Fine pausa: " : "Inizio pausa: ";
+						contentString += "<p><em>" + description + "</em>" + moment(clocking).format("HH:mm") + "</p>";
+					});
 				} else {
 					//var description = scope.taskDay.clockings.length > 2 ? descriptionFullTime : descriptionPartTime;
 					scope.taskDay.clockings.forEach(function (clocking, index) {
