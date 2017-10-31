@@ -52,7 +52,7 @@ function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 				minRoundedEndMoment = moment(minRoundedEndMoment).subtract(TOTAL_ROUND_MINUTES, 'm');
 			}
 			lastClockingMoment = moment(minRoundedEndMoment);
-			endAdvance = moment(maxEndMoment).diff(lastClockingMoment, 'minutes');
+			endAdvance = moment(minEndMoment).diff(lastClockingMoment, 'minutes');
 		};
 		var totalTimeInOffice = moment(lastClockingMoment).diff(moment(firstClockingMoment), 'minutes');
 		var lunchErrors = { advance: 0, delay: 0 };
