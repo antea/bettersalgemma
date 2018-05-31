@@ -19,7 +19,8 @@ function AutenticazioneCtrl($rootScope, $scope, $http, $location, $cookies) {
 }
 
 function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, $window) {
-	$scope.selectedDate = new Date();
+	var now = moment();
+	$scope.selectedDate = new Date(now.set('D',15));
 	$scope.isXOverflow = false;
 	$scope.hasClockings = false;
 	$scope.isJustRedrawing = false;
@@ -894,11 +895,17 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	$scope.calendarTypeMonth = function () {
 		$scope.calendarType = "month";
 		$scope.isMonthSelected = true;
+		var now = moment();
+		$scope.selectedDate = new Date(now.set('D',15));
 		$scope.calculateCalendar();
 	};
 	$scope.calendarTypeWeek = function () {
 		$scope.calendarType = "week";
 		$scope.isMonthSelected = false;
+		var now = moment();
+		if(moment($scope.selectedDate).diff(now, 'month') === 0) {
+			$scope.selectedDate = new Date(now);
+		}
 		$scope.calculateCalendar();
 	};
 	$scope.modalExit = function () {
