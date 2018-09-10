@@ -397,7 +397,7 @@ function getAllClockingInPeriod(start, end, callback) {
 										delete inspectedResult.userId;
 										delete inspectedResult.userClokings;
 									} else {
-										err.message = "Un utente non correttamente registrato ha timbrato. Controllare il database."
+										err = new Error("Un utente non correttamente registrato ha timbrato. Controllare il database.");
 										callback(err, null);
 									}
 								});
@@ -709,7 +709,7 @@ function trovaPianificazione(userId, idOrdine, idsAttivita, callback) {
 						callback(errors);
 					} else {
 						var idPianificazione = [];
-						results.forEach(function(result) {
+						results.forEach(function (result) {
 							idPianificazione.push(result.id);
 						});
 						//var idPianificazione = results[0].ids;
@@ -767,7 +767,8 @@ server.get('/gettotalexcelpreviousmonth', function (req, res) {
 function createAndSendTotalExcel(res, start, end) {
 	getAllClockingInPeriod(start, end, function (err, results) {
 		if (err) {
-			res.send(503, err);
+			res.status(500);
+			res.json({ error: err.message });
 		} else {
 			var workbook = new excel.Workbook();
 			workbook.creator = "BetterSalgemma";
