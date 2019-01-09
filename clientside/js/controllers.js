@@ -525,7 +525,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		task.total = parseFloat((task.total / 100).toFixed(2));
 	}
 	$scope.calculateColTotal = function (task, index) {
-		if (index) {
+		if (index != undefined) {
 			$scope.totalTask[index].ore = 0;
 			$scope.tasks.forEach(function (oneTask) {
 				if (oneTask.mese[index].ore) {
