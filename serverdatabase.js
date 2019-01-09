@@ -442,11 +442,11 @@ server.post('/insertstorico', function (req, res) {
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
-			//var idPianificazione = idsPianificazione.split(',');
-			var idPianificazione = idsPianificazione[0];
 			if (err) {
 				res.send(500, err);
 			} else {
+				//var idPianificazione = idsPianificazione.split(',');
+				var idPianificazione = idsPianificazione[0];
 				calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, tupla) {
 					if (err) {
 						res.send(500, err);
@@ -503,11 +503,11 @@ server.put('/editstorico', function (req, res) {
 						res.send(503, err);
 					} else {
 						trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
-							//var idPianificazione = idsPianificazione.split(',');
-							var idPianificazione = idsPianificazione[0];
 							if (err) {
 								res.send(503, err);
 							} else {
+								//var idPianificazione = idsPianificazione.split(',');
+								var idPianificazione = idsPianificazione[0];
 								calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, nuovaTupla) {
 									if (err) {
 										res.send(503, err);
@@ -520,7 +520,7 @@ server.put('/editstorico', function (req, res) {
 										nuovaTupla.secondi = req.body.secondi;
 										nuovaTupla.note = req.body.note;
 										nuovaTupla.ferie = req.body.ferie ? req.body.ferie : false;
-										if (nuovaTupla.idpianificazione == results[0].idpianificazione &&
+										if (results.length != 0 && nuovaTupla.idpianificazione == results[0].idpianificazione &&
 											nuovaTupla.giorno.toLocaleString() == results[0].giorno.toLocaleString() &&
 											nuovaTupla.secondi == results[0].secondi &&
 											nuovaTupla.note == results[0].note &&
