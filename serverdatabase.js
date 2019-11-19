@@ -54,7 +54,7 @@ server.get('/login/:login/:pw', function (req, res) {
 						} else {
 							var user = encodeURIComponent(JSON.stringify(results[0]));
 							//cookies non possono contenere caratteri speciali se non sono codificati
-							res.cookie('user', user, { maxAge: 60 * 60 * 1000 }).send(200, results[0]);
+							res.cookie('user', user, { maxAge: 4 * 60 * 60 * 1000 }).send(200, results[0]);
 						};
 					};
 				});
@@ -191,7 +191,7 @@ server.get('/attivita/:idordine/:start/:end', function (req, res) {
 							var ids = [];
 							var dateinizioprev = [];
 							var datefineprev = [];
-							var lastDescription = results[0].descrizione;
+							var lastDescription = results.length > 0 ? results[0].descrizione : undefined;
 							results.forEach(function (result, index) {
 								if (lastDescription !== result.descrizione) {
 									var partialResult = { "descrizione": lastDescription, "ids": ids, "dateinizioprev": dateinizioprev, "datefineprev": datefineprev };
@@ -349,7 +349,7 @@ function getAllClockingInPeriod(start, end, callback) {
 				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) order by a.USERID, a.CLOCKING',
 				[moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
 					connection.release();
-					if (err) {
+					if (err || queryResults.length === 0) {
 						callback(err, queryResults);
 					} else {
 						var inspectedResults = [];

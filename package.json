@@ -13,6 +13,6 @@
 		"exceljs": "0.4.2"
 	},
 	"devDependencies": {
-		"nodemon": "*"
+		"nodemon": "^1.18.11"
 	}
 }
