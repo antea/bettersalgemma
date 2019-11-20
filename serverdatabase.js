@@ -1,7 +1,9 @@
 'use strict'
 
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var http = require('http');
+var HttpStatus = require('http-status-codes');
 var mysql = require('mysql');
 var server = express();
 var path = require('path');
@@ -11,16 +13,13 @@ var clockingTaskCreator = require("./clockingTaskCreator.js");
 var excelClockingCreator = require("./excelClockingCreator.js");
 moment.locale('it');
 
-server.configure(function () {
-	server.set('port', 8585);
-	server.use(express.bodyParser());
-	server.use(express.cookieParser());
-	server.use(express.static(path.join(__dirname, "/clientside")));
-});
-
-server.listen(server.get('port'), function () {
-	console.log('Server avviato e in ascolto alla porta:' + server.get('port'));
-});
+server.set('port', 8585);
+server.use(express.urlencoded({
+	extended: true
+}));
+server.use(express.json());
+server.use(cookieParser());
+server.use(express.static(path.join(__dirname, "/clientside")));
 
 var pool = mysql.createPool({
 	host: 'mysql.antea.bogus',
@@ -31,6 +30,11 @@ var pool = mysql.createPool({
 	connectionLimit: 20
 });
 
+server.listen(server.get('port'), function () {
+	console.log('Server avviato e in ascolto alla porta:' + server.get('port'));
+});
+
+
 //  <--------------------------> RICHIESTE GET <-------------------------->
 
 /* 
@@ -40,21 +44,21 @@ var pool = mysql.createPool({
 server.get('/login/:login/:pw', function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(503, err);
+			res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 		} else {
 			connection.query('SELECT id, ta_userid, orecontrattuali, nome, partitaiva, codicefiscale, indirizzo, cap, citta, provincia, nazione, telefono, cellulare, email, password ' +
 				'FROM risorsa WHERE login=? AND password=?', [req.params.login, req.params.pw],
 				function (err, results) {
 					connection.release();
 					if (err) {
-						res.send(503, err);
+						res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 					} else {
 						if (results.length === 0) {
-							res.send(401, "Autenticazione fallita: username e/o password errati");
+							res.status(HttpStatus.UNAUTHORIZED).send("Autenticazione fallita: username e/o password errati");
 						} else {
 							var user = encodeURIComponent(JSON.stringify(results[0]));
 							//cookies non possono contenere caratteri speciali se non sono codificati
-							res.cookie('user', user, { maxAge: 4 * 60 * 60 * 1000 }).send(200, results[0]);
+							res.cookie('user', user, { maxAge: 4 * 60 * 60 * 1000 }).status(HttpStatus.OK).send(results[0]);
 						};
 					};
 				});
@@ -97,12 +101,12 @@ server.get('/login/:login/:pw', function (req, res) {
 
 server.get('/ordini/:start/:end', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(503, err);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 			} else {
 				var start = moment(req.params.start).toDate();
 				//start.setHours(2,start.getTimezoneOffset(),0,0);
@@ -118,9 +122,9 @@ server.get('/ordini/:start/:end', function (req, res) {
 					function (err, results) {
 						connection.release();
 						if (err) {
-							res.send(503, err);
+							res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 						} else {
-							res.send(201, results);
+							res.status(HttpStatus.OK).send(results);
 						};
 					});
 			};
@@ -163,12 +167,12 @@ server.get('/ordini/:start/:end', function (req, res) {
 });*/
 server.get('/attivita/:idordine/:start/:end', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(503, err);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 			} else {
 				var start = moment(req.params.start).toDate();
 				//start.setHours(2,start.getTimezoneOffset(),0,0);
@@ -185,7 +189,7 @@ server.get('/attivita/:idordine/:start/:end', function (req, res) {
 					function (err, results) {
 						connection.release();
 						if (err) {
-							res.send(503, err);
+							res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 						} else {
 							var inspectedResults = [];
 							var ids = [];
@@ -209,7 +213,7 @@ server.get('/attivita/:idordine/:start/:end', function (req, res) {
 									inspectedResults.push(partialResult);
 								}
 							});
-							res.send(201, inspectedResults);
+							res.status(HttpStatus.OK).send(inspectedResults);
 						};
 					});
 			};
@@ -252,16 +256,16 @@ server.get('/attivita/:idordine/:start/:end', function (req, res) {
 });*/
 server.get('/storico/:start/:end/:idordine/:idsattivita', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		trovaPianificazione(user.id, req.params.idordine, req.params.idsattivita, function (err, idsPianificazione) {
 			if (err) {
-				res.send(503, err);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 			} else {
 				pool.getConnection(function (err, connection) {
 					if (err) {
-						res.send(503, err);
+						res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 					} else {
 						var idsString = idsPianificazione.join();
 						var start = moment(req.params.start).toDate();
@@ -274,9 +278,9 @@ server.get('/storico/:start/:end/:idordine/:idsattivita', function (req, res) {
 							function (err, results) {
 								connection.release();
 								if (err) {
-									res.send(503, err);
+									res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 								} else {
-									res.send(201, results);
+									res.status(HttpStatus.OK).send(results);
 								};
 							});
 					};
@@ -290,16 +294,16 @@ server.get('/storico/:start/:end/:idordine/:idsattivita', function (req, res) {
 
 server.get('/timbratore/:start/:end', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		var start = moment(req.params.start);
 		var end = moment(req.params.end);
 		getClockingForUser(user, start, end, function (errors, results) {
 			if (errors) {
-				res.send(503, errors);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(errors);
 			} else {
-				res.send(200, results);
+				res.status(HttpStatus.OK).send(results);
 			}
 		});
 	};
@@ -343,7 +347,7 @@ function getClockingForUser(user, start, end, callback) {
 function getAllClockingInPeriod(start, end, callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(503, err);
+			res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 		} else {
 			connection.query('SELECT a.USERID, a.CLOCKING FROM ta_ATTENDANT AS a ' +
 				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) order by a.USERID, a.CLOCKING',
@@ -413,7 +417,7 @@ function getAllClockingInPeriod(start, end, callback) {
 function getAllUsersWithClockings(callback) {
 	pool.getConnection(function (err, connection) {
 		if (err) {
-			res.send(503, err);
+			res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 		} else {
 			connection.query('SELECT id, ta_userid, orecontrattuali, nome FROM risorsa WHERE ta_userid IS NOT NULL',
 				function (err, queryResults) {
@@ -438,18 +442,18 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 */
 server.post('/insertstorico', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
 			if (err) {
-				res.send(500, err);
+				res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
 			} else {
 				//var idPianificazione = idsPianificazione.split(',');
 				var idPianificazione = idsPianificazione[0];
 				calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, tupla) {
 					if (err) {
-						res.send(500, err);
+						res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
 					} else {
 						tupla.idrisorsa = req.body.idrisorsa,
 							tupla.idpianificazione = idPianificazione,
@@ -460,15 +464,15 @@ server.post('/insertstorico', function (req, res) {
 						tupla.ferie = req.body.ferie ? req.body.ferie : false;
 						pool.getConnection(function (errors, connection) {
 							if (errors) {
-								res.send(503, errors);
+								res.status(HttpStatus.SERVICE_UNAVAILABLE).send(errors);
 							} else {
 								connection.query('INSERT INTO storico SET ?',
 									tupla, function (err, results) {
 										connection.release();
 										if (err) {
-											res.send(503, err);
+											res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 										} else {
-											res.send(201, results);
+											res.status(HttpStatus.CREATED).send(results);
 										};
 									});
 							}
@@ -490,27 +494,27 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 */
 server.put('/editstorico', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(503, err);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 			} else {
 				connection.query('SELECT * FROM storico WHERE id=?', [req.body.id], function (err, results) {
 					connection.release();
 					if (err) {
-						res.send(503, err);
+						res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 					} else {
 						trovaPianificazione(req.body.idrisorsa, req.body.idordine, req.body.idattivita, function (err, idsPianificazione) {
 							if (err) {
-								res.send(503, err);
+								res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 							} else {
 								//var idPianificazione = idsPianificazione.split(',');
 								var idPianificazione = idsPianificazione[0];
 								calcolaCostiRicavi(idPianificazione, req.body.secondi, function (err, nuovaTupla) {
 									if (err) {
-										res.send(503, err);
+										res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 									} else {
 										nuovaTupla.id = req.body.id;
 										nuovaTupla.idrisorsa = req.body.idrisorsa;
@@ -525,19 +529,19 @@ server.put('/editstorico', function (req, res) {
 											nuovaTupla.secondi == results[0].secondi &&
 											nuovaTupla.note == results[0].note &&
 											nuovaTupla.ferie == results[0].ferie) {
-											res.send(201, 'Nessuna modifica apportata, riga identica.');
+											res.status(HttpStatus.ACCEPTED).send('Nessuna modifica apportata, riga identica.');
 										} else {
 											pool.getConnection(function (errors, connection) {
 												if (errors) {
-													res.send(503, errors);
+													res.status(HttpStatus.SERVICE_UNAVAILABLE).send(errors);
 												} else {
 													connection.query('UPDATE storico SET ? WHERE id=?',
 														[nuovaTupla, req.body.id], function (err, results) {
 															connection.release();
 															if (err) {
-																res.send(503, err);
+																res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 															} else {
-																res.send(201, results);
+																res.status(HttpStatus.CREATED).send(results);
 															}
 														});
 												}
@@ -556,19 +560,19 @@ server.put('/editstorico', function (req, res) {
 
 server.put("/edituser", function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(503, err);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 			} else {
 				connection.query('UPDATE risorsa SET ? WHERE id=? ', [req.body, req.body.id], function (err, results) {
 					connection.release();
 					if (err) {
-						res.send(503, err);
+						res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 					} else {
-						res.send(201, results);
+						res.status(HttpStatus.CREATED).send(results);
 					};
 				})
 
@@ -586,20 +590,20 @@ Risponde con i codici standard dell'html: 200 OK, 500 errore del server, 400 err
 */
 server.delete('/deletestorico/:idstorico', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		pool.getConnection(function (err, connection) {
 			if (err) {
-				res.send(503, err);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 			} else {
 				connection.query('DELETE FROM storico WHERE id=?', [req.params.idstorico],
 					function (err, results) {
 						connection.release();
 						if (err) {
-							res.send(503, err);
+							res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 						} else {
-							res.send(201, results)
+							res.status(HttpStatus.OK).send(results);
 						};
 					})
 			};
@@ -724,14 +728,14 @@ function trovaPianificazione(userId, idOrdine, idsAttivita, callback) {
 
 server.get('/getexcel/:start/:end', function (req, res) {
 	if (!req.cookies.user) {
-		res.send(401);
+		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
 		var start = moment(req.params.start);
 		var end = moment(req.params.end);
 		getClockingForUser(user, start, end, function (errors, results) {
 			if (errors) {
-				res.send(503, errors);
+				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(errors);
 			} else {
 				var userClockingsArray = [{ user: user, clockingTask: results }];
 				var workbook = new excel.Workbook();
@@ -767,7 +771,7 @@ server.get('/gettotalexcelpreviousmonth', function (req, res) {
 function createAndSendTotalExcel(res, start, end) {
 	getAllClockingInPeriod(start, end, function (err, results) {
 		if (err) {
-			res.status(500);
+			res.status(INTERNAL_SERVER_ERROR);
 			res.json({ error: err.message });
 		} else {
 			var workbook = new excel.Workbook();
