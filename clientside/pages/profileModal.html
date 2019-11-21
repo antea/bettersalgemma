@@ -7,59 +7,59 @@
 			</div>
 			<div class="modal-body">
 				<button class="btn btn-default" ng-click="userEditChange()" ng-hide="isUserEditing"><span class="glyphicon glyphicon-edit"></span> Modifica</button>
-				<button class="btn btn-default" ng-click="saveUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcod, editpiva)" ng-show="isUserEditing"><span class="glyphicon glyphicon-ok"></span> Salva</button>
+				<button class="btn btn-default" ng-click="saveUserEdit(editnome, editmail, editcel, edittel, editaddress, editcap, editcitta, editprov, editnazione, editcodf, editpiva)" ng-show="isUserEditing"><span class="glyphicon glyphicon-ok"></span> Salva</button>
 				<button class="btn btn-default" ng-click="discardUserEdit()" ng-show="isUserEditing"><span class="glyphicon glyphicon-remove"></span> Annulla</button>
 				<form class="form-horizontal" id="userEdit">
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputName">Nome: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputName">Nome: </label>
 						<label class="control-label" for="inputName" ng-hide="isUserEditing"><strong>{{user.nome}}</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputName" ng-show="isUserEditing" ng-model="editnome" class="form-control">
 						</div>
 					</div>
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputEmail">E-mail: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputEmail">E-mail: </label>
 						<label class="control-label" for="inputEmail" ng-hide="isUserEditing"><strong>{{user.email}}</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputEmail" placeholder="Email" ng-show="isUserEditing" ng-model="editmail" class="form-control">
 						</div>
 					</div>
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputCel">Cellulare: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputCel">Cellulare: </label>
 						<label class="control-label" for="inputCel" ng-hide="isUserEditing"><strong>{{user.cellulare}}</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputCel" placeholder="Cellulare" ng-show="isUserEditing" ng-model="editcel" class="form-control">
 						</div>
 					</div>
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputTel">Telefono: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputTel">Telefono: </label>
 						<label class="control-label" for="inputTel" ng-hide="isUserEditing"><strong>{{user.telefono}}</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputTel" placeholder="Telefono" ng-show="isUserEditing" ng-model="edittel" class="form-control">
 						</div>
 					</div>
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputAddress">Indirizzo: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputAddress">Indirizzo: </label>
 						<label class="control-label" for="inputAddress" ng-hide="isUserEditing"><strong>{{user.indirizzo}},<!--/br-->{{user.cap}} {{user.citta}}, ({{user.provincia}},{{user.nazione}})</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputAddress" placeholder="Indirizzo" ng-show="isUserEditing" ng-model="editaddress" class="form-control">
-							<input type="text" id="inputAddress" placeholder="Cap" ng-show="isUserEditing" ng-model="editcap" class="form-control">
-							<input type="text" id="inputAddress" placeholder="Città" ng-show="isUserEditing" ng-model="editcitta" class="form-control">
-							<input type="text" id="inputAddress" placeholder="Provincia" ng-show="isUserEditing" ng-model="editprov" class="form-control">
-							<input type="text" id="inputAddress" placeholder="Nazione" ng-show="isUserEditing" ng-model="editnazione" class="form-control">
+							<input type="text" id="inputAddress2" placeholder="Cap" ng-show="isUserEditing" ng-model="editcap" class="form-control">
+							<input type="text" id="inputAddress3" placeholder="Città" ng-show="isUserEditing" ng-model="editcitta" class="form-control">
+							<input type="text" id="inputAddress4" placeholder="Provincia" ng-show="isUserEditing" ng-model="editprov" class="form-control">
+							<input type="text" id="inputAddress5" placeholder="Nazione" ng-show="isUserEditing" ng-model="editnazione" class="form-control">
 						</div>
 					</div>
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputCodF">Cod.Fiscale: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputCodF">Cod.Fiscale: </label>
 						<label class="control-label" for="inputCodF" ng-hide="isUserEditing"><strong>{{user.codicefiscale}}</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputCodF" placeholder="Codice Fiscale" ng-show="isUserEditing" ng-model="editcodf" class="form-control">
 						</div>
 					</div>
 					<div class="form-group" type="userEdit">
-						<label class="col-xs-2 col-sm-2 col-md-2 col-lg-2 control-label" id="stdLabel" for="inputPiva">P.Iva: </label>
+						<label class="col-xs-3 col-sm-3 col-md-3 col-lg-3 control-label" id="stdLabel" for="inputPiva">P.Iva: </label>
 						<label class="control-label" for="inputPiva" ng-hide="isUserEditing"><strong>{{user.partitaiva}}</strong></label>
-						<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 controls" id="inputEditUser">
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 controls" id="inputEditUser">
 							<input type="text" id="inputPiva" placeholder="Partita Iva" ng-show="isUserEditing" ng-model="editpiva" class="form-control">
 						</div>
 					</div>

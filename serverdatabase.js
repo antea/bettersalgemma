@@ -58,7 +58,7 @@ server.get('/login/:login/:pw', function (req, res) {
 						} else {
 							var user = encodeURIComponent(JSON.stringify(results[0]));
 							//cookies non possono contenere caratteri speciali se non sono codificati
-							res.cookie('user', user, { maxAge: 4 * 60 * 60 * 1000 }).status(HttpStatus.OK).send(results[0]);
+							res.cookie('user', user, { maxAge: 8 * 60 * 60 * 1000 }).status(HttpStatus.OK).send(results[0]);
 						};
 					};
 				});
@@ -116,9 +116,9 @@ server.get('/ordini/:start/:end', function (req, res) {
 				//end= end.toISOString();
 				connection.query('SELECT DISTINCT o.id, o.descrizione, o.datainizioprev, o.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
-					'WHERE p.idrisorsa=? AND ((o.datafineprev>? AND p.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-					'order by o.descrizione',
-					[user.id, start, end, end, end],
+					'WHERE p.idrisorsa=? AND ((o.datafineprev BETWEEN ? AND ?) OR (o.datafineprev>=? AND o.datainizioprev<=?) OR ' +
+					'(o.datafineprev IS NULL AND o.datainizioprev<=?)) order by o.descrizione',
+					[user.id, start, end, end, end, end],
 					function (err, results) {
 						connection.release();
 						if (err) {
@@ -183,9 +183,9 @@ server.get('/attivita/:idordine/:start/:end', function (req, res) {
 				connection.query('SELECT r.id, r.descrizione, p.datainizioprev, p.datafineprev ' +
 					'FROM (pianificazione AS p JOIN riga AS r ON p.idrigaordine=r.id) JOIN ordine AS o ON r.idtabella=o.id ' +
 					'WHERE p.idrisorsa=? AND r.idtabella=? AND ' +
-					'((o.datafineprev>=? AND o.datafineprev<=?) OR ((o.datafineprev>=? OR o.datafineprev IS NULL) AND o.datainizioprev<=?)) ' +
-					'order by r.descrizione ',
-					[user.id, req.params.idordine, start, end, end, end],
+					'((o.datafineprev BETWEEN ? AND ?) OR (o.datafineprev>=? AND o.datainizioprev<=?) OR (o.datafineprev IS NULL AND o.datainizioprev<=?)) ' +
+					'order by r.descrizione',
+					[user.id, req.params.idordine, start, end, end, end, end],
 					function (err, results) {
 						connection.release();
 						if (err) {
@@ -273,7 +273,7 @@ server.get('/storico/:start/:end/:idordine/:idsattivita', function (req, res) {
 						connection.query('SELECT s.id, s.giorno, s.secondi, s.note, s.costo, s.ricavo, s.ferie ' +
 							'FROM ((storico AS s JOIN pianificazione AS p ON s.idpianificazione=p.id) JOIN riga AS r ON p.idrigaordine=r.id) ' +
 							'JOIN ordine AS o ON r.idtabella=o.id ' +
-							'WHERE s.idrisorsa=? AND (s.giorno>=? AND s.giorno<=?) AND s.idpianificazione IN (?)',
+							'WHERE s.idrisorsa=? AND (s.giorno BETWEEN ? AND ?) AND s.idpianificazione IN (?)',
 							[user.id, start, end, idsString],
 							function (err, results) {
 								connection.release();
@@ -314,7 +314,7 @@ function getClockingForUser(user, start, end, callback) {
 		if (err) {
 			callback(err, clockingTask);
 		} else {
-			connection.query('SELECT a.CLOCKING FROM ta_ATTENDANT AS a WHERE a.USERID=? AND (a.CLOCKING>=? AND a.CLOCKING<=?) AND' +
+			connection.query('SELECT a.CLOCKING FROM ta_ATTENDANT AS a WHERE a.USERID=? AND (a.CLOCKING BETWEEN ? AND ?) AND' +
 				'(a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) ORDER BY a.CLOCKING',
 				[user.ta_userid, moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
 					connection.release();
@@ -350,7 +350,7 @@ function getAllClockingInPeriod(start, end, callback) {
 			res.status(HttpStatus.SERVICE_UNAVAILABLE).send(err);
 		} else {
 			connection.query('SELECT a.USERID, a.CLOCKING FROM ta_ATTENDANT AS a ' +
-				'WHERE (a.CLOCKING>=? AND a.CLOCKING<=?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) order by a.USERID, a.CLOCKING',
+				'WHERE (a.CLOCKING BETWEEN ? AND ?) AND (a.UPDATEINOROUT IS NULL || a.UPDATEINOROUT!=4) order by a.USERID, a.CLOCKING',
 				[moment(start).toDate(), moment(end).toDate()], function (err, queryResults) {
 					connection.release();
 					if (err || queryResults.length === 0) {

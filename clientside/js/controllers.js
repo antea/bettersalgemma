@@ -743,6 +743,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		$http.put('/edituser', $rootScope.user)
 			.success(function (argument) {
 				$scope.isUserEditing = false;
+				$cookies.remove('user');
+				$cookies.putObject('user', $rootScope.user);
 				console.log("Edit Successo!!");
 			})
 			.error(function (data, status, headers, config) {
