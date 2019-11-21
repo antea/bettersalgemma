@@ -28,7 +28,7 @@ angular.module('salgemmainterfaceFilters', [])
 					};
 					return 0;
 				}
-			})
+			});
 			return tasksFiltered;
 		}
 	})

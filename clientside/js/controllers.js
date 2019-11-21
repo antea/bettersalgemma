@@ -20,7 +20,7 @@ function AutenticazioneCtrl($rootScope, $scope, $http, $location, $cookies) {
 
 function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, $window) {
 	var now = moment();
-	$scope.selectedDate = new Date(now.set('D',15));
+	$scope.selectedDate = new Date(now.set('D', 15));
 	$scope.isXOverflow = false;
 	$scope.hasClockings = false;
 	$scope.isJustRedrawing = false;
@@ -73,8 +73,9 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 					};
 					$scope.errors = [];
 					$scope.ordini = data;
+					$scope.ordini.map(ordine => ordine.selected = $cookies.get('filteredOrders') !== undefined ? $cookies.get('filteredOrders').includes(ordine.id) : true);
+					$scope.selectedAll = $scope.ordini.every(order => order.selected === true);
 					$scope.ordini.forEach(function (ordine) {
-						ordine.selected = true;
 						$http.get('/attivita/' + ordine.id + '/' + firstOfMomentISO + '/' + lastOfMomentISO).
 							success(function (data, status, headers, config) {
 								if (data.length == 0) {
@@ -244,7 +245,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		$http.get('/timbratore/' + firstOfMomentISO + '/' + lastOfMomentISO).
 			success(function (data, status, headers, config) {
 				//if (data.length != 0) {
-					$scope.clockingTask = data;
+				$scope.clockingTask = data;
 				//}
 			}).error(function (data, status, headers, config) {
 				if (status === 401) {
@@ -483,32 +484,47 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 				}
 			});
 	}
-	$scope.selectedAll = true;
 	$scope.selectOrDeselectAll = function () {
 		$('#loadingDiv').show();
 		$timeout(function () {
-			$scope.selectedAll = !$scope.selectedAll
+			//$scope.selectedAll = !$scope.selectedAll
 			if ($scope.selectedAll) {
 				$scope.selectAllOrders();
 			} else {
 				$scope.deselectAllOrders();
 			};
 			$('#loadingDiv').hide();
+			$scope.redrawTable();
 		});
 	}
 	$scope.selectAllOrders = function () {
 		$scope.tasks.forEach(function (task) {
 			task.order.selected = true;
 		});
+		$scope.savePreferences();
 	}
 	$scope.deselectAllOrders = function () {
 		$scope.tasks.forEach(function (task) {
 			task.order.selected = false;
 		});
+		$scope.savePreferences();
 	}
 	$scope.focusOn = function (event, $index, task) {
 		this.focused = !this.focused;
 		this.$parent.rowSelected = !this.$parent.rowSelected;
+	}
+	$scope.orderCheckListener = function () {
+		$scope.selectedAll = $scope.ordini.every(order => order.selected === true);
+		$scope.savePreferences();
+		$scope.redrawTable();
+	}
+	$scope.savePreferences = function () {
+		var filteredOrders = $scope.ordini.filter(ordine => ordine.selected == true).map(ordine => ordine.id);
+		if ($cookies.get('filteredOrders') !== undefined) {
+			$cookies.remove('fiteredOrders');
+		}
+		var lastMomentOfThisYear = moment().endOf('year').toDate();
+		$cookies.putObject('filteredOrders', filteredOrders, { 'expires': lastMomentOfThisYear });
 	}
 	/*
 	Per problemi di calcolo i numeri vengono moltiplicati per 100 in quanto non possono, per come è costruito il sistema, avere più di 2 decimali,
@@ -619,7 +635,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	}
 	$scope.editingForm = '<form class="form-inline" ng-show="editmode && day.editable"><div class="form-group {{validator}}" style="width:250px"><input class="form-control" name="formInput" type="text" id="ore-{{task.ids[0]}}-{{$index}}" ng-model="editore" placeholder="{{day.ore && day.ore || \'Ore\'}}" ng-change="validate(editore)" focus-me="editmode" tabindex="1"><button class="btn button-default glyphicon glyphicon-ok" name="formInput" ng-click="save($index, day, task, editore, editnote)" tabindex="3"></button></div></form><form class="form-inline" ng-show="editmode && day.editable"><div class="form-group" style="width:250px"><textarea class="form-control" name="formInput" type="text" id="note" rows="1" cols="10" ng-model="editnote" placeholder="{{day.note && day.note || \'Note\'}}" tabindex="2"></textarea><button class="btn button-default glyphicon glyphicon-remove" name="formInput" ng-click="discard($index, day, task, editore, editnote)" tabindex="4"></button></div></form>';
 	$scope.emptyForm = '';
-	$scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><span class="glyphicon glyphicon-th-list"></span> Ordini visualizzati:</h5><ul style="list-style-type:none; padding-left:0px;"><li><input type="checkbox" ng-click="selectOrDeselectAll()" checked><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
+	$scope.filtersViewing = '<div id="filters"><div id="innerFilters"><button class="btn btn-info" ng-click="dinamicMenuFilter()" ng-hide="dinamicHide">{{dinamicLabelBtn}}</button><h5><span class="glyphicon glyphicon-th-list"></span> Ordini visualizzati:</h5><ul style="list-style-type:none; padding-left:0px;"><li><input type="checkbox" ng-click="selectOrDeselectAll()" ng-model="selectedAll"><span><strong>Seleziona Tutto</strong></span></li><hr><li ng-repeat="ordine in ordini"><input type="checkbox" ng-model="ordine.selected" ng-change="orderCheckListener()"><span>{{ordine.descrizione}}</span></li></ul></div></div>'
 	$scope.filtersview = $scope.emptyForm;
 	var checkDatePicker = function () {
 		var monthPicker = $('#inputMonth')[0];
@@ -826,7 +842,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		$scope.editpw = !$scope.editpw;
 	}
 	$scope.logout = function () {
-		delete $cookies.user;
+		delete $cookies.remove('user');
+		delete $cookies.remove('filteredOrders');
 		delete $rootScope.user;
 	}
 	$scope.makeReport = function () {
@@ -898,14 +915,14 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		$scope.calendarType = "month";
 		$scope.isMonthSelected = true;
 		var now = moment();
-		$scope.selectedDate = new Date(now.set('D',15));
+		$scope.selectedDate = new Date(now.set('D', 15));
 		$scope.calculateCalendar();
 	};
 	$scope.calendarTypeWeek = function () {
 		$scope.calendarType = "week";
 		$scope.isMonthSelected = false;
 		var now = moment();
-		if(moment($scope.selectedDate).diff(now, 'month') === 0) {
+		if (moment($scope.selectedDate).diff(now, 'month') === 0) {
 			$scope.selectedDate = new Date(now);
 		}
 		$scope.calculateCalendar();
