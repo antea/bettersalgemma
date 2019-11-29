@@ -61,6 +61,8 @@ input[name="inputAuth"]{
 	width: 60%;
 }
 #filters {
+	height: 98%;
+	max-height: 98%;
 	padding-left: 30px;
 	padding-right: 30px;
 	padding-top: 30px;
@@ -309,9 +311,9 @@ span[name="img"]{
 #notFound{
 	margin-top: 20%;
 }
-.modal-body {
-	/*max-height: 800px;*/
-}
+/*.modal-body {
+	max-height: 800px;
+}*/
 #wellPw {
 	margin-right: 0px;
 	margin-left: 0px;
@@ -352,6 +354,21 @@ a[name="popoverLink"]:hover {
 }
 .panel>.table-bordered>tbody>tr:last-child>td {
 	border-bottom: 1px solid black;
+}
+#outerFilters {
+	max-height: 92%;
+	height: 92%;
+}
+#innerFilters {
+	max-height: 98%;
+	height: 98%;
+	overflow-y: auto;
+}
+#orderListFilter {
+	list-style-type:none;
+	padding-left:0px;
+	max-height:85%;
+	height:85%;
 }
 /*tbody {
 	height: 100%;
