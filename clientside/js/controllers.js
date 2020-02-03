@@ -848,7 +848,6 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	}
 	$scope.logout = function () {
 		delete $cookies.remove('user');
-		delete $cookies.remove('filteredOrders');
 		delete $rootScope.user;
 	}
 	$scope.makeReport = function () {
