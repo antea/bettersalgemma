@@ -29,7 +29,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	$scope.selectedMonth = $scope.selectedMoment.get('month');
 	$scope.selectedYear = $scope.selectedMoment.get('year');
 	$scope.ordini = [];
-	$scope.weekName = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+	$scope.weekName = moment.weekdaysShort();//['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
 	$scope.calendarType = "month";
 	$scope.calendarPlaceholder = "yyyy-MM";
 	$scope.calendarMin = ($scope.selectedYear - 2) + "-01";
@@ -47,15 +47,15 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		//var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
 		$scope.firstOfMoment = moment($scope.selectedMoment).startOf($scope.calendarType);
 		$scope.lastOfMoment = moment($scope.selectedMoment).endOf($scope.calendarType);
-		var firstOfMomentISO = moment($scope.firstOfMoment).toISOString();
-		var lastOfMomentISO = moment($scope.lastOfMoment).toISOString();
+		$scope.firstOfMomentISO = moment($scope.firstOfMoment).toISOString();
+		$scope.lastOfMomentISO = moment($scope.lastOfMoment).toISOString();
 		var indexMoment = moment($scope.firstOfMoment);
-		while (moment(indexMoment).isBefore(moment($scope.lastOfMoment))) {
+		while (moment(indexMoment).isBefore(moment($scope.lastOfMomentISO))) {
 			$scope.month[monthIndex] = {
 				number: indexMoment.date(),
 				day: $scope.weekName[indexMoment.day()],
 				date: ($scope.calendarType != 'month') ? indexMoment.format('ddd ll') : indexMoment.format('ddd D'),
-				isWeekend: $scope.weekName[indexMoment.day()] === "Sab" || $scope.weekName[indexMoment.day()] === "Dom" ? true : false
+				isWeekend: indexMoment.isoWeekday() === 6 || indexMoment.isoWeekday() === 7 ? true : false
 			};
 			indexMoment.add(1, 'd');
 			monthIndex++;
@@ -67,9 +67,9 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 			$scope.totalTask = new Array($scope.month.length);
 			if ($rootScope.user.ta_userid) {
 				$scope.hasClockings = true;
-				$scope.calculateClockings(firstOfMomentISO, lastOfMomentISO);
+				$scope.calculateClockings($scope.firstOfMomentISO, $scope.lastOfMomentISO);
 			};
-			$http.get('/ordini/' + firstOfMomentISO + '/' + lastOfMomentISO).
+			$http.get('/ordini/' + $scope.firstOfMomentISO + '/' + $scope.lastOfMomentISO).
 				success(function (data, status, headers, config) {
 					if (data.length == 0) {
 						$('#loadingDiv').hide();
@@ -79,7 +79,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 					$scope.ordini.map(ordine => ordine.selected = $cookies.get('filteredOrders') !== undefined ? $cookies.get('filteredOrders').includes(ordine.id) : true);
 					$scope.selectedAll = $scope.ordini.every(order => order.selected === true);
 					var idsOrdini = $scope.ordini.map(ordine => ordine.id);
-					$http.get('/attivita/' + idsOrdini + '/' + firstOfMomentISO + '/' + lastOfMomentISO).
+					$http.get('/attivita/' + idsOrdini + '/' + $scope.firstOfMomentISO + '/' + $scope.lastOfMomentISO).
 						success(function (data, status, headers, config) {
 							if (data.length == 0) {
 								$('#loadingDiv').hide();
@@ -118,7 +118,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 									task.order = ordine;
 									task.mese = new Array($scope.month.length);
 									for (var i = 0; i < (task.mese).length; i++) {
-										var dayOfTask = new Date(moment($scope.firstOfMoment).add(i, 'd'));//new Date($scope.selectedYear, $scope.selectedMonth, i+1);
+										var dayOfTask = new Date(moment($scope.firstOfMomentISO).add(i, 'd'));//new Date($scope.selectedYear, $scope.selectedMonth, i+1);
 										var isPlanned = false;
 										var loop = true;
 										taskStarts.forEach(function (taskStart, index) {
@@ -132,20 +132,20 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 										task.mese[i] = {
 											planned: isPlanned,
 											editable: ordineStart > dayOfTask || ordineEnd <= dayOfTask ? false : true,
-											isWeekend: $scope.month[i].day == "Sab" || $scope.month[i].day == "Dom" ? true : false
+											isWeekend: $scope.month[i].isWeekend
 										}
 									}
-									$http.get('/storico/' + firstOfMomentISO +
-										'/' + lastOfMomentISO + '/' + ordine.id + '/' + task.ids).
+									$http.get('/storico/' + $scope.firstOfMomentISO +
+										'/' + $scope.lastOfMomentISO + '/' + ordine.id + '/' + task.ids).
 										success(function (data, status, headers, config) {
 											data.forEach(function (storico) {
-												var index = (moment(storico.giorno).diff(moment($scope.firstOfMoment), 'days'));//.getDate())-1
+												var index = (moment(storico.giorno).diff(moment($scope.firstOfMomentISO), 'days'));//.getDate())-1
 												storico.ferie = storico.ferie === 0 ? false : true;
 												storico.ore = storico.secondi ? storico.secondi / 3600 : undefined;
 												storico.unimis = storico.secondi ? "h" : undefined;
 												storico.editable = storico.ferie === true ? false : true;
 												storico.planned = task.mese[index].planned;
-												storico.isWeekend = $scope.month[index].day == "Sab" || $scope.month[index].day == "Dom" ? true : false
+												storico.isWeekend = $scope.month[index].isWeekend
 												task.mese[index] = storico;
 												$scope.month[index].ferie = storico.ferie;
 											});
@@ -358,7 +358,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 				idordine: task.order.id,
 				idattivita: task.ids,
 				idrisorsa: $rootScope.user.id,
-				giorno: moment($scope.firstOfMoment).add($index, 'd'),
+				giorno: moment($scope.firstOfMomentISO).add($index, 'd'),
 				secondi: 0,
 				note: undefined,
 				ferie: true
@@ -428,7 +428,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		day.ore = editore;
 		day.secondi = day.ore * 3600;
 		day.unimis = "h";
-		day.giorno = moment($scope.firstOfMoment).add($index, 'd');
+		day.giorno = moment($scope.firstOfMomentISO).add($index, 'd');
 		day.note = editnote;
 		var dati = {
 			idordine: task.order.id,
@@ -647,7 +647,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		var weekPicker = $('#inputWeek')[0];
 		var colorPicker = $('#inputColor')[0];
 		var datePicker = $('#inputDate')[0];
-		var monthNamesArray = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+		var monthNamesArray = moment.months();//["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
 		$timeout(function () {
 			if (monthPicker.type === 'text') {
 				$('#inputMonth').datepicker({
@@ -852,8 +852,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	}
 	$scope.makeReport = function () {
 		var reportFormat = "DD-MM-YYYY";
-		var firstVisualizedMoment = moment($scope.firstOfMoment);
-		var lastVisualizedMoment = moment($scope.lastOfMoment);
+		var firstVisualizedMoment = moment($scope.firstOfMomentISO);
+		var lastVisualizedMoment = moment($scope.lastOfMomentISO);
 		if (window.location.hostname.split('.')[2] == 'com' || window.location.hostname.split('.')[2] == 'bogus') {
 			$window.open("http://salgemma." + window.location.hostname.split('.')[1] + "." + window.location.hostname.split('.')[2] + ":8080/salgemma/report/generate?format=pdf&dagiorno="
 				+ firstVisualizedMoment.format(reportFormat) + "&agiorno=" + lastVisualizedMoment.format(reportFormat)
@@ -894,8 +894,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 			});
 	}
 	$scope.initializeReportDate = function () {
-		$scope.editFromDate = moment($scope.firstOfMoment).toDate();
-		$scope.editToDate = moment($scope.lastOfMoment).toDate();
+		$scope.editFromDate = moment($scope.firstOfMomentISO).toDate();
+		$scope.editToDate = moment($scope.lastOfMomentISO).toDate();
 	}
 	$scope.makePersonalizedReport = function (editFromDate, editToDate) {
 		var reportFormat = "DD-MM-YYYY";
