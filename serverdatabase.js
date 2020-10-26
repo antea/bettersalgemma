@@ -11,7 +11,7 @@ var moment = require('moment');
 var excel = require("exceljs");
 var clockingTaskCreator = require("./clockingTaskCreator.js");
 var excelClockingCreator = require("./excelClockingCreator.js");
-moment.locale('it');
+//moment.locale('it');
 
 server.set('port', 8585);
 server.use(express.urlencoded({
@@ -27,7 +27,8 @@ var pool = mysql.createPool({
 	user: 'matteos',
 	password: 'matteos',
 	waitForConnections: true,
-	connectionLimit: 20
+	connectionLimit: 20,
+	timezone: 'Z'
 });
 
 server.listen(server.get('port'), function () {

@@ -19,13 +19,13 @@ function AutenticazioneCtrl($rootScope, $scope, $http, $location, $cookies) {
 }
 
 function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, $window) {
-	var now = moment();
+	var now = moment.utc();
 	$scope.selectedDate = new Date(now.set('D', 15));
 	$scope.isXOverflow = false;
 	$scope.hasClockings = false;
 	$scope.isJustRedrawing = false;
 	$scope.isMonthSelected = true;
-	$scope.selectedMoment = moment($scope.selectedDate);
+	$scope.selectedMoment = moment.utc($scope.selectedDate);
 	$scope.selectedMonth = $scope.selectedMoment.get('month');
 	$scope.selectedYear = $scope.selectedMoment.get('year');
 	$scope.ordini = [];
@@ -45,10 +45,10 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		$scope.month = [];
 		var monthIndex = 0;
 		//var lastOfMonth = new Date($scope.selectedYear, $scope.selectedMonth+1, 0).getDate();
-		$scope.firstOfMoment = moment($scope.selectedMoment).startOf($scope.calendarType);
-		$scope.lastOfMoment = moment($scope.selectedMoment).endOf($scope.calendarType);
-		$scope.firstOfMomentISO = moment($scope.firstOfMoment).toISOString();
-		$scope.lastOfMomentISO = moment($scope.lastOfMoment).toISOString();
+		$scope.firstOfMoment = moment.utc($scope.selectedMoment).startOf($scope.calendarType);
+		$scope.lastOfMoment = moment.utc($scope.selectedMoment).endOf($scope.calendarType);
+		$scope.firstOfMomentISO = moment.utc($scope.firstOfMoment).toISOString();
+		$scope.lastOfMomentISO = moment.utc($scope.lastOfMoment).toISOString();
 		var indexMoment = moment($scope.firstOfMoment);
 		while (moment(indexMoment).isBefore(moment($scope.lastOfMomentISO))) {
 			$scope.month[monthIndex] = {
@@ -139,7 +139,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 										'/' + $scope.lastOfMomentISO + '/' + ordine.id + '/' + task.ids).
 										success(function (data, status, headers, config) {
 											data.forEach(function (storico) {
-												var index = (moment(storico.giorno).diff(moment($scope.firstOfMomentISO), 'days'));//.getDate())-1
+												var index = (moment.utc(storico.giorno).diff(moment($scope.firstOfMomentISO), 'days'));//.getDate())-1
 												storico.ferie = storico.ferie === 0 ? false : true;
 												storico.ore = storico.secondi ? storico.secondi / 3600 : undefined;
 												storico.unimis = storico.secondi ? "h" : undefined;
@@ -528,7 +528,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		if ($cookies.get('filteredOrders') !== undefined) {
 			$cookies.remove('fiteredOrders');
 		}
-		var lastMomentOfThisYear = moment().endOf('year').toDate();
+		var lastMomentOfThisYear = moment.utc().endOf('year').toDate();
 		$cookies.putObject('filteredOrders', filteredOrders, { 'expires': lastMomentOfThisYear });
 	}
 	/*
@@ -670,7 +670,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 					},
 					beforeShowDay: function (date) {
 						var cssClass = '';
-						if (date >= moment($scope.selectedDate).startOf("month") && date <= moment($scope.selectedDate).endOf("month"))
+						if (date >= moment.utc($scope.selectedDate).startOf("month") && date <= moment.utc($scope.selectedDate).endOf("month"))
 							cssClass = 'ui-state-active';
 						return [true, cssClass];
 					}
@@ -707,7 +707,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 					},
 					beforeShowDay: function (date) {
 						var cssClass = '';
-						if (date >= moment($scope.selectedDate).startOf("week") && date <= moment($scope.selectedDate).endOf("week"))
+						if (date >= moment.utc($scope.selectedDate).startOf("week") && date <= moment.utc($scope.selectedDate).endOf("week"))
 							cssClass = 'ui-state-active';
 						return [true, cssClass];
 					}
@@ -899,8 +899,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	}
 	$scope.makePersonalizedReport = function (editFromDate, editToDate) {
 		var reportFormat = "DD-MM-YYYY";
-		var fromMomentReport = moment(editFromDate);
-		var toMomentReport = moment(editToDate);
+		var fromMomentReport = moment.utc(editFromDate);
+		var toMomentReport = moment.utc(editToDate);
 		if (window.location.hostname.split('.')[2] == 'com' || window.location.hostname.split('.')[2] == 'bogus') {
 			$window.open("http://salgemma." + window.location.hostname.split('.')[1] + "." + window.location.hostname.split('.')[2] + ":8080/salgemma/report/generate?format=pdf&dagiorno="
 				+ fromMomentReport.format(reportFormat) + "&agiorno=" + toMomentReport.format(reportFormat)
@@ -910,7 +910,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		}
 	}
 	$scope.calculateCalendar = function () {
-		$scope.selectedMoment = moment($scope.selectedDate);
+		$scope.selectedMoment = moment.utc($scope.selectedDate);
 		$scope.selectedMonth = $scope.selectedMoment.get('month');
 		$scope.selectedYear = $scope.selectedMoment.get('year');
 		retrieveInfo();
@@ -918,15 +918,15 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	$scope.calendarTypeMonth = function () {
 		$scope.calendarType = "month";
 		$scope.isMonthSelected = true;
-		var now = moment();
+		var now = moment.utc();
 		$scope.selectedDate = new Date(now.set('D', 15));
 		$scope.calculateCalendar();
 	};
 	$scope.calendarTypeWeek = function () {
 		$scope.calendarType = "week";
 		$scope.isMonthSelected = false;
-		var now = moment();
-		if (moment($scope.selectedDate).diff(now, 'month') === 0) {
+		var now = moment.utc();
+		if (moment.utc($scope.selectedDate).diff(now, 'month') === 0) {
 			$scope.selectedDate = new Date(now);
 		}
 		$scope.calculateCalendar();
