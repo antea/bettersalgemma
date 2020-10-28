@@ -26,12 +26,12 @@ const MAX_END_LUNCH = { hour: 14, minute: 0 };
 function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
 	var workedPayedTime = moment.duration(-1, 'h');
 	if (momentArray.length == 4 || momentArray.length == 2) {
-		var firstClockingMoment = moment(momentArray[0]).second(0);
-		var lastClockingMoment = momentArray.length == 4 ? moment(momentArray[3]).second(0) : moment(momentArray[1]).second(0);
-		var minStartMoment = moment(firstClockingMoment).set(MIN_START_TIME);
-		var maxStartMoment = moment(firstClockingMoment).set(MAX_START_TIME);
-		var maxEndMoment = moment(maxStartMoment).add(fullTimeHours + 1, 'h');
-		var minEndMoment = moment(minStartMoment).add(fullTimeHours + 1, 'h');
+		var firstClockingMoment = moment.utc(momentArray[0]).second(0);
+		var lastClockingMoment = momentArray.length == 4 ? moment.utc(momentArray[3]).second(0) : moment.utc(momentArray[1]).second(0);
+		var minStartMoment = moment.utc(firstClockingMoment).set(MIN_START_TIME);
+		var maxStartMoment = moment.utc(firstClockingMoment).set(MAX_START_TIME);
+		var maxEndMoment = moment.utc(maxStartMoment).add(fullTimeHours + 1, 'h');
+		var minEndMoment = moment.utc(minStartMoment).add(fullTimeHours + 1, 'h');
 		var startDelay = 0;
 		var endAdvance = 0;
 		if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
@@ -79,10 +79,10 @@ function calculateClockingsForFullTimeEmployee(fullTimeHours, momentArray) {
  * @return {Number} lunchPeriod
  */
 function calculateLunchbreak(startLunch, endLunch, lunchErrors) {
-	var minStartLunch = moment(startLunch).set(MIN_START_LUNCH);
-	var maxEndLunch = moment(startLunch).set(MAX_END_LUNCH);
-	startLunch = moment(startLunch).second(0);
-	endLunch = moment(endLunch).second(0);
+	var minStartLunch = moment.utc(startLunch).set(MIN_START_LUNCH);
+	var maxEndLunch = moment.utc(startLunch).set(MAX_END_LUNCH);
+	startLunch = moment.utc(startLunch).second(0);
+	endLunch = moment.utc(endLunch).second(0);
 	if (startLunch.isBefore(minStartLunch, 'minute')) {
 		var minRoundedStartLunch = moment(minStartLunch);
 		while (startLunch.isBefore(moment(minRoundedStartLunch).subtract(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
@@ -120,13 +120,13 @@ function calculateClockingsForPartTimeEmployee(momentArray) {
 	if (momentArray.length == 4) {
 		workedTime = calculateClockingsForFullTimeEmployee(8, momentArray);
 	} else if (momentArray.length == 2) {
-		var firstClockingMoment = moment(momentArray[0]);
-		var lastClockingMoment = moment(momentArray[1]);
-		firstClockingMoment = moment(firstClockingMoment).second(0);
-		lastClockingMoment = moment(lastClockingMoment).second(0);
+		var firstClockingMoment = moment.utc(momentArray[0]);
+		var lastClockingMoment = moment.utc(momentArray[1]);
+		firstClockingMoment = moment.utc(firstClockingMoment).second(0);
+		lastClockingMoment = moment.utc(lastClockingMoment).second(0);
 		if (moment(firstClockingMoment).isBefore(moment(firstClockingMoment).set(MIN_START_LUNCH))) {
-			var minStartMoment = moment(firstClockingMoment).set(MIN_START_TIME);
-			var maxStartMoment = moment(firstClockingMoment).set(MAX_START_TIME);
+			var minStartMoment = moment.utc(firstClockingMoment).set(MIN_START_TIME);
+			var maxStartMoment = moment.utc(firstClockingMoment).set(MAX_START_TIME);
 			if (firstClockingMoment.isBefore(minStartMoment, 'minute')) {
 				firstClockingMoment = moment(minStartMoment);
 			} else if (firstClockingMoment.isAfter(maxStartMoment, 'minute')) {
@@ -145,7 +145,7 @@ function calculateClockingsForPartTimeEmployee(momentArray) {
 				lastClockingMoment = moment(minRoundedLastMoment);
 			};
 		} else {
-			var maxStartMoment = moment(firstClockingMoment).set(MAX_END_LUNCH);
+			var maxStartMoment = moment.utc(firstClockingMoment).set(MAX_END_LUNCH);
 			if (firstClockingMoment.isAfter(maxStartMoment, 'minute')) {
 				var maxRoundedStartMoment = moment(maxStartMoment);
 				while (firstClockingMoment.isAfter(moment(maxRoundedStartMoment).add(MAX_TOLERANCE_IN_MINUTES, 'm'), 'minute')) {
@@ -181,10 +181,10 @@ function calculateClockingsForPartTimeEmployee(momentArray) {
 function calculateActualClockedTime(momentArray) {
 	var actualClockedTime = moment.duration(-1, 'h');
 	if (momentArray.length == 4) {
-		firstClockingMoment = moment(momentArray[0]).second(0);
-		secondClockingMoment = moment(momentArray[1]).second(0);
-		thirdClockingMoment = moment(momentArray[2]).second(0);
-		lastClockingMoment = moment(momentArray[3]).second(0);
+		firstClockingMoment = moment.utc(momentArray[0]).second(0);
+		secondClockingMoment = moment.utc(momentArray[1]).second(0);
+		thirdClockingMoment = moment.utc(momentArray[2]).second(0);
+		lastClockingMoment = moment.utc(momentArray[3]).second(0);
 		actualClockedTime = moment(secondClockingMoment).diff(moment(firstClockingMoment), 'minutes')
 			+ moment(lastClockingMoment).diff(moment(thirdClockingMoment), 'minutes');
 		actualClockedTime = moment.duration(actualClockedTime - (actualClockedTime % TOTAL_ROUND_MINUTES), 'm');
@@ -202,8 +202,8 @@ function calculateClockingsForPivaEmployee(momentArray) {
 	if (momentArray.length % 2 == 0) {
 		actualClockedTime = 0;
 		for (i = momentArray.length - 1; i > 0; i -= 2) {
-			secondClockingMoment = moment(momentArray[i]).second(0);
-			firstClockingMoment = moment(momentArray[i - 1]).second(0);
+			secondClockingMoment = moment.utc(momentArray[i]).second(0);
+			firstClockingMoment = moment.utc(momentArray[i - 1]).second(0);
 			var tempActualClockedTime = moment(secondClockingMoment).diff(moment(firstClockingMoment), 'minutes');
 			actualClockedTime += tempActualClockedTime;
 		}
@@ -213,7 +213,7 @@ function calculateClockingsForPivaEmployee(momentArray) {
 }
 
 function createClockings(clockingsFromDB, firstOfMoment, lastOfMoment, user) {
-	var monthLength = (moment(lastOfMoment).diff(moment(firstOfMoment), 'days')) + 1;
+	var monthLength = (moment.utc(lastOfMoment).diff(moment.utc(firstOfMoment), 'days')) + 1;
 	var clockingTask = {};
 	clockingTask = { mese: new Array(monthLength), totalWorkedTime: 0, totalActualTime: 0 };
 	for (var d = 0; d < monthLength; d++) {

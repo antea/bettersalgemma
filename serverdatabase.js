@@ -741,8 +741,8 @@ server.get('/getexcel/:start/:end', function (req, res) {
 		res.status(HttpStatus.UNAUTHORIZED).end();
 	} else {
 		var user = JSON.parse(decodeURIComponent(req.cookies.user));
-		var start = moment(req.params.start);
-		var end = moment(req.params.end);
+		var start = moment.utc(req.params.start);
+		var end = moment.utc(req.params.end);
 		getClockingForUser(user, start, end, function (errors, results) {
 			if (errors) {
 				res.status(HttpStatus.SERVICE_UNAVAILABLE).send(errors);
@@ -750,7 +750,7 @@ server.get('/getexcel/:start/:end', function (req, res) {
 				var userClockingsArray = [{ user: user, clockingTask: results }];
 				var workbook = new excel.Workbook();
 				workbook.creator = "BetterSalgemma";
-				workbook.created = moment().toDate();
+				workbook.created = moment.utc().toDate();
 				var sheet = workbook.addWorksheet(user.nome);
 				excelClockingCreator.createClockingTableExcel(sheet, userClockingsArray, start);
 				res.setHeader("Content-Type", "application/vnd.ms-excel");
@@ -766,13 +766,13 @@ server.get('/getexcel/:start/:end', function (req, res) {
 });
 
 server.get('/gettotalexcel/:start/:end', function (req, res) {
-	var start = moment(req.params.start);
-	var end = moment(req.params.end);
+	var start = moment.utc(req.params.start);
+	var end = moment.utc(req.params.end);
 	createAndSendTotalExcel(res, start, end);
 });
 
 server.get('/gettotalexcelpreviousmonth', function (req, res) {
-	var previousMonth = moment().subtract(1, 'months');
+	var previousMonth = moment.utc().subtract(1, 'months');
 	var start = moment(previousMonth).startOf('month');
 	var end = moment(previousMonth).endOf('month');
 	createAndSendTotalExcel(res, start, end);
@@ -786,7 +786,7 @@ function createAndSendTotalExcel(res, start, end) {
 		} else {
 			var workbook = new excel.Workbook();
 			workbook.creator = "BetterSalgemma";
-			workbook.created = moment();
+			workbook.created = moment.utc();
 			var monthString = moment(end).format("MMMM-YYYY");
 			var sheet = workbook.addWorksheet(monthString);
 			excelClockingCreator.createClockingTableExcel(sheet, results, start);

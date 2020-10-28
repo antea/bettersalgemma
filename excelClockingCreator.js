@@ -25,7 +25,7 @@ function createClockingTableExcel(sheet, usersClockingsTaskArray, firstOfMoment)
 		var clockingRow = ["Ore Pagate"];
 		var differenceRow = ["Differenza"];
 		clockingTask.mese.forEach(function (day, index) {
-			var dayOfMonth = moment(firstOfMoment).add(index, 'days').date();
+			var dayOfMonth = moment.utc(firstOfMoment).add(index, 'days').date();
 			headersRow.push(dayOfMonth);
 			actualClockingRow.push(day.actualWorkedTime);
 			clockingRow.push(day.calculatedWorkedTime);
@@ -153,7 +153,7 @@ function setStyleToTable(sheet, firstRowTable, lastRowTable, firstOfMoment) {
 				cell.style = cellStyle;
 			} else {
 				var styleToUse = cellStyle;
-				var momentDay = moment(firstOfMoment).add(colNumber - 2, 'd');
+				var momentDay = moment.utc(firstOfMoment).add(colNumber - 2, 'd');
 				if (momentDay.day() === 0 || momentDay.day() === 6) {
 					styleToUse = yellowStyle;
 				}

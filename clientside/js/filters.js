@@ -56,14 +56,14 @@ angular.module('salgemmainterfaceFilters', [])
 					contentString = "<p>Rivolgiti al responsabile del personale.</p>";
 					scope.taskDay.clockings.forEach(function (clocking, index) {
 						description = index == 0 ? "Ingresso: " : index == scope.taskDay.clockings.length - 1 ? "Uscita: " : index % 2 == 0 ? "Fine pausa: " : "Inizio pausa: ";
-						contentString += "<p><em>" + description + "</em>" + moment(clocking).format("HH:mm") + "</p>";
+						contentString += "<p><em>" + description + "</em>" + moment.utc(clocking).format("HH:mm") + "</p>";
 					});
 				} else {
 					//var description = scope.taskDay.clockings.length > 2 ? descriptionFullTime : descriptionPartTime;
 					scope.taskDay.clockings.forEach(function (clocking, index) {
 						titleString = "<strong>Marcature:</strong>";
 						description = index == 0 ? "Ingresso: " : index == scope.taskDay.clockings.length - 1 ? "Uscita: " : index % 2 == 0 ? "Fine pausa: " : "Inizio pausa: ";
-						contentString += "<p><em>" + description + "</em>" + moment(clocking).format("HH:mm") + "</p>";
+						contentString += "<p><em>" + description + "</em>" + moment.utc(clocking).format("HH:mm") + "</p>";
 					});
 					//contentString += "<p><strong>Ore effettive: </strong>" + scope.taskDay.actualWorkedTime + "</p>";
 					if (scope.taskDay.warning) {
