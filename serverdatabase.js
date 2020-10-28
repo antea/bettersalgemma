@@ -26,8 +26,10 @@ var pool = mysql.createPool({
 	database: 'matteos2',
 	user: 'matteos',
 	password: 'matteos',
-	waitForConnections: true,
-	connectionLimit: 20,
+	// Scommentare le righe seguenti per attivare il limite di connessione e 
+	// togliere l'attesa in caso di limite raggiunto e lanciare errore; 
+	connectionLimit: y20, //default 10
+	waitForConnection: true, //default=true
 	timezone: 'Z'
 });
 
