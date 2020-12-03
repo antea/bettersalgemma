@@ -852,8 +852,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 	}
 	$scope.makeReport = function () {
 		var reportFormat = "DD-MM-YYYY";
-		var firstVisualizedMoment = moment($scope.firstOfMomentISO);
-		var lastVisualizedMoment = moment($scope.lastOfMomentISO);
+		var firstVisualizedMoment = moment.utc($scope.firstOfMomentISO);
+		var lastVisualizedMoment = moment.utc($scope.lastOfMomentISO);
 		if (window.location.hostname.split('.')[2] == 'com' || window.location.hostname.split('.')[2] == 'bogus') {
 			$window.open("http://salgemma." + window.location.hostname.split('.')[1] + "." + window.location.hostname.split('.')[2] + ":8080/salgemma/report/generate?format=pdf&dagiorno="
 				+ firstVisualizedMoment.format(reportFormat) + "&agiorno=" + lastVisualizedMoment.format(reportFormat)
@@ -894,8 +894,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 			});
 	}
 	$scope.initializeReportDate = function () {
-		$scope.editFromDate = moment($scope.firstOfMomentISO).toDate();
-		$scope.editToDate = moment($scope.lastOfMomentISO).toDate();
+		$scope.editFromDate = moment.utc($scope.firstOfMomentISO).toDate();
+		$scope.editToDate = moment.utc($scope.lastOfMomentISO).toDate();
 	}
 	$scope.makePersonalizedReport = function (editFromDate, editToDate) {
 		var reportFormat = "DD-MM-YYYY";
