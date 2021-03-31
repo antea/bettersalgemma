@@ -7,12 +7,12 @@
 		"start": "nodemon serverdatabase.js"
 	},
 	"dependencies": {
-		"express": "4.17.1",
 		"cookie-parser": "1.4.4",
-		"mysql": "2.17.1",
-		"moment": "2.24.0",
 		"exceljs": "3.4.0",
-		"http-status-codes": "1.4.0"
+		"express": "4.17.1",
+		"http-status-codes": "1.4.0",
+		"moment": "2.24.0",
+		"mysql": "2.17.1"
 	},
 	"devDependencies": {
 		"nodemon": "^1.19.4"

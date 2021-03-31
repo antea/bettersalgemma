@@ -49,8 +49,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		$scope.lastOfMoment = moment.utc($scope.selectedMoment).endOf($scope.calendarType);
 		$scope.firstOfMomentISO = moment.utc($scope.firstOfMoment).toISOString();
 		$scope.lastOfMomentISO = moment.utc($scope.lastOfMoment).toISOString();
-		var indexMoment = moment($scope.firstOfMoment);
-		while (moment(indexMoment).isBefore(moment($scope.lastOfMomentISO))) {
+		var indexMoment = moment.utc($scope.firstOfMoment);
+		while (moment.utc(indexMoment).isBefore(moment.utc($scope.lastOfMomentISO))) {
 			$scope.month[monthIndex] = {
 				number: indexMoment.date(),
 				day: $scope.weekName[indexMoment.day()],
@@ -118,7 +118,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 									task.order = ordine;
 									task.mese = new Array($scope.month.length);
 									for (var i = 0; i < (task.mese).length; i++) {
-										var dayOfTask = new Date(moment($scope.firstOfMomentISO).add(i, 'd'));//new Date($scope.selectedYear, $scope.selectedMonth, i+1);
+										var dayOfTask = new Date(moment.utc($scope.firstOfMomentISO).add(i, 'd'));//new Date($scope.selectedYear, $scope.selectedMonth, i+1);
 										var isPlanned = false;
 										var loop = true;
 										taskStarts.forEach(function (taskStart, index) {
@@ -139,7 +139,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 										'/' + $scope.lastOfMomentISO + '/' + ordine.id + '/' + task.ids).
 										success(function (data, status, headers, config) {
 											data.forEach(function (storico) {
-												var index = (moment.utc(storico.giorno).diff(moment($scope.firstOfMomentISO), 'days'));//.getDate())-1
+												var index = (moment.utc(storico.giorno).diff(moment.utc($scope.firstOfMomentISO), 'days'));//.getDate())-1
 												storico.ferie = storico.ferie === 0 ? false : true;
 												storico.ore = storico.secondi ? storico.secondi / 3600 : undefined;
 												storico.unimis = storico.secondi ? "h" : undefined;
@@ -358,7 +358,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 				idordine: task.order.id,
 				idattivita: task.ids,
 				idrisorsa: $rootScope.user.id,
-				giorno: moment($scope.firstOfMomentISO).add($index, 'd'),
+				giorno: moment.utc($scope.firstOfMomentISO).add($index, 'd'),
 				secondi: 0,
 				note: undefined,
 				ferie: true
@@ -428,7 +428,7 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		day.ore = editore;
 		day.secondi = day.ore * 3600;
 		day.unimis = "h";
-		day.giorno = moment($scope.firstOfMomentISO).add($index, 'd');
+		day.giorno = moment.utc($scope.firstOfMomentISO).add($index, 'd');
 		day.note = editnote;
 		var dati = {
 			idordine: task.order.id,
@@ -863,8 +863,8 @@ function CalendarCtrl($rootScope, $scope, $http, $timeout, $location, $cookies, 
 		}
 	}
 	$scope.makeExcel = function () {
-		var firstMomentISO = moment($scope.firstOfMoment).toISOString();
-		var lastMomentISO = moment($scope.lastOfMoment).toISOString();
+		var firstMomentISO = moment.utc($scope.firstOfMoment).toISOString();
+		var lastMomentISO = moment.utc($scope.lastOfMoment).toISOString();
 		//$window.open(window.location.origin + '/getexcel/' + firstMomentISO + '/' + lastMomentISO);
 		$http.get('/getexcel/' + firstMomentISO + '/' + lastMomentISO, { responseType: "arraybuffer" })
 			.success(function (data, status, headers, config) {
